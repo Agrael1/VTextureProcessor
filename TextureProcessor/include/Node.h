@@ -2,11 +2,13 @@
 #include <Source.h>
 #include <Sink.h>
 #include <vector>
+#include <memory>
 
 class Node
 {
 public:
 	Node(std::string_view name);
+	explicit Node(std::string&& name);
 	virtual ~Node() = default;
 public:
 	std::string_view GetName() const noexcept;
@@ -20,7 +22,7 @@ public:
 
 	virtual void Update()noexcept = 0;
 private:
-	std::vector<Sink> sinks;
-	std::vector<Source> sources;
+	std::vector<std::unique_ptr<Sink>> sinks;
+	std::vector<std::unique_ptr<Source>> sources;
 	std::string name;
 };

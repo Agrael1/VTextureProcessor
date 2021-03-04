@@ -4,6 +4,9 @@
 Node::Node(std::string_view name)
 	:name(name)
 {}
+Node::Node(std::string&& name)
+	: name(std::move(name))
+{}
 
 std::string_view Node::GetName() const noexcept
 {
@@ -13,29 +16,31 @@ std::string_view Node::GetName() const noexcept
 Source& Node::GetSource(std::string_view registeredName)
 {
 	for (auto& src : sources)
-		if (src.GetName() == registeredName)
-			return src;
+		if (src->GetName() == registeredName)
+			return *src;
 	throw RGC_EXCEPTION(fmt::sprintf("Source named [%s] not found in node: %s", registeredName, GetName()));
 }
 Sink& Node::GetSink(std::string_view registeredName)
 {
 	for (auto& si : sinks)
-		if (si.GetRegisteredName() == registeredName)
-			return si;
+		if (si->GetRegisteredName() == registeredName)
+			return *si;
 	throw RGC_EXCEPTION(fmt::sprintf("Sink named [%s] not found in node: %s", registeredName, GetName()));
 }
 Source& Node::GetSource(size_t index)
 {
-	return sources.at(index);
+	return *sources.at(index);
 }
 Sink& Node::GetSink(size_t index)
 {
-	return sinks.at(index);
+	return *sinks.at(index);
 }
+
+struct a : Sink { a() :Sink("a") {} int x; };
 
 void Node::RegisterSink()
 {
-
+	
 }
 void Node::RegisterSource()
 {
