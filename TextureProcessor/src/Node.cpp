@@ -36,8 +36,6 @@ Sink& Node::GetSink(size_t index)
 	return *sinks.at(index);
 }
 
-struct a : Sink { a() :Sink("a") {} int x; };
-
 void Node::RegisterSink()
 {
 	

@@ -20,7 +20,7 @@ public:
 	void RegisterSink();
 	void RegisterSource();
 
-	virtual void Update()noexcept = 0;
+	//virtual void Update()noexcept = 0;
 private:
 	std::vector<std::unique_ptr<Sink>> sinks;
 	std::vector<std::unique_ptr<Source>> sources;
