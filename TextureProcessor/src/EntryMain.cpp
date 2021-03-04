@@ -1,7 +1,7 @@
 ﻿// TextureProcessor.cpp: определяет точку входа для приложения.
 //
 
-#include "TextureProcessor.h"
+#include <EntryMain.h>
 
 using namespace std;
 
