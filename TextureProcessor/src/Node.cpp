@@ -32,3 +32,12 @@ Sink& Node::GetSink(size_t index)
 {
 	return sinks.at(index);
 }
+
+void Node::RegisterSink()
+{
+
+}
+void Node::RegisterSource()
+{
+
+}

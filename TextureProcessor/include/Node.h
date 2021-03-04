@@ -14,6 +14,10 @@ public:
 	Sink& GetSink(std::string_view registeredName);
 	Source& GetSource(size_t index);
 	Sink& GetSink(size_t index);
+
+	void RegisterSink();
+	void RegisterSource();
+
 	virtual void Update()noexcept = 0;
 private:
 	std::vector<Sink> sinks;

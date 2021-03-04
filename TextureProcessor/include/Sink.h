@@ -12,6 +12,7 @@ public:
 	void SetTarget(std::string_view nodeName, std::string_view sourceName);
 	virtual void Bind(Source& source) = 0;
 	virtual void PostLinkValidate()const = 0;
+	virtual void Unlink() = 0;
 	virtual ~Sink() = default;
 protected:
 	Sink(std::string_view registeredName);
