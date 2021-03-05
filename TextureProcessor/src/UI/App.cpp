@@ -24,8 +24,8 @@ App::App(int argc, char** argv)
 
     app.setPalette(darkPalette);
 
-	window.emplace();
-	window->showMaximized();
+	window.emplace(1280, 720);
+	window->ShowMaximized();
 }
 
 int App::Start()
