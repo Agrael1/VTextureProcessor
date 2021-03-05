@@ -12,6 +12,7 @@ endif()
 
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
@@ -22,6 +23,8 @@ if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
 endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
+set(CMAKE_BUILD_TYPE "Release")
+
 
 conan_cmake_configure(REQUIRES fmt/7.1.3 GENERATORS cmake_find_package)
 conan_cmake_autodetect(settings)
@@ -31,6 +34,8 @@ conan_cmake_install(PATH_OR_REFERENCE .
                     SETTINGS ${settings})
 
 find_package(fmt)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
 
 # Добавьте источник в исполняемый файл этого проекта.
 add_executable (TextureProcessor 
@@ -50,3 +55,4 @@ add_executable (TextureProcessor
 # TODO: Добавьте тесты и целевые объекты, если это необходимо.
 target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries("${PROJECT_NAME}" fmt::fmt)
+target_link_libraries("${PROJECT_NAME}" Qt5::Widgets)
