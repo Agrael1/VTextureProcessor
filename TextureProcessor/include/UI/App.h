@@ -12,6 +12,8 @@ public:
 	int Start();
 private:
 	std::optional<Window> window;
+	
+	QApplication app;
 private:
 	static constexpr std::string_view AppName = "VTexEditor";
 	static constexpr std::string_view AppVer = "0.0.1";
