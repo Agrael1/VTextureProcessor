@@ -1,10 +1,6 @@
-﻿#include <EntryMain.h>
-#include <GraphCodex.h>
+﻿#include <UI/App.h>
 
-using namespace std;
-
-int main()
+int main(int argc, char** argv)
 {
-	cout << "Hello CMake." << endl;
-	return 0;
+	return App{ argc, argv }.Start();
 }

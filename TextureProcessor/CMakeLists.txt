@@ -10,6 +10,9 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
 endif()
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
@@ -36,23 +39,25 @@ conan_cmake_install(PATH_OR_REFERENCE .
 find_package(fmt)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
+add_compile_definitions(_HAS_DEPRECATED_RESULT_OF=1)
 
 # Добавьте источник в исполняемый файл этого проекта.
 add_executable (TextureProcessor 
 	"src/EntryMain.cpp" 
-	"include/EntryMain.h" 
+	 
 	"include/Sink.h" 
 	"include/Source.h" 
 	"src/Source.cpp" 
 	"src/Sink.cpp" 
 	"include/Link.h" 
 	"src/Link.cpp"
-	"include/Node.h" 
+	"include/UI/UINode.h" 
 	"include/Graph.h"
 	"include/utils/Exception.h"
-	"src/Node.cpp"   "include/GraphCodex.h"  "include/utils/Utils.h")
+	"src/Node.cpp"   "include/GraphCodex.h"  "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp")
 
 # TODO: Добавьте тесты и целевые объекты, если это необходимо.
+target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt5Widgets_INCLUDE_DIRS}")
 target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries("${PROJECT_NAME}" fmt::fmt)
 target_link_libraries("${PROJECT_NAME}" Qt5::Widgets)

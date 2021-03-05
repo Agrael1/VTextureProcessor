@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 
-class Node;
+//class Node;
 
 class Source
 {
@@ -13,5 +13,5 @@ protected:
 	Source(std::string_view name);
 private:
 	std::string name;
-	std::vector<Node*> connections; //tmp update
+	//std::vector<Node*> connections; //tmp update
 };
