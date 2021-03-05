@@ -11,20 +11,17 @@ public:
 		static GraphCodex lazy;
 		return lazy;
 	}
-	Link& MakeLink(Node& from, Node& to)
-	{
 
-	}
+
 	Node& MakeNode(std::string_view name)
 	{
 		return *((*(nodes.emplace(name, std::make_unique<Node>(name)).first)).second);
 	}
 	void EraseNode(std::string_view name)
 	{
-
+		nodes.erase(name);
 	}
 private:
-	std::unordered_map<std::string_view, std::vector<Link>> links;
 	std::unordered_map<std::string_view, std::unique_ptr<Node>> nodes;
 };
 
@@ -39,8 +36,7 @@ namespace vrg
 			GraphCodex::get().EraseNode(impl.GetName());
 		}
 	public:
-		constexpr auto* operator ->()
-		{
+		constexpr auto* operator ->(){
 			return &impl;
 		}
 	private:

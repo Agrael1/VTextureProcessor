@@ -45,7 +45,7 @@ add_executable (TextureProcessor
 	"include/Node.h" 
 	"include/Graph.h"
 	"include/utils/Exception.h"
-	"src/Node.cpp"   "include/GraphCodex.h")
+	"src/Node.cpp"   "include/GraphCodex.h"  "include/utils/Utils.h")
 
 # TODO: Добавьте тесты и целевые объекты, если это необходимо.
 target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

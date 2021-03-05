@@ -17,9 +17,10 @@ public:
 	Source& GetSource(size_t index);
 	Sink& GetSink(size_t index);
 
-	void RegisterSink();
-	void RegisterSource();
+	void RegisterSink(std::unique_ptr<Sink> in);
+	void RegisterSource(std::unique_ptr<Source> in);
 
+	void SetSinkLinkage(std::string_view registeredName, const std::string& target);
 	//virtual void Update()noexcept = 0;
 private:
 	std::vector<std::unique_ptr<Sink>> sinks;
