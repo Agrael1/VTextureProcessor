@@ -13,6 +13,8 @@ Window::Window(int32_t width, int32_t height)
 	scene.setSceneRect(-32000, -32000, 64000, 64000);
 
 	setCentralWidget(&view);
+
+	scene.addItem(&node);
 }
 
 void Window::onClearTriggered()

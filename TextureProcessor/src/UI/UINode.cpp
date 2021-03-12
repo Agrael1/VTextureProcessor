@@ -20,6 +20,9 @@ UINode::UINode()
     setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
 
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+
+    setAcceptHoverEvents(true);
+    setZValue(0);
 }
 
 QRectF UINode::boundingRect() const
@@ -56,4 +59,6 @@ void UINode::paint(QPainter* painter,
     path_content.addRect(0, title_height, edge_size, edge_size);
     path_content.addRect(size.width() - edge_size, title_height, edge_size, edge_size);
     painter->setPen(Qt::NoPen);
+    painter->setBrush(Background);
+    painter->drawPath(path_content.simplified());
 }
