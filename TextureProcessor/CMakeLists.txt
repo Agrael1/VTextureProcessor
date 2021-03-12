@@ -54,7 +54,7 @@ add_executable (TextureProcessor
 	"include/UI/UINode.h" 
 	"include/Graph.h"
 	"include/utils/Exception.h"
-	"src/Node.cpp"   "include/GraphCodex.h"  "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp" "src/UI/NodeBox.cpp" "include/UI/NodeBox.h" "include/UI/NodeView.h" "src/UI/NodeView.cpp")
+	"src/Node.cpp"   "include/GraphCodex.h"  "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp" "src/UI/FlowScene.cpp" "include/UI/FlowScene.h" "include/UI/FlowView.h" "src/UI/FlowView.cpp" "src/UI/UINode.cpp")
 
 # TODO: Добавьте тесты и целевые объекты, если это необходимо.
 target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt5Widgets_INCLUDE_DIRS}")

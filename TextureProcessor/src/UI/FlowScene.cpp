@@ -1,7 +1,7 @@
-#include <UI/NodeBox.h>
+#include <UI/FlowScene.h>
 #include <QPainter>
 
-NodeBox::NodeBox(QObject* parent)
+FlowScene::FlowScene(QObject* parent)
 	:QGraphicsScene(parent)
 	, Cbackground("#393939")
 	, Clight("#2F2F2F")
@@ -15,7 +15,7 @@ NodeBox::NodeBox(QObject* parent)
 	setBackgroundBrush(Bbackground);
 }
 
-void NodeBox::drawBackground(QPainter* painter, const QRectF& rect)
+void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 {
 	// call parent method
 	QGraphicsScene::drawBackground(painter, rect);

@@ -1,10 +1,10 @@
 #pragma once
 #include <QGraphicsScene>
 
-class NodeBox : public QGraphicsScene
+class FlowScene : public QGraphicsScene
 {
 public:
-	NodeBox(QObject* parent);
+	FlowScene(QObject* parent);
 protected:
 	void drawBackground(QPainter* painter, const QRectF& rect) override;
 private:

@@ -1,8 +1,9 @@
 #pragma once
 #include <QMainWindow>
 #include <QMenuBar>
-#include <UI/NodeBox.h>
-#include <UI/NodeView.h>
+#include <UI/FlowScene.h>
+#include <UI/FlowView.h>
+#include <UI/UINode.h>
 
 class Window : public QMainWindow
 {
@@ -22,6 +23,8 @@ private:
 	QMenu menu;
 	QAction Aclear;
 	
-	NodeBox scene;
-	NodeSceneView view;
+	FlowScene scene;
+	FlowView view;
+
+	UINode node;
 };
