@@ -26,9 +26,9 @@ void FlowView::wheelEvent(QWheelEvent* event)
 		return;
 	}
 
-	double const d = delta.y() / std::abs(delta.y());
+	const float d = float(delta.y()) / std::abs(delta.y());
 
-	if (d > 0.0)
+	if (d > 0.0f)
 		scaleUp();
 	else
 		scaleDown();

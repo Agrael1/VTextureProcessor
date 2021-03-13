@@ -12,6 +12,7 @@ constexpr const qreal _pen_width = 1.0;
 constexpr const qreal _socket_size = 6.0;
 
 UINode::UINode()
+    :sinks(4), sources(4), size(150, (2 * std::max(sources, sinks)+2)*diameter)
 {
     setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);
     setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -23,6 +24,8 @@ UINode::UINode()
 
     setAcceptHoverEvents(true);
     setZValue(0);
+
+
 }
 
 QRectF UINode::boundingRect() const
@@ -39,8 +42,14 @@ void UINode::paint(QPainter* painter,
 	const QStyleOptionGraphicsItem* option,
 	QWidget* widget)
 {
+    DrawNodeRect(painter);
+    DrawConnectionPoints(painter);
+}
+
+void UINode::DrawNodeRect(QPainter* painter)
+{
     constexpr qreal edge_size = 10.0;
-    constexpr qreal title_height = 20.0;
+    
 
     // path for the caption of this node
     QPainterPath path_title;
@@ -52,6 +61,7 @@ void UINode::paint(QPainter* painter,
     painter->setBrush(Title);
     painter->drawPath(path_title.simplified());
 
+
     // path for the content of this node
     QPainterPath path_content;
     path_content.setFillRule(Qt::WindingFill);
@@ -61,4 +71,35 @@ void UINode::paint(QPainter* painter,
     painter->setPen(Qt::NoPen);
     painter->setBrush(Background);
     painter->drawPath(path_content.simplified());
+
+    if (isSelected())
+    {
+        painter->setPen({ {"#FFFFFFFF"},2.0 });
+    }
+    else
+    {
+        painter->setPen(Qt::NoPen);
+    }
+    painter->setBrush(Qt::BrushStyle::NoBrush);
+    painter->drawPath((path_title+path_content).simplified());
+
+}
+
+void UINode::DrawConnectionPoints(QPainter* painter)
+{
+    painter->setPen(Sinks);
+    painter->setBrush(BrushSinks);
+    auto ypos = title_height + diameter;
+    for (unsigned int i = 0; i < sinks; ++i, ypos+=diameter+offset)
+    {
+        painter->drawEllipse(-diameter/2, ypos, diameter, diameter);
+    }
+
+    painter->setPen(Sources);
+    painter->setBrush(BrushSources);
+    ypos = title_height + diameter;
+    for (unsigned int i = 0; i < sources; ++i, ypos += diameter + offset)
+    {
+        painter->drawEllipse(size.width()-diameter / 2, ypos, diameter, diameter);
+    }
 }
