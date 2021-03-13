@@ -2,40 +2,32 @@
 #include <QGraphicsItem>
 #include <QBrush>
 #include <QPen>
+#include <Node.h>
+#include <UI/NodeStyle.h>
+#include <optional>
 
-class UINode : public QGraphicsItem
+namespace UI
 {
-public:
-	UINode();
-public:
-	QRectF boundingRect() const override;
-	void paint(QPainter* painter,
-		const QStyleOptionGraphicsItem* option,
-		QWidget* widget = nullptr) override;
-
-private:
-	void DrawNodeRect(QPainter* painter);
-	void DrawConnectionPoints(QPainter* painter);
-private:
-	size_t sinks, sources;
-	QSizeF size;
-
-
-	QPen Sources{ "#FF000000" };
-	QPen Sinks{ "#FF000000" };
-
-	struct Boundary
+	class Node : public QGraphicsItem
 	{
-		QColor Selected{ "#FFFF36A7" };
-		QColor Normal{ "#7F000000" };
-	}bnd;
-	
+	public:
+		Node();
+		Node(QJsonObject document);
+	public:
+		QRectF boundingRect() const override;
+		void paint(QPainter* painter,
+			const QStyleOptionGraphicsItem* option,
+			QWidget* widget = nullptr) override;
 
-	QBrush Title{ "#E3212121" };
-	QBrush Background{ "#E31a1a1a" };
-	QBrush BrushSources{ "#FFFF7700" };
-	QBrush BrushSinks{ "#FF0077FF" };
-	constexpr static const qreal diameter = 10.0;
-	constexpr static const qreal offset = 5;
-	constexpr static const qreal title_height = 20.0;
-};
+	private:
+		void Init();
+		void DrawNodeRect(QPainter* painter);
+		void DrawConnectionPoints(QPainter* painter);
+	private:
+		std::optional<ver::Node> model;
+		NodeStyle style;
+		constexpr static const qreal diameter = 10.0;
+		constexpr static const qreal offset = 5;
+	};
+}
+

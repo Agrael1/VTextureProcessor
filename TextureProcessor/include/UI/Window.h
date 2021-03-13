@@ -26,5 +26,5 @@ private:
 	FlowScene scene;
 	FlowView view;
 
-	UINode node;
+	UI::Node node;
 };

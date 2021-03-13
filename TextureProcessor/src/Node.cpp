@@ -2,6 +2,8 @@
 #include <utils/Exception.h>
 #include <utils/Utils.h>
 
+using namespace ver;
+
 Node::Node(std::string_view name)
 	:name(name)
 {}
