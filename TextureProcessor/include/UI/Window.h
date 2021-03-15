@@ -3,7 +3,6 @@
 #include <QMenuBar>
 #include <UI/FlowScene.h>
 #include <UI/FlowView.h>
-#include <UI/UINode.h>
 
 class Window : public QMainWindow
 {
@@ -25,6 +24,4 @@ private:
 	
 	FlowScene scene;
 	FlowView view;
-
-	UI::Node node;
 };

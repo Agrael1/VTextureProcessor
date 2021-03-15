@@ -1,5 +1,6 @@
 #include <UI/FlowScene.h>
 #include <QPainter>
+#include <fmt/printf.h>
 
 FlowScene::FlowScene(QObject* parent)
 	:QGraphicsScene(parent)
@@ -50,8 +51,19 @@ void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 	// draw calls
 	painter->setPen(Plight);
-	painter->drawLines(lines_light.data(), lines_light.size());
+	painter->drawLines(lines_light.data(), int(lines_light.size()));
 
 	painter->setPen(Pdark);
-	painter->drawLines(lines_dark.data(), lines_dark.size());
+	painter->drawLines(lines_dark.data(), int(lines_dark.size()));
+}
+
+UI::Node& FlowScene::CreateNode(std::string_view name)
+{
+	static int a = 0;
+	auto x = std::make_unique<UI::Node>();
+	auto y = x.get();
+	addItem(y);
+	nodes.emplace(fmt::sprintf("%s_%d", name, a), std::move(x));
+	a++;
+	return *y;
 }

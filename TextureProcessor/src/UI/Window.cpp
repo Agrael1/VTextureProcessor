@@ -2,7 +2,7 @@
 
 
 Window::Window(int32_t width, int32_t height)
-	:menu("File"), Aclear("Clear", this), scene(this), view(&scene)
+	:menu("File"), Aclear("Clear", this), scene(this), view(scene)
 {
 	resize(width, height);
 	menuBar()->addMenu(&menu);
@@ -13,8 +13,6 @@ Window::Window(int32_t width, int32_t height)
 	scene.setSceneRect(-32000, -32000, 64000, 64000);
 
 	setCentralWidget(&view);
-
-	scene.addItem(&node);
 }
 
 void Window::onClearTriggered()
