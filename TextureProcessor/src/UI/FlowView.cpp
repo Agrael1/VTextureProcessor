@@ -1,9 +1,7 @@
 #include <UI/FlowView.h>
 
-#include <QWheelEvent>
-
 FlowView::FlowView(FlowScene& scene)
-	:scene(scene), QGraphicsView(&scene, nullptr)
+	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr)
 {
 	setRenderHints(QPainter::Antialiasing |
 		QPainter::TextAntialiasing |
@@ -35,10 +33,12 @@ void FlowView::wheelEvent(QWheelEvent* event)
 }
 void FlowView::contextMenuEvent(QContextMenuEvent* event)
 {
-	auto& x = scene.CreateNode("somebody");
-	QPoint pos = event->pos();
-	QPointF posView = mapToScene(pos);
-	x.setPos(posView);
+	menu.exec(event->globalPos());
+
+	//auto& x = scene.CreateNode("somebody");
+	//QPoint pos = event->pos();
+	//QPointF posView = mapToScene(pos);
+	//x.setPos(posView);
 }
 
 void FlowView::scaleUp()

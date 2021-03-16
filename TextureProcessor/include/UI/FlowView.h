@@ -1,6 +1,7 @@
 #pragma once
 #include <QGraphicsView>
 #include <UI/FlowScene.h>
+#include <UI/ContextMenu.h>
 
 class FlowView : public QGraphicsView
 {
@@ -12,5 +13,7 @@ public:
 private:
 	void scaleUp();
 	void scaleDown();
+private:
 	FlowScene& scene;
+	ContextMenu menu;
 };

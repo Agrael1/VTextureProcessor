@@ -1,7 +1,5 @@
 #pragma once
 #include <QMainWindow>
-#include <QMenuBar>
-#include <UI/FlowScene.h>
 #include <UI/FlowView.h>
 
 class Window : public QMainWindow

@@ -1,5 +1,4 @@
 #include <UI/NodeStyle.h>
-#include <QJsonArray>
 #include <array>
 
 using namespace UI;
@@ -36,7 +35,7 @@ void NODE_STYLE_READ_COLOR(QJsonObject values, QColor& variable, std::string_vie
         auto colorArray = valueRef.toArray();
         std::array<int, 3> rgb;
         for (size_t i = 0; const auto & it : colorArray) {
-            rgb[i] = it.toInt();
+            rgb[i++] = it.toInt();
         }
         variable = QColor(rgb[0], rgb[1], rgb[2]);
     }

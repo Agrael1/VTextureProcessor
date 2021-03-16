@@ -1,5 +1,3 @@
-#include <QBrush>
-#include <QJsonObject>
 
 namespace UI
 {

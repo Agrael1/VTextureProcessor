@@ -1,7 +1,7 @@
 #pragma once
 #include <QGraphicsScene>
 #include <UI/UINode.h>
-#include <unordered_map>
+#include <UI/FlowCodex.h>
 
 class FlowScene : public QGraphicsScene
 {
@@ -21,5 +21,6 @@ private:
 
 	QBrush Bbackground;
 
-	std::unordered_map<std::string_view, std::unique_ptr<UI::Node>> nodes;
+	FlowCodex codex;
+	std::vector<UI::Node> nodes;
 };

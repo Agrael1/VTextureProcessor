@@ -54,10 +54,11 @@ add_executable (TextureProcessor
 	"include/UI/UINode.h" 
 	"include/Graph.h"
 	"include/utils/Exception.h"
-	"src/Node.cpp"   "include/GraphCodex.h"  "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp" "src/UI/FlowScene.cpp" "include/UI/FlowScene.h" "include/UI/FlowView.h" "src/UI/FlowView.cpp" "src/UI/UINode.cpp"   "include/UI/NodeStyle.h" "src/UI/NodeStyle.cpp")
+	"src/Node.cpp"   "include/GraphCodex.h"  "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp" "src/UI/FlowScene.cpp" "include/UI/FlowScene.h" "include/UI/FlowView.h" "src/UI/FlowView.cpp" "src/UI/UINode.cpp"   "include/UI/NodeStyle.h" "src/UI/NodeStyle.cpp" "include/UI/ContextMenu.h" "include/pch.h" "src/UI/ContextMenu.cpp" "include/UI/FlowCodex.h" "src/UI/FlowCodex.cpp")
 
 # TODO: Добавьте тесты и целевые объекты, если это необходимо.
 target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt5Widgets_INCLUDE_DIRS}")
 target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_precompile_headers("${PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/pch.h")
 target_link_libraries("${PROJECT_NAME}" fmt::fmt)
 target_link_libraries("${PROJECT_NAME}" Qt5::Widgets)

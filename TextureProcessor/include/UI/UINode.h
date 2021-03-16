@@ -1,10 +1,8 @@
 #pragma once
-#include <QGraphicsItem>
-#include <QBrush>
-#include <QPen>
 #include <Node.h>
 #include <UI/NodeStyle.h>
 #include <optional>
+
 
 namespace UI
 {
