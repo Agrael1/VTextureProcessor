@@ -4,7 +4,7 @@
 class FlowCodex
 {
 public:
-	FlowCodex(QJsonObject nodes);
+	FlowCodex(QJsonDocument nodes);
 public:
 
 private:

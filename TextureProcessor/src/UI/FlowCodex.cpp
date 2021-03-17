@@ -1,5 +1,8 @@
 #include <UI/FlowCodex.h>
 
-FlowCodex::FlowCodex(QJsonObject nodes)
+FlowCodex::FlowCodex(QJsonDocument nodes)
 {
+	QJsonObject topLevelObject = nodes.object();
+
+
 }
