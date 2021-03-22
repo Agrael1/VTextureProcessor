@@ -32,6 +32,44 @@ constexpr std::string_view json = R"(
     "Opacity": 0.8
   })";
 
+
+constexpr std::string_view y = R"({
+	"Example": {
+		"Node": {
+			"Group": "Example",
+			"Sources": [{"Name": "Source1", "Type": "Grayscale"}, {"Name": "Source2", "Type": "Grayscale"}],
+			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
+		},
+		"NodeStyle": {
+			"TitleColor":[128,0,0]
+		}
+	},
+	
+	"Example2": {
+		"Node": {
+			"Group": "Example",
+			"Sources": [{"Name": "Source1", "Type": "Grayscale"}, {"Name": "Source2", "Type": "Grayscale"}],
+			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
+		},
+		"NodeStyle": {
+			"TitleColor":"green"
+		}
+	},
+	
+	"Example3": {
+		"Node": {
+			"Group": "Example2",
+			"Sources": [{"Name": "Source1", "Type": "Grayscale"}, {"Name": "Source2", "Type": "Grayscale"}],
+			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
+		},
+		"NodeStyle": {
+			"TitleColor":"cyan"
+		}
+	}
+})";
+
+QJsonParseError e;
+
 FlowScene::FlowScene(QObject* parent)
 	:QGraphicsScene(parent)
 	, Cbackground("#393939")
@@ -40,7 +78,7 @@ FlowScene::FlowScene(QObject* parent)
 	, Plight(Clight)
 	, Pdark(Cdark)
 	, Bbackground(Cbackground)
-	, codex(QJsonDocument::fromJson(json.data()))
+	, codex(QJsonDocument::fromJson(y.data(),&e))
 {
 	Plight.setWidth(0);
 	Pdark.setWidth(0);
@@ -88,7 +126,7 @@ void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->drawLines(lines_dark.data(), int(lines_dark.size()));
 }
 
-UI::Node& FlowScene::CreateNode(std::string_view name)
+UI::Node& FlowScene::CreateNode(std::wstring_view name)
 {
-	return nodes[0];
+	return nodes.emplace_back(codex.MakeNode(name));
 }

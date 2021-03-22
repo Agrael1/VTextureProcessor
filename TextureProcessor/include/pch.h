@@ -6,3 +6,4 @@
 #include <QTreeWidget>
 #include <QWidgetAction>
 #include <QHeaderView>
+#include <QGraphicsScene>
