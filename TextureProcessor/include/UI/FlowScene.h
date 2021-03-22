@@ -7,6 +7,10 @@ class FlowScene : public QGraphicsScene
 public:
 	FlowScene(QObject* parent);
 public:
+	auto& GetGroupList()const noexcept
+	{
+		return codex.CatMap();
+	}
 	UI::Node& CreateNode(std::wstring_view name);
 protected:
 	void drawBackground(QPainter* painter, const QRectF& rect) override;

@@ -1,5 +1,5 @@
 #include <UI/FlowView.h>
-
+#pragma optimize ("", off)
 FlowView::FlowView(FlowScene& scene)
 	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr)
 {
@@ -12,6 +12,17 @@ FlowView::FlowView(FlowScene& scene)
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
+	auto& m = scene.GetGroupList();
+	for (const auto& x : m)
+	{
+		menu.AppendGroup(x.first);
+		for (const auto& y : x.second)
+		{
+			menu.AppendItem(y);
+		}
+	}	
+	menu.Finish();
 }
 
 void FlowView::wheelEvent(QWheelEvent* event)
@@ -33,7 +44,7 @@ void FlowView::wheelEvent(QWheelEvent* event)
 }
 void FlowView::contextMenuEvent(QContextMenuEvent* event)
 {
-	menu.exec(event->globalPos());
+	menu.Execute(event->globalPos());
 
 	//auto& x = scene.CreateNode("somebody");
 	//QPoint pos = event->pos();
