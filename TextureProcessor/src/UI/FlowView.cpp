@@ -48,7 +48,7 @@ void FlowView::wheelEvent(QWheelEvent* event)
 void FlowView::contextMenuEvent(QContextMenuEvent* event)
 {
 	last_event = event->pos();
-	menu.Execute(last_event = event->globalPos());
+	menu.Execute(event->globalPos());
 
 	//auto& x = scene.CreateNode(L"somebody");
 	
@@ -84,7 +84,7 @@ void FlowView::OnItemSelected(QTreeWidgetItem* item, int)
 	auto& type = scene.CreateNode(modelName);
 	{
 		
-		QPointF posView = this->mapToScene(menu.pos());
+		QPointF posView = this->mapToScene(last_event);
 
 		type.setPos(posView);
 	}
