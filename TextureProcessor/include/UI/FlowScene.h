@@ -12,6 +12,7 @@ public:
 		return codex.CatMap();
 	}
 	UI::Node& CreateNode(std::wstring_view name);
+	void Clear();
 protected:
 	void drawBackground(QPainter* painter, const QRectF& rect) override;
 private:
@@ -25,5 +26,5 @@ private:
 	QBrush Bbackground;
 
 	FlowCodex codex;
-	std::vector<UI::Node> nodes;
+	std::list<UI::Node> nodes;
 };

@@ -1,6 +1,8 @@
 #include <UI/UINode.h>
 #include <unordered_map>
 
+#pragma optimize("",off)
+
 class FlowCodex
 {
 public:

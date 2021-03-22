@@ -17,5 +17,5 @@ Window::Window(int32_t width, int32_t height)
 
 void Window::onClearTriggered()
 {
-	scene.clear();
+	scene.Clear();
 }

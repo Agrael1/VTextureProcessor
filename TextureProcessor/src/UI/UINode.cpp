@@ -36,6 +36,11 @@ Node::Node(QJsonObject document)
     Init();
 }
 
+UI::Node::Node(const Node& other) noexcept
+    :model(), style(other.style)
+{
+    Init();
+}
 QRectF Node::boundingRect() const
 {
     return QRectF(

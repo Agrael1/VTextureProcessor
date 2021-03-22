@@ -1,4 +1,5 @@
 #include <UI/FlowView.h>
+
 #pragma optimize ("", off)
 FlowView::FlowView(FlowScene& scene)
 	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr)
@@ -12,6 +13,7 @@ FlowView::FlowView(FlowScene& scene)
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+	setCacheMode(QGraphicsView::CacheBackground);
 
 	auto& m = scene.GetGroupList();
 	for (const auto& x : m)
@@ -21,8 +23,9 @@ FlowView::FlowView(FlowScene& scene)
 		{
 			menu.AppendItem(y);
 		}
-	}	
+	}
 	menu.Finish();
+	menu.SetItemClickCallback([this](QTreeWidgetItem* item, int) {OnItemSelected(item, 0); });
 }
 
 void FlowView::wheelEvent(QWheelEvent* event)
@@ -44,10 +47,11 @@ void FlowView::wheelEvent(QWheelEvent* event)
 }
 void FlowView::contextMenuEvent(QContextMenuEvent* event)
 {
-	menu.Execute(event->globalPos());
+	last_event = event->pos();
+	menu.Execute(last_event = event->globalPos());
 
-	//auto& x = scene.CreateNode("somebody");
-	//QPoint pos = event->pos();
+	//auto& x = scene.CreateNode(L"somebody");
+	
 	//QPointF posView = mapToScene(pos);
 	//x.setPos(posView);
 }
@@ -66,4 +70,24 @@ void FlowView::scaleDown()
 {
 	constexpr double factor = 1/1.2;
 	scale(factor, factor);
+}
+
+void FlowView::OnItemSelected(QTreeWidgetItem* item, int)
+{
+	auto modelName = item->data(0, Qt::UserRole).toString().toStdWString();
+
+	if (modelName == skipper)
+	{
+		return;
+	}
+
+	auto& type = scene.CreateNode(modelName);
+	{
+		
+		QPointF posView = this->mapToScene(menu.pos());
+
+		type.setPos(posView);
+	}
+
+	menu.close();
 }

@@ -11,10 +11,7 @@ namespace UI
 	public:
 		Node();
 		Node(QJsonObject document);
-		Node(const Node& other) noexcept
-			:model(), style(style)
-		{
-		}
+		Node(const Node& other) noexcept;
 	public:
 		QRectF boundingRect() const override;
 		void paint(QPainter* painter,

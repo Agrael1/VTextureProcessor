@@ -13,7 +13,10 @@ public:
 private:
 	void scaleUp();
 	void scaleDown();
+	void OnItemSelected(QTreeWidgetItem* item, int);
 private:
 	FlowScene& scene;
 	ContextMenu menu;
+
+	QPoint last_event;
 };

@@ -83,6 +83,7 @@ FlowScene::FlowScene(QObject* parent)
 	Plight.setWidth(0);
 	Pdark.setWidth(0);
 	setBackgroundBrush(Bbackground);
+	setItemIndexMethod(QGraphicsScene::NoIndex);
 }
 
 void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
@@ -128,5 +129,13 @@ void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 UI::Node& FlowScene::CreateNode(std::wstring_view name)
 {
-	return nodes.emplace_back(codex.MakeNode(name));
+	auto& x = nodes.emplace_back(codex.MakeNode(name));
+	addItem(&x);
+	return x;
+}
+
+void FlowScene::Clear()
+{
+	nodes.clear();
+	clear();
 }

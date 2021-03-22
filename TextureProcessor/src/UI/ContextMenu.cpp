@@ -22,16 +22,16 @@ ContextMenu::ContextMenu(QWidget* parent)
 void ContextMenu::AppendGroup(std::wstring_view groupName)
 {
     auto& item = *new QTreeWidgetItem(&selection);
-    item.setText(0, QString::fromWCharArray(groupName.data(), groupName.size()));
-    item.setData(0, Qt::UserRole, "XXX");
+    item.setText(0, QString::fromWCharArray(groupName.data(), int(groupName.size())));
+    item.setData(0, Qt::UserRole, QString::fromWCharArray(skipper.data(),int(skipper.size())));
     current_group = &item;
 }
 
 void ContextMenu::AppendItem(std::wstring_view item)
 {
     auto& xitem = *new QTreeWidgetItem(current_group);
-    xitem.setText(0, QString::fromWCharArray(item.data(), item.size()));
-    xitem.setData(0, Qt::UserRole, QString::fromWCharArray(item.data(), item.size()));
+    xitem.setText(0, QString::fromWCharArray(item.data(), int(item.size())));
+    xitem.setData(0, Qt::UserRole, QString::fromWCharArray(item.data(), int(item.size())));
 }
 void ContextMenu::Finish()
 {
