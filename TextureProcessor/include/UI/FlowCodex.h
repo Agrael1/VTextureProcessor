@@ -11,9 +11,9 @@ public:
 	{
 		return cats;
 	}
-	UI::Node MakeNode(std::string_view in)
+	UI::Node&& MakeNode(std::string_view in)
 	{
-		return codex.at(in.data());
+		return std::move(codex.at(in.data()));
 	}
 private:
 	std::unordered_map<std::string, UI::Node> codex;
