@@ -19,7 +19,7 @@ namespace UI
 			QWidget* widget = nullptr) override;
 		std::string_view GetName()const noexcept
 		{
-			return model->GetName();
+			return model.GetName();
 		}
 		std::string_view GetStyleName()const noexcept
 		{
@@ -27,12 +27,13 @@ namespace UI
 		}
 
 	private:
+	private:
 		void Init();
 		void DrawNodeRect(QPainter* painter);
 		void DrawConnectionPoints(QPainter* painter);
 		void DrawCaptionName(QPainter* painter);
 	private:
-		std::optional<ver::Node> model;
+		ver::Node model;
 		NodeStyle style;
 		constexpr static const qreal diameter = 10.0;
 		constexpr static const qreal offset = 5;

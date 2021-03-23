@@ -33,7 +33,7 @@ Node::Node(QJsonObject document, std::string_view name)
 }
 
 UI::Node::Node(const Node& other) noexcept
-    :model(), style(other.style)
+    :model(other.model), style(other.style)
 {
     printf("copy called\n");
     Init();

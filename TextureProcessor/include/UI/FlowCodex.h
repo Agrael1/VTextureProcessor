@@ -1,21 +1,29 @@
 #include <UI/UINode.h>
 #include <unordered_map>
 
-
-class FlowCodex
+namespace UI
 {
-public:
-	FlowCodex(QJsonDocument nodes);
-public:
-	const auto& CatMap()const noexcept
+	class FlowCodex
 	{
-		return cats;
-	}
-	UI::Node&& MakeNode(std::string_view in)
-	{
-		return std::move(codex.at(in.data()));
-	}
-private:
-	std::unordered_map<std::string, UI::Node> codex;
-	std::unordered_map<std::string, std::vector<std::string_view>> cats;
-};
+		template<class C>
+		struct RefCountPair : C
+		{
+			template<typename ...Args>
+			RefCountPair(Args&&... in)
+				:C(std::forward<Args>(in)...)
+			{}
+			mutable size_t refcount = 0;
+		};
+	public:
+		FlowCodex(QJsonDocument nodes);
+	public:
+		const auto& CatMap()const noexcept
+		{
+			return cats;
+		}
+		std::pair<const UI::Node&, size_t> MakeNode(std::string_view in)const;
+	private:
+		std::unordered_map<std::string, RefCountPair<UI::Node>> codex;
+		std::unordered_map<std::string, std::vector<std::string_view>> cats;
+	};
+}

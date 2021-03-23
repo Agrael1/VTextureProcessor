@@ -25,6 +25,6 @@ private:
 
 	QBrush Bbackground;
 
-	FlowCodex codex;
-	std::list<UI::Node> nodes;
+	UI::FlowCodex codex;
+	std::unordered_map<std::string, UI::Node> nodes;
 };

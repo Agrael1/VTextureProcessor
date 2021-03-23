@@ -129,9 +129,14 @@ void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 UI::Node& FlowScene::CreateNode(std::string_view name)
 {
-	auto& x = nodes.emplace_back(codex.MakeNode(name));
-	addItem(&x);
-	return x;
+	auto r = codex.MakeNode(name);
+	auto x = nodes.emplace(std::piecewise_construct,
+		std::forward_as_tuple(fmt::sprintf("%s_%zu",name, r.second)),
+		std::forward_as_tuple(r.first)
+	);
+	
+	addItem(&x.first->second);
+	return x.first->second;
 }
 
 void FlowScene::Clear()
