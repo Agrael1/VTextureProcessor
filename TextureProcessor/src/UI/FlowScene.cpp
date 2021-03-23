@@ -41,7 +41,8 @@ constexpr std::string_view y = R"({
 			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
 		},
 		"NodeStyle": {
-			"TitleColor":[128,0,0]
+			"TitleColor":[128,0,0],
+			"FontColor" : "white"
 		}
 	},
 	
@@ -52,7 +53,8 @@ constexpr std::string_view y = R"({
 			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
 		},
 		"NodeStyle": {
-			"TitleColor":"green"
+			"TitleColor": "green",
+			"FontColor" : "white"
 		}
 	},
 	
@@ -63,7 +65,8 @@ constexpr std::string_view y = R"({
 			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
 		},
 		"NodeStyle": {
-			"TitleColor":"cyan"
+			"TitleColor": "cyan",
+			"FontColor" : "white"
 		}
 	}
 })";

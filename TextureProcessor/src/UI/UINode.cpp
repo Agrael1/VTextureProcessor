@@ -54,6 +54,7 @@ void Node::paint(QPainter* painter,
 {
     DrawNodeRect(painter);
     DrawConnectionPoints(painter);
+    DrawCaptionName(painter);
 }
 
 void Node::DrawNodeRect(QPainter* painter)
@@ -114,5 +115,20 @@ void Node::DrawConnectionPoints(QPainter* painter)
 }
 void Node::DrawCaptionName(QPainter* painter)
 {
+    QString name{ style.StyleName().data() };
+    QFont f = painter->font();
+    f.setBold(true);
+    
+    QFontMetrics metrics(f);
+    auto rect = metrics.boundingRect(name);
 
+    QPointF position((style.MinWidth() - rect.width()) / 2.0,
+        (NodeStyle::title_height - rect.height()/2.0));
+
+    painter->setFont(f);
+    painter->setPen(style.FontColor());
+    painter->drawText(position, name);
+
+    f.setBold(false);
+    painter->setFont(f);
 }

@@ -13,6 +13,7 @@ namespace UI
 		auto MinHeight()const noexcept { return minsize.height(); }
 		auto Background()const noexcept { return brBackground; }
 		auto Title()const noexcept { return brTitle; }
+		auto FontColor()const noexcept { return font_color; }
 		std::string_view StyleName()const noexcept {return styleName;}
 	private:
 		QSizeF minsize{150, 120};
@@ -23,6 +24,7 @@ namespace UI
 		}boundary;
 		QBrush brTitle{ "#E3212121" };
 		QBrush brBackground{ "#E31a1a1a" };
+		QColor font_color{ "#7FFFFFFF" };
 		std::string styleName;
 	};
 }
