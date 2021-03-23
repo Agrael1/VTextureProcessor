@@ -9,19 +9,28 @@ namespace UI
 	class Node : public QGraphicsItem
 	{
 	public:
-		Node();
-		Node(QJsonObject document);
+		Node() = delete;
+		Node(QJsonObject document, std::string_view name);
 		Node(const Node& other) noexcept;
 	public:
 		QRectF boundingRect() const override;
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
+		std::string_view GetName()const noexcept
+		{
+			return model->GetName();
+		}
+		std::string_view GetStyleName()const noexcept
+		{
+			return style.StyleName();
+		}
 
 	private:
 		void Init();
 		void DrawNodeRect(QPainter* painter);
 		void DrawConnectionPoints(QPainter* painter);
+		void DrawCaptionName(QPainter* painter);
 	private:
 		std::optional<ver::Node> model;
 		NodeStyle style;

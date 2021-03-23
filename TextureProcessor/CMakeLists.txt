@@ -26,7 +26,7 @@ if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
 endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
-set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Debug")
 
 
 conan_cmake_configure(REQUIRES fmt/7.1.3 GENERATORS cmake_find_package)
@@ -62,3 +62,19 @@ target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}
 target_precompile_headers("${PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/pch.h")
 target_link_libraries("${PROJECT_NAME}" fmt::fmt)
 target_link_libraries("${PROJECT_NAME}" Qt5::Widgets)
+
+if(WIN32)
+    if($<CONFIG:Debug>)
+        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
+    else($<CONFIG:Debug>)
+        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_RELEASE)
+    endif($<CONFIG:Debug>)
+    add_custom_command(
+        TARGET "${PROJECT_NAME}" POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:Qt5::Widgets>
+        $<TARGET_FILE:Qt5::Core>
+        $<TARGET_FILE:Qt5::Gui>
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    )
+endif(WIN32)

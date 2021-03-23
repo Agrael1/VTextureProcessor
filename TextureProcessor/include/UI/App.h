@@ -12,8 +12,6 @@ public:
 	int Start();
 private:
 	std::optional<Window> window;
-
-	UI::Node node;
 	QApplication app;
 private:
 	static constexpr std::string_view AppName = "VTexEditor";

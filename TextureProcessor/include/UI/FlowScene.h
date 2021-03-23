@@ -11,7 +11,7 @@ public:
 	{
 		return codex.CatMap();
 	}
-	UI::Node& CreateNode(std::wstring_view name);
+	UI::Node& CreateNode(std::string_view name);
 	void Clear();
 protected:
 	void drawBackground(QPainter* painter, const QRectF& rect) override;

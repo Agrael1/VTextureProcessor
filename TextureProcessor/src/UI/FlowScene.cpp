@@ -127,7 +127,7 @@ void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->drawLines(lines_dark.data(), int(lines_dark.size()));
 }
 
-UI::Node& FlowScene::CreateNode(std::wstring_view name)
+UI::Node& FlowScene::CreateNode(std::string_view name)
 {
 	auto& x = nodes.emplace_back(codex.MakeNode(name));
 	addItem(&x);

@@ -26,12 +26,8 @@ void Node::Init()
     setZValue(0);
 }
 
-Node::Node()
-{
-    Init();
-}
-Node::Node(QJsonObject document)
-    :style(document)
+Node::Node(QJsonObject document, std::string_view name)
+    :style(document, name)
 {
     Init();
 }
@@ -39,6 +35,7 @@ Node::Node(QJsonObject document)
 UI::Node::Node(const Node& other) noexcept
     :model(), style(other.style)
 {
+    printf("copy called\n");
     Init();
 }
 QRectF Node::boundingRect() const
@@ -114,4 +111,8 @@ void Node::DrawConnectionPoints(QPainter* painter)
     //{
     //    painter->drawEllipse(MinWidth()-diameter / 2, ypos, diameter, diameter);
     //}
+}
+void Node::DrawCaptionName(QPainter* painter)
+{
+
 }

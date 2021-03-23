@@ -7,12 +7,13 @@ namespace UI
 		constexpr static const qreal title_height = 20.0;
 	public:
 		NodeStyle() = default;
-		NodeStyle(QJsonObject document);
+		NodeStyle(QJsonObject document, std::string_view styleName);
 	public:
 		auto MinWidth()const noexcept { return minsize.width(); }
 		auto MinHeight()const noexcept { return minsize.height(); }
 		auto Background()const noexcept { return brBackground; }
 		auto Title()const noexcept { return brTitle; }
+		std::string_view StyleName()const noexcept {return styleName;}
 	private:
 		QSizeF minsize{150, 120};
 		struct
@@ -22,6 +23,7 @@ namespace UI
 		}boundary;
 		QBrush brTitle{ "#E3212121" };
 		QBrush brBackground{ "#E31a1a1a" };
+		std::string styleName;
 	};
 }
 

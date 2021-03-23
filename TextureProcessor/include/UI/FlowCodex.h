@@ -1,7 +1,6 @@
 #include <UI/UINode.h>
 #include <unordered_map>
 
-#pragma optimize("",off)
 
 class FlowCodex
 {
@@ -12,11 +11,11 @@ public:
 	{
 		return cats;
 	}
-	UI::Node MakeNode(std::wstring_view in)
+	UI::Node MakeNode(std::string_view in)
 	{
 		return codex.at(in.data());
 	}
 private:
-	std::unordered_map<std::wstring, UI::Node> codex;
-	std::unordered_map<std::wstring, std::vector<std::wstring>> cats;
+	std::unordered_map<std::string, UI::Node> codex;
+	std::unordered_map<std::string, std::vector<std::string_view>> cats;
 };

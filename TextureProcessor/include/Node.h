@@ -10,7 +10,7 @@ namespace ver
 	{
 	public:
 		Node(std::string_view name);
-		explicit Node(std::string&& name);
+		Node(std::string&& name);
 		virtual ~Node() = default;
 	public:
 		std::string_view GetName() const noexcept;

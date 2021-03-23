@@ -4,10 +4,10 @@
 
 using namespace ver;
 
-Node::Node(std::string_view name)
+inline Node::Node(std::string_view name)
 	:name(name)
 {}
-Node::Node(std::string&& name)
+inline Node::Node(std::string&& name)
 	: name(std::move(name))
 {}
 

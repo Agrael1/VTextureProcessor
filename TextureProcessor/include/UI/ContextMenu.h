@@ -5,8 +5,8 @@ class ContextMenu : public QMenu
 public:
 	ContextMenu(QWidget* parent);
 public:
-	void AppendGroup(std::wstring_view groupName);
-	void AppendItem(std::wstring_view item);
+	void AppendGroup(std::string_view groupName);
+	void AppendItem(std::string_view item);
 	void Finish();
 	void Execute(const QPoint& where);
 
@@ -22,4 +22,4 @@ private:
 	QTreeWidgetItem* current_group;
 };
 
-constexpr std::wstring_view skipper = L"XXXX";
+constexpr std::string_view skipper = "XXXX";
