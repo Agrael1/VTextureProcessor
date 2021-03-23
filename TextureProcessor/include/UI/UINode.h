@@ -8,6 +8,7 @@ namespace UI
 {
 	class Node : public QGraphicsItem
 	{
+		friend class FlowScene;
 	public:
 		Node() = delete;
 		Node(QJsonObject document, std::string_view name);

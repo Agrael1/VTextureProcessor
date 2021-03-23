@@ -6,7 +6,7 @@
 class FlowView : public QGraphicsView
 {
 public:
-	FlowView(FlowScene& scene);
+	FlowView(UI::FlowScene& scene);
 public:
 	void wheelEvent(QWheelEvent* event) override;
 	void contextMenuEvent(QContextMenuEvent* event)override;
@@ -15,7 +15,7 @@ private:
 	void scaleDown();
 	void OnItemSelected(QTreeWidgetItem* item, int);
 private:
-	FlowScene& scene;
+	UI::FlowScene& scene;
 	ContextMenu menu;
 
 	QPoint last_event;

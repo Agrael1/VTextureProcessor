@@ -70,6 +70,8 @@ constexpr std::string_view y = R"({
 
 QJsonParseError e;
 
+using namespace UI;
+
 FlowScene::FlowScene(QObject* parent)
 	:QGraphicsScene(parent)
 	, Cbackground("#393939")
@@ -134,7 +136,7 @@ UI::Node& FlowScene::CreateNode(std::string_view name)
 		std::forward_as_tuple(fmt::sprintf("%s_%zu",name, r.second)),
 		std::forward_as_tuple(r.first)
 	);
-	
+	x.first->second.model.SetUniqueName(x.first->first);
 	addItem(&x.first->second);
 	return x.first->second;
 }
@@ -142,5 +144,6 @@ UI::Node& FlowScene::CreateNode(std::string_view name)
 void FlowScene::Clear()
 {
 	nodes.clear();
+	codex.ClearCounts();
 	clear();
 }

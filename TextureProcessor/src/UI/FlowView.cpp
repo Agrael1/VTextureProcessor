@@ -1,7 +1,7 @@
 #include <UI/FlowView.h>
 
 
-FlowView::FlowView(FlowScene& scene)
+FlowView::FlowView(UI::FlowScene& scene)
 	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr)
 {
 	setRenderHints(QPainter::Antialiasing |

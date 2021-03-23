@@ -21,6 +21,11 @@ namespace UI
 		{
 			return cats;
 		}
+		void ClearCounts()
+		{
+			for (auto&& x : codex)
+				x.second.refcount = 0;
+		}
 		std::pair<const UI::Node&, size_t> MakeNode(std::string_view in)const;
 	private:
 		std::unordered_map<std::string, RefCountPair<UI::Node>> codex;

@@ -20,6 +20,6 @@ private:
 	QMenu menu;
 	QAction Aclear;
 	
-	FlowScene scene;
+	UI::FlowScene scene;
 	FlowView view;
 };
