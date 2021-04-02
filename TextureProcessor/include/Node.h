@@ -23,15 +23,17 @@ namespace ver
 		Sink& GetSink(std::string_view registeredName);
 		Source& GetSource(size_t index);
 		Sink& GetSink(size_t index);
+		size_t SourcesCount()const noexcept { return sources.size(); }
+		size_t SinksCount()const noexcept { return sinks.size(); }
 
-		void RegisterSink(pv::polymorphic_value<Sink> in);
-		void RegisterSource(pv::polymorphic_value<Source> in);
+		void RegisterSink(std::unique_ptr<Sink> in);
+		void RegisterSource(std::unique_ptr<Source> in);
 
 		void SetSinkLinkage(std::string_view registeredName, const std::string& target);
 		//virtual void Update()noexcept = 0;
-	private:
-		std::vector<pv::polymorphic_value<Sink>> sinks;
-		std::vector<pv::polymorphic_value<Source>> sources;
+	protected:
+		std::vector<std::unique_ptr<Sink>> sinks;
+		std::vector<std::unique_ptr<Source>> sources;
 		std::string_view name;
 	};
 

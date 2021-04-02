@@ -28,6 +28,6 @@ namespace UI
 		QBrush Bbackground;
 
 		UI::FlowCodex codex;
-		std::unordered_map<std::string, UI::Node> nodes;
+		std::unordered_map<std::string, pv::polymorphic_value<UI::Node>> nodes;
 	};
 }

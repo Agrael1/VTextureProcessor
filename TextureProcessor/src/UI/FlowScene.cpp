@@ -4,6 +4,7 @@
 constexpr std::string_view y = R"({
 	"Square": {
 		"Node": {
+			"Class": "Texture",
 			"Group": "Shapes",
 			"Sources": [{"Name": "Shape", "Type": "Grayscale"}],
 			"Sinks": []
@@ -20,6 +21,7 @@ constexpr std::string_view y = R"({
 	
 	"Example2": {
 		"Node": {
+			"Class": "Texture",
 			"Group": "Example",
 			"Sources": [{"Name": "Source1", "Type": "Grayscale"}, {"Name": "Source2", "Type": "Grayscale"}],
 			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
@@ -36,6 +38,7 @@ constexpr std::string_view y = R"({
 	
 	"Example3": {
 		"Node": {
+			"Class": "Texture",
 			"Group": "Example2",
 			"Sources": [{"Name": "Source1", "Type": "Grayscale"}, {"Name": "Source2", "Type": "Grayscale"}],
 			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
@@ -119,9 +122,9 @@ UI::Node& FlowScene::CreateNode(std::string_view name)
 		std::forward_as_tuple(fmt::sprintf("%s_%zu",name, r.second)),
 		std::forward_as_tuple(r.first)
 	);
-	x.first->second.model.SetUniqueName(x.first->first);
-	addItem(&x.first->second);
-	return x.first->second;
+	x.first->second->SetUniqueName(x.first->first);
+	addItem(&*x.first->second);
+	return *x.first->second;
 }
 
 void FlowScene::Clear()

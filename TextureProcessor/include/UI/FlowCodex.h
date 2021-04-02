@@ -1,18 +1,18 @@
 #pragma once
-#include <UI/UINode.h>
+#include <UI/TextureNode.h> 
 #include <unordered_map>
 
 namespace UI
 {
 	class FlowCodex
 	{
-		template<class C>
-		struct RefCountPair : C
+		struct RefCountPair: public pv::polymorphic_value<UI::Node>
 		{
-			template<typename ...Args>
-			RefCountPair(Args&&... in)
-				:C(std::forward<Args>(in)...)
-			{}
+			template<typename T, typename ...Args>
+			static RefCountPair set(Args&&... in)
+			{
+				return { pv::polymorphic_value<UI::Node>(pv::make_polymorphic_value<T>(std::forward<Args>(in)...)) };
+			}
 			mutable size_t refcount = 0;
 		};
 	public:
@@ -27,9 +27,9 @@ namespace UI
 			for (auto&& x : codex)
 				x.second.refcount = 0;
 		}
-		std::pair<const UI::Node&, size_t> MakeNode(std::string_view in)const;
+		std::pair<const pv::polymorphic_value<UI::Node>&, size_t> MakeNode(std::string_view in)const;
 	private:
-		std::unordered_map<std::string, RefCountPair<UI::Node>> codex;
+		std::unordered_map<std::string, RefCountPair> codex;
 		std::unordered_map<std::string, std::vector<std::string_view>> cats;
 	};
 }

@@ -23,6 +23,8 @@ ShaderNode::ShaderNode(QJsonObject document)
 		xshader += x.toString();
 	}
 
+	shader = std::make_shared<NodePrivate>(std::move(xshader));
+
 	auto sources = node["Sources"].toArray();
 	for (auto it : sources)
 	{
@@ -30,6 +32,9 @@ ShaderNode::ShaderNode(QJsonObject document)
 		auto type = source["Type"].toString();
 		if (type == "Grayscale")
 		{
+			auto sname = source["Name"].toString().toStdString();
+			RegisterSource(GrayscaleSource::Make(sname,
+				shader->shadercode, outputs.emplace_back(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D))));
 		}
 	}
 
@@ -39,6 +44,22 @@ ShaderNode::ShaderNode(QJsonObject document)
 		auto sink = it.toObject();
 		sink["Name"];
 	}
+}
 
-
+ShaderNode::ShaderNode(const ShaderNode& other)
+	:shader(other.shader)
+{
+	sinks.reserve(other.SinksCount());
+	sources.reserve(other.SourcesCount());
+	for (auto& s : other.sources)
+	{
+		switch (s->GetType())
+		{
+		case Source::Type::Grayscale:
+			RegisterSource(GrayscaleSource::Make(s->GetName(),
+				shader->shadercode, outputs.emplace_back(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D))));
+		default:
+			break;
+		}
+	}
 }

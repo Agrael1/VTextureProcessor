@@ -11,18 +11,21 @@ FlowCodex::FlowCodex(QJsonDocument nodes)
 	{
 		QJsonObject obj = topLevelObject[key].toObject();
 		auto wkey = key.toStdString();
-		auto pair = codex.emplace(
-			std::piecewise_construct,
-			std::forward_as_tuple(wkey),
-			std::forward_as_tuple(obj, wkey)
-		);
+		auto node = obj["Node"].toObject();
 
-		auto x = obj["Node"].toObject()["Group"].toString().toStdString();
-		cats[x].emplace_back(pair.first->second.GetStyleName());
+		RefCountPair p;
+		
+		if(node["Class"].toString() == "Texture")
+			p = RefCountPair::set<TextureNode>(obj, wkey);
+
+		auto pair = codex.emplace(wkey, std::move(p));
+
+		auto x = node["Group"].toString().toStdString();
+		cats[x].emplace_back(pair.first->second->GetStyleName());
 	}
 }
 
-std::pair<const UI::Node&, size_t> FlowCodex::MakeNode(std::string_view in)const
+std::pair<const pv::polymorphic_value<UI::Node>&, size_t> FlowCodex::MakeNode(std::string_view in)const
 {
 	const auto& r = codex.at(in.data());
 	return { r, r.refcount++ };

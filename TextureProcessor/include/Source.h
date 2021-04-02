@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 
-//class Node;
+class QOpenGLTexture;
 
 class Source
 {
@@ -13,8 +13,11 @@ public:
 	};
 public:
 	std::string_view GetName()const noexcept;
+	auto GetType()const noexcept { return type; }
+
 	virtual ~Source() = default;
 	virtual std::string_view YieldShader();
+	virtual std::shared_ptr<QOpenGLTexture> YieldTexture();
 protected:
 	Source(std::string_view name, Type ty);
 private:

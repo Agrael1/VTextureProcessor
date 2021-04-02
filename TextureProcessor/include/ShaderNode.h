@@ -13,9 +13,10 @@ namespace ver
 		};
 	public:
 		ShaderNode(QJsonObject document);
+		ShaderNode(const ShaderNode& other);
 	public:
 	private:
-		std::vector<QOpenGLTexture> outs;
+		std::vector<std::shared_ptr<QOpenGLTexture>> outputs;
 		std::shared_ptr<NodePrivate> shader;
 	};
 }

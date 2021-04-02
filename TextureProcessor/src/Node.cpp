@@ -39,7 +39,7 @@ Sink& Node::GetSink(size_t index)
 	return *sinks.at(index);
 }
 
-void Node::RegisterSink(pv::polymorphic_value<Sink> in)
+void Node::RegisterSink(std::unique_ptr<Sink> in)
 {
 	// check for overlap of input names
 	for (auto& si : sinks)
@@ -48,7 +48,7 @@ void Node::RegisterSink(pv::polymorphic_value<Sink> in)
 
 	sinks.push_back(std::move(in));
 }
-void Node::RegisterSource(pv::polymorphic_value<Source> in)
+void Node::RegisterSource(std::unique_ptr<Source> in)
 {
 	// check for overlap of output names
 	using namespace std::string_literals;

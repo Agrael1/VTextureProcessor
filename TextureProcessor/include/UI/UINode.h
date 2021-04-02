@@ -18,23 +18,23 @@ namespace UI
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
-		std::string_view GetName()const noexcept
-		{
-			return model.GetName();
-		}
+		virtual std::string_view GetName()const noexcept = 0;
+		virtual size_t SourcesCount()const noexcept { return 0; }
+		virtual size_t SinksCount()const noexcept { return 0; }
+
 		std::string_view GetStyleName()const noexcept
 		{
 			return style.StyleName();
 		}
 
 	private:
+		virtual void SetUniqueName(std::string_view xname) = 0;
 	private:
 		void Init();
 		void DrawNodeRect(QPainter* painter);
 		void DrawConnectionPoints(QPainter* painter);
 		void DrawCaptionName(QPainter* painter);
 	private:
-		ver::Node model;
 		NodeStyle style;
 		constexpr static const qreal diameter = 10.0;
 		constexpr static const qreal offset = 5;
