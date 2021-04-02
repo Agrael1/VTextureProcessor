@@ -7,3 +7,4 @@
 #include <QWidgetAction>
 #include <QHeaderView>
 #include <QGraphicsScene>
+#include <QOpenGLContext>

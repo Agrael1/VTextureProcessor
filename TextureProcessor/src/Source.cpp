@@ -1,7 +1,7 @@
 #include <Source.h>
 #include <utils/Exception.h>
 
-Source::Source(std::string_view name) :name(name) 
+Source::Source(std::string_view name, Type ty) :name(name), type(ty)
 {
 	if (name.empty())
 	{
@@ -20,5 +20,8 @@ std::string_view Source::GetName() const noexcept
 {
 	return name;
 }
-
+std::string_view Source::YieldShader()
+{
+	throw RGC_EXCEPTION("Output cannot be accessed as shader");
+}
 

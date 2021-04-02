@@ -1,3 +1,4 @@
+#pragma once
 #include <UI/UINode.h>
 #include <unordered_map>
 

@@ -1,3 +1,4 @@
+#pragma once
 
 class ContextMenu : public QMenu
 {

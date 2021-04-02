@@ -1,4 +1,5 @@
 #include <UI/UINode.h>
+#include <UI/PortsGeometry.h>
 
 constexpr const qreal _hard_min_width = 150.0;
 constexpr const qreal _hard_min_height = 120.0;
