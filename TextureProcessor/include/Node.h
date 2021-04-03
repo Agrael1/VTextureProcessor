@@ -3,9 +3,9 @@
 #include <Sink.h>
 #include <vector>
 #include <memory>
-#include <utils/polymorphic_value.h>
+#include <span>
 
-namespace pv = isocpp_p0201;
+
 
 namespace ver
 {
@@ -17,6 +17,14 @@ namespace ver
 		Node(std::string&& name);
 		virtual ~Node() = default;
 	public:
+		std::span<const std::unique_ptr<Source>> GetSources()const noexcept
+		{
+			return sources;
+		}
+		std::span<const std::unique_ptr<Sink>> GetSinks()const noexcept
+		{
+			return sinks;
+		}
 		void SetUniqueName(std::string_view xname) { name = xname; }
 		std::string_view GetName() const noexcept;
 		Source& GetSource(std::string_view registeredName);

@@ -2,6 +2,8 @@
 #include <array>
 
 using namespace UI;
+const PortStyle PortStyle::Grayscale;
+
 
 static inline QColor ReadColor(QJsonObject values, std::string_view varname)
 {
