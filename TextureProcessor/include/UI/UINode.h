@@ -28,6 +28,7 @@ namespace UI
 		}
 	protected:
 		void CalculateSize(QSizeF minsize = {})noexcept;
+		qreal EffectiveHeight()const noexcept { return body_size.height() - NodeStyle::title_height - 2 * NodeStyle::item_padding; }
 		
 		QSizeF body_size;
 	private:

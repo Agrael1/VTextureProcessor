@@ -6,11 +6,7 @@ namespace UI
 	class TextureNode : public Node
 	{
 	public:
-		TextureNode(QJsonObject document, std::string_view name) 
-			:Node(document, name), model(document)
-		{
-			CalculateSize({128,128});
-		}
+		TextureNode(QJsonObject document, std::string_view name);
 	public:
 		std::string_view GetName()const noexcept override { return model.GetName(); }
 		size_t SourcesCount()const noexcept override { return model.SourcesCount(); }
@@ -21,7 +17,10 @@ namespace UI
 	private:
 		void SetUniqueName(std::string_view xname)override{	model.SetUniqueName(xname);}
 		void DrawConnectionPoints(QPainter* painter);
+		void DrawTexture(QPainter* painter);
 	private:
+		QPen frame{ {"#FFFFFFFF"}, 2.0f};
+		QImage texture;
 		ver::ShaderNode model;
 	};
 }

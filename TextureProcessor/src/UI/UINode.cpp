@@ -1,10 +1,5 @@
 #include <UI/UINode.h>
 
-constexpr const qreal _top_margin = 30.0;
-constexpr const qreal _bottom_margin = 15.0;
-constexpr const qreal _lr_padding = 10.0;
-
-
 using namespace UI;
 
 void Node::Init()
@@ -38,8 +33,8 @@ UI::Node::Node(const Node& other) noexcept
 void UI::Node::CalculateSize(QSizeF minsize) noexcept
 {
 	qreal max_port = std::max(SourcesCount(), SinksCount()) * PortStyle::port_bbox + NodeStyle::item_padding * 2;
-	qreal max_height = std::max(std::max(minsize.height() + 2 * NodeStyle::item_padding, max_port), NodeStyle::min_height);
-	qreal max_width = std::max(minsize.width() + 2 * NodeStyle::item_padding, NodeStyle::min_width);
+	qreal max_height = NodeStyle::title_height + std::max(std::max(minsize.height() + 2 * NodeStyle::item_padding, max_port), NodeStyle::min_height);
+	qreal max_width = std::max(minsize.width() + PortStyle::port_bbox, NodeStyle::min_width);
 	body_size = { max_width, max_height };
 }
 QRectF Node::boundingRect() const

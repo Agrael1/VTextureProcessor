@@ -17,14 +17,8 @@ namespace ver
 		Node(std::string&& name);
 		virtual ~Node() = default;
 	public:
-		std::span<const std::unique_ptr<Source>> GetSources()const noexcept
-		{
-			return sources;
-		}
-		std::span<const std::unique_ptr<Sink>> GetSinks()const noexcept
-		{
-			return sinks;
-		}
+		std::span<const std::unique_ptr<Source>> GetSources()const noexcept	{return sources;}
+		std::span<const std::unique_ptr<Sink>> GetSinks()const noexcept	{return sinks;}
 		void SetUniqueName(std::string_view xname) { name = xname; }
 		std::string_view GetName() const noexcept;
 		Source& GetSource(std::string_view registeredName);
