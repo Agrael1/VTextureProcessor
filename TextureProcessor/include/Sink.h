@@ -1,4 +1,5 @@
 #pragma once
+#include <PortType.h>
 #include <string>
 
 class Source;
@@ -6,6 +7,7 @@ class Source;
 class Sink
 {
 public:
+	auto GetType()const noexcept { return type; }
 	std::string_view GetRegisteredName()const noexcept;
 	std::string_view GetOutputNodeName()const noexcept;
 	std::string_view GetSourceName()const noexcept;
@@ -15,9 +17,10 @@ public:
 	virtual void Unlink() = 0;
 	virtual ~Sink() = default;
 protected:
-	Sink(std::string_view registeredName);
+	Sink(std::string_view registeredName, PortType type);
 private:
 	std::string registeredName;	//sink name
 	std::string nodeName;		//from which node input comes
 	std::string sourceName;		//which source it is
+	PortType type;
 };

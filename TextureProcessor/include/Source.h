@@ -1,4 +1,5 @@
 #pragma once
+#include <PortType.h>
 #include <memory>
 #include <string>
 
@@ -7,11 +8,6 @@ class QOpenGLTexture;
 class Source
 {
 public:
-	enum class Type
-	{
-		Grayscale
-	};
-public:
 	std::string_view GetName()const noexcept;
 	auto GetType()const noexcept { return type; }
 
@@ -19,9 +15,9 @@ public:
 	virtual std::string_view YieldShader();
 	virtual std::shared_ptr<QOpenGLTexture> YieldTexture();
 protected:
-	Source(std::string_view name, Type ty);
+	Source(std::string_view name, PortType ty);
 private:
 	std::string name;
-	Type type;
+	PortType type;
 	//std::vector<Node*> connections; //tmp update
 };

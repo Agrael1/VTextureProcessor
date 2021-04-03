@@ -1,7 +1,7 @@
 #include <Source.h>
 #include <utils/Exception.h>
 
-Source::Source(std::string_view name, Type ty) :name(name), type(ty)
+Source::Source(std::string_view name, PortType ty) :name(name), type(ty)
 {
 	if (name.empty())
 	{

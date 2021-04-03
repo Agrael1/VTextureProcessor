@@ -16,6 +16,7 @@ namespace ver
 		ShaderNode(const ShaderNode& other);
 	public:
 	private:
+		std::vector<std::shared_ptr<QOpenGLTexture>> inputs;
 		std::vector<std::shared_ptr<QOpenGLTexture>> outputs;
 		std::shared_ptr<NodePrivate> shader;
 	};

@@ -19,7 +19,6 @@ namespace UI
 		void DrawConnectionPoints(QPainter* painter);
 		void DrawTexture(QPainter* painter);
 	private:
-		QPen frame{ {"#FFFFFFFF"}, 2.0f};
 		QImage texture;
 		ver::ShaderNode model;
 	};

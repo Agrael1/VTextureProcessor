@@ -1,7 +1,7 @@
 #pragma once
 #include <Source.h>
 
-template <Source::Type ty = Source::Type::Grayscale>
+template <PortType ty = PortType::Grayscale>
 class DirectTextureSource : public Source
 {
 public:
@@ -23,4 +23,4 @@ private:
 	std::string_view shader_value;
 };
 
-using GrayscaleSource = DirectTextureSource<Source::Type::Grayscale>;
+using GrayscaleSource = DirectTextureSource<PortType::Grayscale>;

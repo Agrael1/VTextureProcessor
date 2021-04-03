@@ -1,5 +1,6 @@
 #include <ShaderNode.h>
 #include <SourcesT.h>
+#include <SinksT.h>
 
 using namespace ver;
 
@@ -42,7 +43,12 @@ ShaderNode::ShaderNode(QJsonObject document)
 	for (auto it : sinks)
 	{
 		auto sink = it.toObject();
-		sink["Name"];
+		auto type = sink["Type"].toString();
+		if (type == "Grayscale")
+		{
+			auto sname = sink["Name"].toString().toStdString();
+			RegisterSink(GrayscaleSink::Make(sname, inputs.emplace_back()));
+		}
 	}
 }
 
@@ -55,9 +61,20 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 	{
 		switch (s->GetType())
 		{
-		case Source::Type::Grayscale:
+		case PortType::Grayscale:
 			RegisterSource(GrayscaleSource::Make(s->GetName(),
 				shader->shadercode, outputs.emplace_back(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D))));
+		default:
+			break;
+		}
+	}
+	for (auto& s : other.sinks)
+	{
+		switch (s->GetType())
+		{
+		case PortType::Grayscale:
+			RegisterSink(GrayscaleSink::Make(s->GetRegisteredName(),
+				inputs.emplace_back()));
 		default:
 			break;
 		}
