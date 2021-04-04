@@ -37,8 +37,8 @@ namespace UI
 		void Init();
 		void DrawNodeRect(QPainter* painter);
 		void DrawCaptionName(QPainter* painter);
+
 	private:
-		
 		NodeStyle style;
 		constexpr static const qreal diameter = 10.0;
 		constexpr static const qreal offset = 5;
