@@ -28,6 +28,11 @@ FlowView::FlowView(UI::FlowScene& scene)
 	menu.SetItemClickCallback([this](QTreeWidgetItem* item, int) {OnItemSelected(item, 0); });
 }
 
+UI::Node* FlowView::LocateNode(QPointF pos) noexcept
+{
+	return nullptr;
+}
+
 void FlowView::wheelEvent(QWheelEvent* event)
 {
 	QPoint delta = event->angleDelta();

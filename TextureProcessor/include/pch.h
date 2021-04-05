@@ -8,3 +8,4 @@
 #include <QHeaderView>
 #include <QGraphicsScene>
 #include <QOpenGLContext>
+#include <QGraphicsSceneMouseEvent>

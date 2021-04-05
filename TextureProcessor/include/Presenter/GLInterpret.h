@@ -12,7 +12,7 @@ public:
 private:
 	QOpenGLContext context;
 	QOpenGLPaintDevice device;
-	QOpenGLFunctions funcs;
+	//QOpenGLFunctions funcs;
     QOffscreenSurface surface;
     QOpenGLFramebufferObject frame;
     QOpenGLShaderProgram shaders;

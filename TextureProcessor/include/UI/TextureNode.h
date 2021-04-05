@@ -5,11 +5,6 @@ namespace UI
 {
 	class TextureNode : public Node
 	{
-		enum class Port:uint8_t
-		{
-			Sink,
-			Source
-		};
 	public:
 		TextureNode(QJsonObject document, std::string_view name);
 	public:

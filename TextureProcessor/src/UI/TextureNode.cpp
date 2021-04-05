@@ -1,5 +1,5 @@
 #include <UI/TextureNode.h>
-#include <QGraphicsSceneMouseEvent>
+
 
 UI::TextureNode::TextureNode(QJsonObject document, std::string_view name)
 	:Node(document, name), model(document), texture(128, 128, QImage::Format::Format_ARGB32)
@@ -55,11 +55,11 @@ void UI::TextureNode::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	
 	if (auto port = PortHit(pos))
 	{
-
+		event->accept();
 	}
 }
 
-std::optional<std::pair<UI::TextureNode::Port, uint8_t>> UI::TextureNode::PortHit(QPointF point)
+std::optional<std::pair<Port, uint8_t>> UI::TextureNode::PortHit(QPointF point)
 {
 	if (point.x() < PortStyle::port_bbox)
 	{

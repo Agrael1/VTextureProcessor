@@ -8,9 +8,11 @@ class FlowView : public QGraphicsView
 public:
 	FlowView(UI::FlowScene& scene);
 public:
+	UI::Node* LocateNode(QPointF pos)noexcept;
+
+private:
 	void wheelEvent(QWheelEvent* event) override;
 	void contextMenuEvent(QContextMenuEvent* event)override;
-private:
 	void scaleUp();
 	void scaleDown();
 	void OnItemSelected(QTreeWidgetItem* item, int);
