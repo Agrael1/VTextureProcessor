@@ -1,6 +1,6 @@
 #pragma once 
 
-enum class PortType
+enum class PortType :uint8_t
 {
 	Grayscale
 };

@@ -3,10 +3,11 @@
 
 namespace UI
 {
+	class Node;
 	class Connection : public QGraphicsItem
 	{
 	public:
-		Connection(QPointF pos, Port ty);
+		Connection(Node& node, Port ty, size_t portidx);
 	public:
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
@@ -22,6 +23,7 @@ namespace UI
 		}
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
 	private:
+		std::pair<Node*, Node*> connector{};
 		QPointF in;
 		QPointF out;
 		constexpr static const qreal linewidth = 2.0;

@@ -23,7 +23,12 @@ Node::Node(QJsonObject document, std::string_view name)
 }
 
 UI::Node::Node(const Node& other) noexcept
-	:style(other.style), body_size(other.body_size)
+	:style(other.style), 
+	body_size(other.body_size), 
+	sinks(other.sinks), 
+	sources(other.sources),
+	pdelta_sink(other.pdelta_sink),
+	pdelta_source(other.pdelta_source)
 {
 	printf("copy called\n");
 	Init();
@@ -32,10 +37,14 @@ UI::Node::Node(const Node& other) noexcept
 
 void UI::Node::CalculateSize(QSizeF minsize) noexcept
 {
-	qreal max_port = std::max(SourcesCount(), SinksCount()) * PortStyle::port_bbox + NodeStyle::item_padding * 2;
+	qreal max_port = std::max(sources.size(), sinks.size()) * PortStyle::port_bbox + NodeStyle::item_padding * 2;
 	qreal max_height = NodeStyle::title_height + std::max(std::max(minsize.height() + 2 * NodeStyle::item_padding, max_port), NodeStyle::min_height);
 	qreal max_width = std::max(minsize.width() + PortStyle::port_bbox, NodeStyle::min_width);
 	body_size = { max_width, max_height };
+
+	auto height = max_height - NodeStyle::title_height - NodeStyle::item_padding * 2;
+	pdelta_sink = height / (sinks.size() + 1);
+	pdelta_source = height / (sources.size() + 1);
 }
 QRectF Node::boundingRect() const
 {
@@ -46,6 +55,11 @@ QRectF Node::boundingRect() const
 		body_size.height() + NodeStyle::pen_width / 2.0
 	).normalized();
 }
+QPointF Node::GetPortPos(Port po, size_t pos)
+{
+	return{ po == Port::Sink ? -PortStyle::diameter / 2 : body_size.width() - PortStyle::diameter / 2,
+		NodeStyle::title_height + NodeStyle::item_padding + pdelta_sink - PortStyle::diameter / 2 + pdelta_source * (pos - 1) };
+}
 
 void Node::paint(QPainter* painter,
 	const QStyleOptionGraphicsItem* option,
@@ -53,6 +67,7 @@ void Node::paint(QPainter* painter,
 {
 	DrawNodeRect(painter);
 	DrawCaptionName(painter);
+	DrawConnectionPoints(painter);
 }
 
 void Node::DrawNodeRect(QPainter* painter)
@@ -92,8 +107,6 @@ void Node::DrawNodeRect(QPainter* painter)
 	painter->drawPath((path_title + path_content).simplified());
 
 }
-
-
 void Node::DrawCaptionName(QPainter* painter)
 {
 	QString name{ style.StyleName().data() };
@@ -112,4 +125,53 @@ void Node::DrawCaptionName(QPainter* painter)
 
 	f.setBold(false);
 	painter->setFont(f);
+}
+void UI::Node::DrawConnectionPoints(QPainter* painter)
+{
+	auto& style = PortStyle::Grayscale;
+	painter->setPen(style.port);
+	painter->setBrush(style.brSink);
+
+	auto ypos = NodeStyle::title_height + NodeStyle::item_padding + pdelta_sink - PortStyle::diameter / 2;
+	for (const auto& si : sinks)
+	{
+		painter->drawEllipse(-PortStyle::diameter / 2, ypos, PortStyle::diameter, PortStyle::diameter);
+		ypos += pdelta_sink;
+	}
+
+
+	painter->setBrush(style.brSource);
+	ypos = NodeStyle::title_height + NodeStyle::item_padding + pdelta_source - PortStyle::diameter / 2;
+	for (const auto& so : sources)
+	{
+		painter->drawEllipse(body_size.width() - PortStyle::diameter / 2, ypos, PortStyle::diameter, PortStyle::diameter);
+		ypos += pdelta_source;
+	}
+}
+
+std::optional<std::pair<Port, uint8_t>> UI::Node::PortHit(QPointF point)
+{
+	if (point.x() < PortStyle::port_bbox)
+	{
+		auto startheight = NodeStyle::title_height + NodeStyle::item_padding + pdelta_sink - PortStyle::port_bbox / 2;
+		if (point.y() < startheight)return std::nullopt;
+		for (uint8_t si = 0; si < sinks.size(); si++, startheight += pdelta_sink)
+		{
+			if (point.y() < startheight + PortStyle::port_bbox)
+			{
+				return { {Port::Sink,si} };
+			}
+		}
+		return std::nullopt;
+	}
+	auto startheight = NodeStyle::title_height + NodeStyle::item_padding + pdelta_source - PortStyle::port_bbox / 2;
+	if (point.y() < startheight)return std::nullopt;
+	for (uint8_t si = 0; si < sources.size(); si++, startheight += pdelta_sink)
+	{
+		if (point.y() < startheight + PortStyle::port_bbox)
+		{
+			return { {Port::Source,si} };
+		}
+	}
+	return std::nullopt;
 }

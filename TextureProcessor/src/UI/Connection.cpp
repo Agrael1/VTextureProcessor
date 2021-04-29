@@ -3,15 +3,17 @@
 
 using namespace UI;
 
-Connection::Connection(QPointF pos, Port ty)
+Connection::Connection(Node& node, Port ty, size_t portidx)
 {
 	switch (ty)
 	{
 	case Port::Sink:
-		out = pos;
+		out = node.GetPortPos(ty, portidx);
+		connector.second = &node;
 		break;
 	case Port::Source:
-		in = pos;
+		in = node.GetPortPos(ty, portidx);
+		connector.first = &node;
 		break;
 	default:
 		break;
@@ -27,8 +29,6 @@ void Connection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 void UI::Connection::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
 	auto& view = static_cast<FlowView&>(*event->widget());
-
-
 	auto* node = view.LocateNode(event->pos());
 
 }

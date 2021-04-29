@@ -1,6 +1,7 @@
 #pragma once
 #include <UI/UINode.h>
 #include <UI/FlowCodex.h>
+#include <UI/Connection.h>
 
 namespace UI
 {
@@ -14,6 +15,7 @@ namespace UI
 			return codex.CatMap();
 		}
 		UI::Node& CreateNode(std::string_view name);
+		UI::Connection& CreateConnection();
 		void Clear();
 	protected:
 		void drawBackground(QPainter* painter, const QRectF& rect) override;

@@ -14,13 +14,12 @@ namespace UI
 		Node(QJsonObject document, std::string_view name);
 		Node(const Node& other) noexcept;
 	public:
+		QPointF GetPortPos(Port po, size_t pos);
 		QRectF boundingRect() const override;
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
 		virtual std::string_view GetName()const noexcept = 0;
-		virtual size_t SourcesCount()const noexcept { return 0; }
-		virtual size_t SinksCount()const noexcept { return 0; }
 
 		std::string_view GetStyleName()const noexcept
 		{
@@ -33,11 +32,17 @@ namespace UI
 		QSizeF body_size;
 	private:
 		virtual void SetUniqueName(std::string_view xname) = 0;
-	private:
 		void Init();
 		void DrawNodeRect(QPainter* painter);
 		void DrawCaptionName(QPainter* painter);
-
+		void DrawConnectionPoints(QPainter* painter);
+	protected:
+		std::optional<std::pair<Port, uint8_t>> PortHit(QPointF point);
+	protected:
+		std::basic_string<PortType> sinks;
+		std::basic_string<PortType> sources;
+		qreal pdelta_sink;
+		qreal pdelta_source;
 	private:
 		NodeStyle style;
 		constexpr static const qreal diameter = 10.0;
