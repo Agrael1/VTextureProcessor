@@ -23,9 +23,9 @@ Node::Node(QJsonObject document, std::string_view name)
 }
 
 UI::Node::Node(const Node& other) noexcept
-	:style(other.style), 
-	body_size(other.body_size), 
-	sinks(other.sinks), 
+	:style(other.style),
+	body_size(other.body_size),
+	sinks(other.sinks),
 	sources(other.sources),
 	pdelta_sink(other.pdelta_sink),
 	pdelta_source(other.pdelta_source)
@@ -57,8 +57,9 @@ QRectF Node::boundingRect() const
 }
 QPointF Node::GetPortPos(Port po, size_t pos)
 {
-	return{ po == Port::Sink ? -PortStyle::diameter / 2 : body_size.width() - PortStyle::diameter / 2,
-		NodeStyle::title_height + NodeStyle::item_padding + pdelta_sink - PortStyle::diameter / 2 + pdelta_source * (pos - 1) };
+	return mapToScene({ po == Port::Sink ? 0 : body_size.width(),
+		po == Port::Sink ? NodeStyle::title_height + PortStyle::port_bbox + pdelta_sink * (pos + 1) :
+		NodeStyle::title_height + pdelta_source * (pos + 1) + PortStyle::port_bbox });
 }
 
 void Node::paint(QPainter* painter,

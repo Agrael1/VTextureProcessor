@@ -12,20 +12,20 @@ namespace UI
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
+		QRectF boundingRect()const override;
 	private:
-		void Init()
-		{
-			setFlag(QGraphicsItem::ItemIsMovable, true);
-			setFlag(QGraphicsItem::ItemIsFocusable, true);
-			setFlag(QGraphicsItem::ItemIsSelectable, true);
-			setAcceptHoverEvents(true);
-			setZValue(-1.0);
-		}
+		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
+		void mouseReleaseEvent(QGraphicsSceneMouseEvent* event)override;
+
+
+		std::pair<QPointF, QPointF> PointsC1C2()const;
+		Port Requires()const;
+		void MoveEndpoint(Port port, QPointF offset);
 	private:
 		std::pair<Node*, Node*> connector{};
-		QPointF in;
-		QPointF out;
+		QPointF source;
+		QPointF sink;
 		constexpr static const qreal linewidth = 2.0;
 	};
 }

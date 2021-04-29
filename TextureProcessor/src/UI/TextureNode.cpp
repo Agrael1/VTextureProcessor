@@ -1,4 +1,5 @@
 #include <UI/TextureNode.h>
+#include <UI/Connection.h>
 
 
 UI::TextureNode::TextureNode(QJsonObject document, std::string_view name)
@@ -33,7 +34,8 @@ void UI::TextureNode::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	
 	if (auto port = PortHit(pos))
 	{
-		return Node::mousePressEvent(event);
+		auto& conn = *new Connection(*this, port->first, port->second);
+		conn.grabMouse();
 	}
 }
 
