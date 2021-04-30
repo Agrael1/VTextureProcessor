@@ -1,6 +1,13 @@
 #include <UI/UINode.h>
 #include <UI/Connection.h>
 
+template<typename TO, typename FROM>
+std::unique_ptr<TO> static_unique_pointer_cast(std::unique_ptr<FROM>&& old) {
+	return std::unique_ptr<TO>{static_cast<TO*>(old.release())};
+}
+
+
+
 using namespace UI;
 
 void Node::Init()
@@ -82,6 +89,8 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 	if (auto port = PortHit(pos))
 	{
+		if (port->first == Port::Sink && Sink_conns[port->second])
+			return ConnMapper::AttachTemporary(static_unique_pointer_cast<Connection>(std::move(Sink_conns[port->second])));
 		ConnMapper::MakeTemporary(*this, port->first, port->second);
 	}
 }

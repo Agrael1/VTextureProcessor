@@ -19,6 +19,11 @@ namespace UI
 		QRectF boundingRect()const override;
 		Node* GetSink()const noexcept { return connector.second; }
 		void Move(QPointF deltapos, Port ty);
+		void ResetSink()
+		{
+			connector.second = nullptr;
+			bFinished = false;
+		}
 	private:
 		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
@@ -38,7 +43,6 @@ namespace UI
 		bool bFinished = false;
 		QPointF source;
 		QPointF sink;
-		constexpr static const int linewidth = 2;
 	};
 
 
@@ -46,6 +50,13 @@ namespace UI
 	{
 	public:
 		static void MakeTemporary(Node& node, Port port, uint8_t portidx);
+		static void AttachTemporary(std::unique_ptr<Connection>&& in)
+		{
+			auto& x = Instance().tmp;
+			x = std::move(in);
+			x->ResetSink();
+			x->grabMouse();
+		}
 		static void ClearTemporary();
 		static auto DetachTemporary()
 		{
