@@ -9,7 +9,7 @@ set(CXX_STANDARD 20)
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
 else(MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std:c++20")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 endif()
 
 #set(CMAKE_AUTOMOC ON)
@@ -44,16 +44,16 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 add_compile_definitions(_HAS_DEPRECATED_RESULT_OF=1)
 
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (TextureProcessor 
-	"src/EntryMain.cpp" 
-	 
-	"include/Sink.h" 
-	"include/Source.h" 
-	"src/Source.cpp" 
-	"src/Sink.cpp" 
-	"include/Link.h" 
+add_executable (TextureProcessor
+	"src/EntryMain.cpp"
+
+	"include/Sink.h"
+	"include/Source.h"
+	"src/Source.cpp"
+	"src/Sink.cpp"
+	"include/Link.h"
 	"src/Link.cpp"
-	"include/UI/UINode.h" 
+	"include/UI/UINode.h"
 	"include/Graph.h"
 	"include/utils/Exception.h"
 	"src/Node.cpp"   "include/GraphCodex.h"  "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp" "src/UI/FlowScene.cpp" "include/UI/FlowScene.h" "include/UI/FlowView.h" "src/UI/FlowView.cpp" "src/UI/UINode.cpp"   "include/UI/NodeStyle.h" "src/UI/NodeStyle.cpp" "include/UI/ContextMenu.h" "include/pch.h" "src/UI/ContextMenu.cpp" "include/UI/FlowCodex.h" "src/UI/FlowCodex.cpp"  "include/SinksT.h" "include/SourcesT.h" "include/Presenter/GLInterpret.h" "src/Presenter/GLInterpret.cpp" "include/ShaderNode.h" "src/ShaderNode.cpp" "include/UI/TextureNode.h" "src/UI/TextureNode.cpp" "include/PortType.h" "include/UI/Connection.h" "src/UI/Connection.cpp" "include/CompositeNode.h" "src/CompositeNode.cpp" "include/UI/INodePrivate.h" )

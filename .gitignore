@@ -1,3 +1,12 @@
+CMakeFiles
+conan*
+graph_info*
+TextureProcessor
+cmake_install.cmake
+CMakeCache*
+conan.cmake
+Makefile
+
 # Prerequisites
 *.d
 
