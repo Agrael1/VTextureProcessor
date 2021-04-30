@@ -1,5 +1,5 @@
 #include <UI/Connection.h>
-#include <UI/FlowView.h>
+#include <UI/FlowScene.h>
 
 using namespace UI;
 
@@ -50,13 +50,14 @@ QRectF UI::Connection::boundingRect() const
 
 void Connection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-	QPen p;
-	p.setWidth(linewidth);
-	p.setColor(Qt::white);
-	p.setStyle(Qt::DashLine);
-
-	painter->setPen(p);
 	painter->setBrush(Qt::NoBrush);
+	if (isSelected())
+		painter->setPen(ConnectionStyle::Grayscale.hovered);
+	else if (bFinished)
+		painter->setPen(ConnectionStyle::Grayscale.connected);
+	else
+		painter->setPen(ConnectionStyle::Grayscale.sketch);
+
 
 	auto c1c2 = PointsC1C2();
 	QPainterPath cubic(source);
@@ -118,7 +119,7 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 		source = node->GetPortPos(Port::Source, sourceN);
 		break;
 	}
-	
+	bFinished = true;
 }
 
 std::pair<QPointF, QPointF> Connection::PointsC1C2()const

@@ -33,14 +33,26 @@ namespace UI
 	struct PortStyle
 	{
 	public:
-		constexpr static const qreal diameter = 8.0;
+		constexpr static const qreal diameter = 10.0;
 		constexpr static const qreal port_bbox = 20.0;
 	public:
 		QPen port{ {"#FFFFFFFF"}, NodeStyle::pen_width};
-		QBrush brSink{ "#FF0AC710" };
-		QBrush brSource{ "#FF129DB5" };
+		QBrush brSink{ "#FF828282" };
+		QBrush brSinkUsed{ "#FFD9DDDC" };
+		QBrush brSource{ "#FF909090" };
 	public:
 		static const PortStyle Grayscale;
+	};
+
+	struct ConnectionStyle
+	{
+		constexpr static const int line_width = 3;
+	public:
+		QPen sketch{ {"#FF878787"}, line_width, Qt::DashLine };
+		QPen connected{ {"#FFD9DDDC"}, line_width };
+		QPen hovered{ Qt::white, line_width*2 };
+	public:
+		static const ConnectionStyle Grayscale;
 	};
 }
 

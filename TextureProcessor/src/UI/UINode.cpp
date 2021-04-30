@@ -167,12 +167,12 @@ void Node::DrawCaptionName(QPainter* painter)
 void UI::Node::DrawConnectionPoints(QPainter* painter)
 {
 	auto& style = PortStyle::Grayscale;
+	
 	painter->setPen(style.port);
-	painter->setBrush(style.brSink);
-
 	auto ypos = NodeStyle::title_height + NodeStyle::item_padding + pdelta_sink - PortStyle::diameter / 2;
-	for (const auto& si : sinks)
+	for (auto si = 0; si < sinks.size(); si++)
 	{
+		painter->setBrush(Sink_conns[si]?style.brSinkUsed:style.brSink);
 		painter->drawEllipse(-PortStyle::diameter / 2, ypos, PortStyle::diameter, PortStyle::diameter);
 		ypos += pdelta_sink;
 	}

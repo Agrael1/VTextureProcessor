@@ -3,6 +3,7 @@
 
 using namespace UI;
 const PortStyle PortStyle::Grayscale;
+const ConnectionStyle ConnectionStyle::Grayscale;
 
 
 static inline QColor ReadColor(QJsonObject values, std::string_view varname)

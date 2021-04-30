@@ -35,6 +35,7 @@ namespace UI
 		std::pair<Node*/*source*/, Node*/*sink*/> connector{};
 		uint8_t sourceN;
 		uint8_t sinkN;
+		bool bFinished = false;
 		QPointF source;
 		QPointF sink;
 		constexpr static const int linewidth = 2;
