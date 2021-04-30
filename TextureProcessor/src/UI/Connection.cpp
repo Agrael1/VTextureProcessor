@@ -92,6 +92,7 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 {
 	auto re = Requires();
 	if (port->first != re) { ConnMapper::ClearTemporary(); return; };
+	prepareGeometryChange();
 	switch (re)
 	{
 	case Port::Sink:
