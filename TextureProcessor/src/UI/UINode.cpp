@@ -30,6 +30,7 @@ UI::Node::Node(const Node& other) noexcept
 	pdelta_sink(other.pdelta_sink),
 	pdelta_source(other.pdelta_source)
 {
+	Sink_conns.resize(other.sinks.size());
 	printf("copy called\n");
 	Init();
 }
@@ -45,9 +46,6 @@ void UI::Node::CalculateSize(QSizeF minsize) noexcept
 	auto height = max_height - NodeStyle::title_height - NodeStyle::item_padding * 2;
 	pdelta_sink = height / (sinks.size() + 1);
 	pdelta_source = height / (sources.size() + 1);
-
-	//We know sinks and sources here
-	Sink_conns = std::make_unique<std::unique_ptr<QGraphicsItem>[]>(sinks.size());
 }
 QRectF Node::boundingRect() const
 {

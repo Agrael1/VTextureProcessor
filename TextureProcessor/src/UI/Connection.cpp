@@ -82,13 +82,42 @@ void UI::Connection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	auto& xscene = static_cast<UI::FlowScene&>(*scene());
 	auto* node = xscene.LocateNode(event->scenePos());
 	if (node && node != StartNode())
-		if (auto p = node->PortHit(event->pos()); p)
-		{
-
-		}
+		if (auto p = node->PortHitScene(event->scenePos()); p)
+			return PlaceConnection(p, node);
 
 
 	if (any(Requires()))ConnMapper::ClearTemporary();
+}
+void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> port, Node* node)
+{
+	auto re = Requires();
+	if (port->first != re)ConnMapper::ClearTemporary();
+	switch (re)
+	{
+	case Port::Sink:
+	{
+		sinkN = port->second;
+		connector.second = node;
+		auto* pcon = static_cast<Connection*>(node->GetConnection(sinkN));
+		if (pcon)
+		{
+			auto* key = pcon->connector.first;
+			ConnMapper::Unmap(key, pcon);
+		}
+		node->SetConnection(ConnMapper::DetachTemporary(), sinkN);
+		ConnMapper::Map(connector.first, this);
+		sink = node->GetPortPos(Port::Sink, sinkN);
+		break;
+	}
+	case Port::Source:
+		connector.first = node;
+		sourceN = port->second;
+		connector.second->SetConnection(ConnMapper::DetachTemporary(), sinkN);
+		ConnMapper::Map(connector.first, this);
+		source = node->GetPortPos(Port::Source, sourceN);
+		break;
+	}
+	
 }
 
 std::pair<QPointF, QPointF> Connection::PointsC1C2()const
@@ -143,11 +172,6 @@ PortType Connection::GetType()const noexcept
 	return PortType::None;
 }
 
-void Connection::Remove()
-{
-	if (connector.first && connector.second)
-		connector.second->RemoveConnection(this);
-}
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -170,7 +194,7 @@ std::span<Connection*> UI::ConnMapper::Get(Node* n)
 
 void UI::ConnMapper::MakeTemporary(Node& node, Port port, uint8_t portidx)
 {
-	Instance().tmp.reset(new Connection{node, port, portidx});
+	Instance().tmp.reset(new Connection{ node, port, portidx });
 	Instance().tmp->grabMouse();
 }
 void UI::ConnMapper::ConnectApply()

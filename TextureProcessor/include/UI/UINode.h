@@ -36,13 +36,19 @@ namespace UI
 		}
 
 	private:
-		void RemoveConnection(QGraphicsItem* conn)
+		virtual void SetUniqueName(std::string_view xname) = 0;
+
+		void SetConnection(std::unique_ptr<QGraphicsItem>&& in, uint8_t portN)
 		{
-			auto d = conn - Sink_conns[0].get();
-			Sink_conns[d].reset();
+			assert(portN < sinks.size());
+			Sink_conns[portN] = std::move(in);
+		}
+		QGraphicsItem* GetConnection(uint8_t portN)
+		{
+			assert(portN < sinks.size());
+			return Sink_conns[portN].get();
 		}
 
-		virtual void SetUniqueName(std::string_view xname) = 0;
 		void Init();
 		void DrawNodeRect(QPainter* painter);
 		void DrawCaptionName(QPainter* painter);
@@ -52,12 +58,15 @@ namespace UI
 		void CalculateSize(QSizeF minsize = {})noexcept;
 		qreal EffectiveHeight()const noexcept { return body_size.height() - NodeStyle::title_height - 2 * NodeStyle::item_padding; }
 		std::optional<std::pair<Port, uint8_t>> PortHit(QPointF point);
-
+		std::optional<std::pair<Port, uint8_t>> PortHitScene(QPointF scene_point)
+		{
+			return PortHit(mapFromScene(scene_point));
+		}
 	protected:
 		std::basic_string<PortType> sinks;
 		std::basic_string<PortType> sources;
 
-		std::unique_ptr<std::unique_ptr<QGraphicsItem>[]> Sink_conns;
+		std::vector<std::unique_ptr<QGraphicsItem>> Sink_conns;
 		QSizeF body_size;
 		qreal pdelta_sink;
 		qreal pdelta_source;

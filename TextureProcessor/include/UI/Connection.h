@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <span>
+#include <optional>
 #include <PortType.h>
 
 namespace UI
@@ -17,11 +18,12 @@ namespace UI
 			QWidget* widget = nullptr) override;
 		QRectF boundingRect()const override;
 		Node* GetSink()const noexcept { return connector.second; }
-		void Remove();
+		//void Remove();
 	private:
 		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
 		void mouseReleaseEvent(QGraphicsSceneMouseEvent* event)override;
+		void PlaceConnection(std::optional<std::pair<Port, uint8_t>> port, Node* node);
 
 
 		std::pair<QPointF, QPointF> PointsC1C2()const;
@@ -45,9 +47,19 @@ namespace UI
 	public:
 		static void MakeTemporary(Node& node, Port port, uint8_t portidx);
 		static void ClearTemporary();
+		static auto DetachTemporary()
+		{
+			return std::move(Instance().tmp);
+		}
 		static void ConnectApply();
 		static ConnMapper& Instance();
 		static void Map(Node* n, Connection* c);
+		static void Unmap(Node* n, Connection* c)
+		{
+			auto& x = Instance().map.at(n);
+			auto it = std::find(x.begin(), x.end(), c);
+			if (it != x.end())x.erase(it);
+		}
 		static std::span<Connection*> Get(Node* n);
 	private:
 		ConnMapper() = default;
