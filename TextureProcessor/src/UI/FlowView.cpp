@@ -30,7 +30,7 @@ FlowView::FlowView(UI::FlowScene& scene)
 
 UI::Node* FlowView::LocateNode(QPointF pos) noexcept
 {
-	return nullptr;
+	return scene.LocateNode(pos);
 }
 
 void FlowView::wheelEvent(QWheelEvent* event)

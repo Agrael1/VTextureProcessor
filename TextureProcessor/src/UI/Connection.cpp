@@ -79,11 +79,13 @@ void UI::Connection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	ungrabMouse();
 	event->accept();
 
-	auto& view = static_cast<FlowView&>(*event->widget());
-	auto* node = view.LocateNode(event->pos());
+	auto& xscene = static_cast<UI::FlowScene&>(*scene());
+	auto* node = xscene.LocateNode(event->scenePos());
 	if (node && node != StartNode())
-		if(auto p = node->TryConnect(event->scenePos(), GetType()); p.first)
+		if (auto p = node->PortHit(event->pos()); p)
+		{
 
+		}
 
 
 	if (any(Requires()))ConnMapper::ClearTemporary();

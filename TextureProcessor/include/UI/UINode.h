@@ -41,10 +41,6 @@ namespace UI
 			auto d = conn - Sink_conns[0].get();
 			Sink_conns[d].reset();
 		}
-		std::pair<bool, uint8_t> TryConnect(QPointF point, PortType connTy)
-		{
-			return{ false,0 };
-		}
 
 		virtual void SetUniqueName(std::string_view xname) = 0;
 		void Init();

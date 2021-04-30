@@ -15,6 +15,7 @@ namespace UI
 			return codex.CatMap();
 		}
 		UI::Node& CreateNode(std::string_view name);
+		UI::Node* LocateNode(QPointF pos)noexcept;
 		UI::Connection& CreateConnection();
 		void Clear();
 	protected:

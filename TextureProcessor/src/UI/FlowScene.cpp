@@ -126,6 +126,21 @@ UI::Node& FlowScene::CreateNode(std::string_view name)
 	addItem(&*x.first->second);
 	return *x.first->second;
 }
+UI::Node* FlowScene::LocateNode(QPointF pos)noexcept
+{
+	auto xitems = items(pos);
+
+	std::vector<QGraphicsItem*> filteredItems;
+	std::copy_if(xitems.begin(), xitems.end(), std::back_inserter(filteredItems),
+		[](QGraphicsItem* item)
+		{
+			return (dynamic_cast<UI::Node*>(item) != nullptr);
+		});
+	if (filteredItems.empty())
+		return nullptr;
+
+	return static_cast<UI::Node*>(filteredItems.front());
+}
 
 void FlowScene::Clear()
 {
