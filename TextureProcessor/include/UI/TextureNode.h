@@ -15,7 +15,6 @@ namespace UI
 	private:
 		void SetUniqueName(std::string_view xname)override{	model.SetUniqueName(xname);}
 		void DrawTexture(QPainter* painter);
-		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;
 	private:
 		QImage texture;
 		ver::ShaderNode model;

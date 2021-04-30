@@ -24,18 +24,5 @@ void UI::TextureNode::DrawTexture(QPainter* painter)
 	painter->drawImage(point, texture);
 }
 
-void UI::TextureNode::mousePressEvent(QGraphicsSceneMouseEvent* event)
-{
-	auto pos = event->pos();
-	if (pos.y() < NodeStyle::title_height + NodeStyle::item_padding ||
-		pos.y() > body_size.height() - NodeStyle::item_padding ||
-		pos.x() > PortStyle::port_bbox / 2 && pos.x() < body_size.width() - PortStyle::port_bbox / 2)
-		return Node::mousePressEvent(event);
-	
-	if (auto port = PortHit(pos))
-	{
-		ConnMapper::MakeTemporary(*this, port->first, port->second);
-	}
-}
 
 

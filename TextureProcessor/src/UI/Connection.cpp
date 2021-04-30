@@ -171,7 +171,21 @@ PortType Connection::GetType()const noexcept
 		return connector.first->GetSinkType(sinkN);
 	return PortType::None;
 }
-
+void Connection::Move(QPointF deltapos, Port ty)
+{
+	prepareGeometryChange();
+	switch (ty)
+	{
+	case Port::Sink:
+		sink += deltapos;
+		break;
+	case Port::Source:
+		source += deltapos;
+		break;
+	default:
+		break;
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -189,7 +203,7 @@ void ConnMapper::Map(Node* n, Connection* c)
 
 std::span<Connection*> UI::ConnMapper::Get(Node* n)
 {
-	return Instance().map.at(n);
+	return Instance().map[n];
 }
 
 void UI::ConnMapper::MakeTemporary(Node& node, Port port, uint8_t portidx)

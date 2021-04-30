@@ -37,6 +37,8 @@ namespace UI
 
 	private:
 		virtual void SetUniqueName(std::string_view xname) = 0;
+		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;
+		QVariant itemChange(GraphicsItemChange change, const QVariant& value)override;
 
 		void SetConnection(std::unique_ptr<QGraphicsItem>&& in, uint8_t portN)
 		{
@@ -54,6 +56,7 @@ namespace UI
 		void DrawCaptionName(QPainter* painter);
 		void DrawConnectionPoints(QPainter* painter);
 
+		void MoveConnections(QPointF newpos);
 	protected:
 		void CalculateSize(QSizeF minsize = {})noexcept;
 		qreal EffectiveHeight()const noexcept { return body_size.height() - NodeStyle::title_height - 2 * NodeStyle::item_padding; }

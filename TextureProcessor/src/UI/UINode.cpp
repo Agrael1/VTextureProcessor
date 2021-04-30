@@ -1,4 +1,5 @@
 #include <UI/UINode.h>
+#include <UI/Connection.h>
 
 using namespace UI;
 
@@ -70,6 +71,41 @@ void Node::paint(QPainter* painter,
 	DrawNodeRect(painter);
 	DrawCaptionName(painter);
 	DrawConnectionPoints(painter);
+}
+void Node::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+	auto pos = event->pos();
+	if (pos.y() < NodeStyle::title_height + NodeStyle::item_padding ||
+		pos.y() > body_size.height() - NodeStyle::item_padding ||
+		pos.x() > PortStyle::port_bbox / 2 && pos.x() < body_size.width() - PortStyle::port_bbox / 2)
+		return QGraphicsItem::mousePressEvent(event);
+
+	if (auto port = PortHit(pos))
+	{
+		ConnMapper::MakeTemporary(*this, port->first, port->second);
+	}
+}
+QVariant Node::itemChange(GraphicsItemChange change, const QVariant& value)
+{
+	if (change == ItemPositionChange)
+		MoveConnections(value.toPointF());
+
+	return QGraphicsItem::itemChange(change, value);
+}
+void Node::MoveConnections(QPointF newpos)
+{
+	auto delta = newpos - pos();
+	for (auto& s : Sink_conns)
+	{
+		if (s)
+		{
+			static_cast<Connection&>(*s.get()).Move(delta, Port::Sink);
+		}
+	}
+	for (auto s : ConnMapper::Get(this))
+	{
+		s->Move(delta, Port::Source);
+	}
 }
 
 void Node::DrawNodeRect(QPainter* painter)

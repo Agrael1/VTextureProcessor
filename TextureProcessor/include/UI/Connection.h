@@ -18,7 +18,7 @@ namespace UI
 			QWidget* widget = nullptr) override;
 		QRectF boundingRect()const override;
 		Node* GetSink()const noexcept { return connector.second; }
-		//void Remove();
+		void Move(QPointF deltapos, Port ty);
 	private:
 		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
@@ -31,7 +31,6 @@ namespace UI
 		void MoveEndpoint(Port port, QPointF offset);
 		PortType GetType()const noexcept;
 		Node* StartNode()const noexcept { return connector.first ? connector.first : (connector.second ? connector.second : nullptr); }
-		void FillPair();
 	private:
 		std::pair<Node*/*source*/, Node*/*sink*/> connector{};
 		uint8_t sourceN;
