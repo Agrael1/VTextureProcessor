@@ -30,7 +30,7 @@ void Connection::Init()
 	setFlag(QGraphicsItem::ItemIsSelectable, true);
 
 	setAcceptHoverEvents(true);
-	setZValue(1.0);
+	setZValue(-1.0);
 }
 
 QRectF UI::Connection::boundingRect() const
@@ -91,7 +91,7 @@ void UI::Connection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> port, Node* node)
 {
 	auto re = Requires();
-	if (port->first != re)ConnMapper::ClearTemporary();
+	if (port->first != re) { ConnMapper::ClearTemporary(); return; };
 	switch (re)
 	{
 	case Port::Sink:
