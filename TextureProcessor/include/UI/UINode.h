@@ -8,6 +8,7 @@ namespace UI
 {
 	class Node : public QGraphicsItem
 	{
+		friend class Connection;
 		friend class FlowScene;
 	public:
 		Node() = delete;
@@ -25,28 +26,48 @@ namespace UI
 		{
 			return style.StyleName();
 		}
-	protected:
-		void CalculateSize(QSizeF minsize = {})noexcept;
-		qreal EffectiveHeight()const noexcept { return body_size.height() - NodeStyle::title_height - 2 * NodeStyle::item_padding; }
-		
-		QSizeF body_size;
+		auto GetSourceType(size_t pos)
+		{
+			return sinks[pos];
+		}
+		auto GetSinkType(size_t pos)
+		{
+			return sources[pos];
+		}
+
 	private:
+		void RemoveConnection(QGraphicsItem* conn)
+		{
+			auto d = conn - Sink_conns[0].get();
+			Sink_conns[d].reset();
+		}
+		std::pair<bool, uint8_t> TryConnect(QPointF point, PortType connTy)
+		{
+			return{ false,0 };
+		}
+
 		virtual void SetUniqueName(std::string_view xname) = 0;
 		void Init();
 		void DrawNodeRect(QPainter* painter);
 		void DrawCaptionName(QPainter* painter);
 		void DrawConnectionPoints(QPainter* painter);
+
 	protected:
+		void CalculateSize(QSizeF minsize = {})noexcept;
+		qreal EffectiveHeight()const noexcept { return body_size.height() - NodeStyle::title_height - 2 * NodeStyle::item_padding; }
 		std::optional<std::pair<Port, uint8_t>> PortHit(QPointF point);
+
 	protected:
 		std::basic_string<PortType> sinks;
 		std::basic_string<PortType> sources;
+
+		std::unique_ptr<std::unique_ptr<QGraphicsItem>[]> Sink_conns;
+		QSizeF body_size;
 		qreal pdelta_sink;
 		qreal pdelta_source;
+
 	private:
 		NodeStyle style;
-		constexpr static const qreal diameter = 10.0;
-		constexpr static const qreal offset = 5;
 	};
 }
 

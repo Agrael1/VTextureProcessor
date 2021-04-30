@@ -1,0 +1,3 @@
+
+struct [[msvc::novtable]]X {};
+

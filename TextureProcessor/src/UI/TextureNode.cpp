@@ -34,8 +34,7 @@ void UI::TextureNode::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	
 	if (auto port = PortHit(pos))
 	{
-		auto& conn = *new Connection(*this, port->first, port->second);
-		conn.grabMouse();
+		ConnMapper::MakeTemporary(*this, port->first, port->second);
 	}
 }
 

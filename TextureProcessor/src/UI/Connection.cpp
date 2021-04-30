@@ -3,7 +3,7 @@
 
 using namespace UI;
 
-Connection::Connection(Node& node, Port ty, size_t portidx)
+Connection::Connection(Node& node, Port ty, uint8_t portidx)
 {
 	node.scene()->addItem(this);
 	sink = source = node.GetPortPos(ty, portidx);
@@ -11,9 +11,11 @@ Connection::Connection(Node& node, Port ty, size_t portidx)
 	{
 	case Port::Sink:
 		connector.second = &node;
+		sinkN = portidx;
 		break;
 	case Port::Source:
 		connector.first = &node;
+		sourceN = portidx;
 		break;
 	default:
 		break;
@@ -49,7 +51,7 @@ QRectF UI::Connection::boundingRect() const
 void Connection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	QPen p;
-	p.setWidth(3);
+	p.setWidth(linewidth);
 	p.setColor(Qt::white);
 	p.setStyle(Qt::DashLine);
 
@@ -65,8 +67,6 @@ void Connection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 void UI::Connection::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
 	prepareGeometryChange();
-	auto& view = static_cast<FlowView&>(*event->widget());
-	auto* node = view.LocateNode(event->pos());
 
 	if (auto x = Requires(); any(x))
 		MoveEndpoint(x, event->pos() - event->lastPos());
@@ -78,6 +78,15 @@ void UI::Connection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	ungrabMouse();
 	event->accept();
+
+	auto& view = static_cast<FlowView&>(*event->widget());
+	auto* node = view.LocateNode(event->pos());
+	if (node && node != StartNode())
+		if(auto p = node->TryConnect(event->scenePos(), GetType()); p.first)
+
+
+
+	if (any(Requires()))ConnMapper::ClearTemporary();
 }
 
 std::pair<QPointF, QPointF> Connection::PointsC1C2()const
@@ -122,4 +131,53 @@ void Connection::MoveEndpoint(Port port, QPointF offset)
 	default:
 		break;
 	}
+}
+PortType Connection::GetType()const noexcept
+{
+	if (connector.first)
+		return connector.first->GetSourceType(sourceN);
+	if (connector.second)
+		return connector.first->GetSinkType(sinkN);
+	return PortType::None;
+}
+
+void Connection::Remove()
+{
+	if (connector.first && connector.second)
+		connector.second->RemoveConnection(this);
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+ConnMapper& UI::ConnMapper::Instance()
+{
+	static ConnMapper mapper;
+	return mapper;
+}
+
+void ConnMapper::Map(Node* n, Connection* c)
+{
+	auto& i = Instance();
+	i.map[n].push_back(c);
+}
+
+std::span<Connection*> UI::ConnMapper::Get(Node* n)
+{
+	return Instance().map.at(n);
+}
+
+void UI::ConnMapper::MakeTemporary(Node& node, Port port, uint8_t portidx)
+{
+	Instance().tmp.reset(new Connection{node, port, portidx});
+	Instance().tmp->grabMouse();
+}
+void UI::ConnMapper::ConnectApply()
+{
+	auto& i = Instance();
+	i.map[i.tmp->GetSink()].emplace_back(i.tmp.get());
+}
+
+void UI::ConnMapper::ClearTemporary()
+{
+	Instance().tmp.reset();
 }
