@@ -3,6 +3,7 @@
 App::App(int argc, char** argv)
 	:app(argc, argv)
 {
+    // TODO: Calling AppName and AppVer causes a segfault on Linux
 	QCoreApplication::setApplicationName(AppName.data());
 	QCoreApplication::setApplicationVersion(AppVer.data());
 	app.setStyle(QStyleFactory::create(AppTheme.data()));
