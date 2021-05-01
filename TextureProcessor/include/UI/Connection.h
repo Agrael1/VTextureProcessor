@@ -74,6 +74,13 @@ namespace UI
 			auto it = std::find(x.begin(), x.end(), c);
 			if (it != x.end())x.erase(it);
 		}
+		static void Trim(Node* n)
+		{
+			auto& x = Instance().map[n];
+			for (auto* i : x)
+				i->RemoveForce();
+			Instance().map.erase(n);
+		}
 		static std::span<Connection*> Get(Node* n);
 	private:
 		ConnMapper() = default;

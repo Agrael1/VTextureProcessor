@@ -43,6 +43,10 @@ UI::Node::Node(const Node& other) noexcept
 	Init();
 }
 
+UI::Node::~Node()
+{
+	ConnMapper::Trim(this);
+}
 
 void UI::Node::CalculateSize(QSizeF minsize) noexcept
 {

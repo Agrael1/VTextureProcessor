@@ -14,6 +14,7 @@ namespace UI
 		Node() = delete;
 		Node(QJsonObject document, std::string_view name);
 		Node(const Node& other) noexcept;
+		~Node();
 	public:
 		QPointF GetPortPos(Port po, size_t pos);
 		QRectF boundingRect() const override;
