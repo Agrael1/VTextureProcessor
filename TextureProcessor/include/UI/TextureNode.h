@@ -1,12 +1,14 @@
 #include <UI/UINode.h>
 #include <ShaderNode.h>
 
+class Engine;
+
 namespace UI
 {
 	class TextureNode : public Node
 	{
 	public:
-		TextureNode(QJsonObject document, std::string_view name);
+		TextureNode(QJsonObject document, std::string_view name, Engine& engine);
 	public:
 		std::string_view GetName()const noexcept override { return model.GetName(); }
 		void paint(QPainter* painter,

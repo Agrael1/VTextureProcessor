@@ -10,7 +10,8 @@ ShaderNode::NodePrivate::NodePrivate(QString&& code)
 	shader.compileSourceCode(code);
 }
 
-ShaderNode::ShaderNode(QJsonObject document)
+ShaderNode::ShaderNode(QJsonObject document, Engine& e)
+	:e(e)
 {
 	auto node = document["Node"].toObject();
 	QString xshader;
@@ -53,7 +54,7 @@ ShaderNode::ShaderNode(QJsonObject document)
 }
 
 ShaderNode::ShaderNode(const ShaderNode& other)
-	:shader(other.shader)
+	:shader(other.shader), e(other.e)
 {
 	sinks.reserve(other.SinksCount());
 	sources.reserve(other.SourcesCount());

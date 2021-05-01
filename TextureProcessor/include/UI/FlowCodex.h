@@ -2,6 +2,7 @@
 #include <UI/TextureNode.h> 
 #include <unordered_map>
 #include <utils/polymorphic_value.h>
+#include <Presenter/GLInterpret.h>
 
 namespace pv = isocpp_p0201;
 
@@ -34,5 +35,6 @@ namespace UI
 	private:
 		std::unordered_map<std::string, RefCountPair> codex;
 		std::unordered_map<std::string, std::vector<std::string_view>> cats;
+		Engine engine;
 	};
 }

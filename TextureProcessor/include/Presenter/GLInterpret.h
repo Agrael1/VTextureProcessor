@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 
 class Engine
 {
@@ -12,9 +13,9 @@ public:
 private:
 	QOpenGLContext context;
 	QOpenGLPaintDevice device;
-	//QOpenGLFunctions funcs;
+	QOpenGLFunctions funcs;
     QOffscreenSurface surface;
-    QOpenGLFramebufferObject frame;
+    std::optional<QOpenGLFramebufferObject> frame;
     QOpenGLShaderProgram shaders;
     QOpenGLShader vs;
 

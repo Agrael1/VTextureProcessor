@@ -2,8 +2,8 @@
 #include <UI/Connection.h>
 
 
-UI::TextureNode::TextureNode(QJsonObject document, std::string_view name)
-	:Node(document, name), model(document), texture(128, 128, QImage::Format::Format_ARGB32)
+UI::TextureNode::TextureNode(QJsonObject document, std::string_view name, Engine& engine)
+	:Node(document, name), model(document, engine), texture(128, 128, QImage::Format::Format_ARGB32)
 {
 	for (auto& s : model.GetSinks())
 		sinks.push_back(s->GetType());

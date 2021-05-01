@@ -1,6 +1,8 @@
 #pragma once
 #include <Node.h>
 
+class Engine;
+
 namespace ver
 {
 	class ShaderNode : public Node
@@ -12,13 +14,14 @@ namespace ver
 			std::string shadercode;
 		};
 	public:
-		ShaderNode(QJsonObject document);
+		ShaderNode(QJsonObject document, Engine& e);
 		ShaderNode(const ShaderNode& other);
 	public:
 	private:
 		std::vector<std::shared_ptr<QOpenGLTexture>> inputs;
 		std::vector<std::shared_ptr<QOpenGLTexture>> outputs;
 		std::shared_ptr<NodePrivate> shader;
+		Engine& e;
 	};
 }
 
