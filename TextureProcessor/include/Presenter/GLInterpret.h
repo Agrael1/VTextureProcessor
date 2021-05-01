@@ -3,6 +3,20 @@
 
 class Engine
 {
+    struct Context
+    {
+        Context()
+        {
+            context.create();
+            surface.create();
+            context.makeCurrent(&surface);
+            funcs.initializeOpenGLFunctions();
+        }
+        QOpenGLContext context;
+        QOpenGLPaintDevice device;
+        QOffscreenSurface surface;
+        QOpenGLFunctions funcs;
+    };
 public:
 	Engine(QSize size);
 public:
@@ -11,21 +25,17 @@ public:
         
 	}
 private:
-	QOpenGLContext context;
-	QOpenGLPaintDevice device;
-	QOpenGLFunctions funcs;
-    QOffscreenSurface surface;
-    std::optional<QOpenGLFramebufferObject> frame;
+    Context con;
+    QOpenGLFramebufferObject frame;
     QOpenGLShaderProgram shaders;
     QOpenGLShader vs;
 
     static constexpr const char* vertexShaderSource =
-        "attribute highp vec4 posAttr;\n"
-        "attribute lowp vec4 colAttr;\n"
-        "varying lowp vec4 col;\n"
-        "uniform highp mat4 matrix;\n"
-        "void main() {\n"
-        "   col = colAttr;\n"
-        "   gl_Position = matrix * posAttr;\n"
-        "}\n";
+     R"(#version 330 core
+        out vec2 texcoords;
+        void main() {
+            vec2 vertices[3] = vec2[3](vec2(-1, -1), vec2(3, -1), vec2(-1, 3));
+            gl_Position = vec4(vertices[gl_VertexID], 0, 1);
+            texcoords = 0.5 * gl_Position.xy + vec2(0.5);
+        })";
 };
