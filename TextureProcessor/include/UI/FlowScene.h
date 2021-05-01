@@ -17,6 +17,7 @@ namespace UI
 		UI::Node& CreateNode(std::string_view name);
 		UI::Node* LocateNode(QPointF pos)noexcept;
 		UI::Connection& CreateConnection();
+		void DeleteSelected();
 		void Clear();
 	protected:
 		void drawBackground(QPainter* painter, const QRectF& rect) override;

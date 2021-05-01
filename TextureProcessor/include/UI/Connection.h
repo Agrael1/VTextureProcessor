@@ -13,6 +13,8 @@ namespace UI
 	private:
 		Connection(Node& node, Port ty, uint8_t portidx);
 	public:
+		~Connection();
+	public:
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
@@ -24,6 +26,7 @@ namespace UI
 			connector.second = nullptr;
 			bFinished = false;
 		}
+		void RemoveForce()noexcept;
 	private:
 		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;

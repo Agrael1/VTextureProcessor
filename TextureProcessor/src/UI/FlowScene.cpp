@@ -142,6 +142,20 @@ UI::Node* FlowScene::LocateNode(QPointF pos)noexcept
 	return static_cast<UI::Node*>(filteredItems.front());
 }
 
+void FlowScene::DeleteSelected()
+{
+	for (QGraphicsItem* item : selectedItems())
+	{
+		if (auto c = dynamic_cast<Connection*>(item))
+			c->RemoveForce();
+	}
+	for (QGraphicsItem* item : selectedItems())
+	{
+		if (auto n = dynamic_cast<Node*>(item))
+			nodes.erase(n->GetName().data());
+	}
+}
+
 void FlowScene::Clear()
 {
 	nodes.clear();

@@ -2,7 +2,8 @@
 
 
 FlowView::FlowView(UI::FlowScene& scene)
-	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr)
+	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr), view_menu("View"),
+	delet("Delete selected"), clrselect("Clear Selection")
 {
 	setRenderHints(QPainter::Antialiasing |
 		QPainter::TextAntialiasing |
@@ -26,6 +27,13 @@ FlowView::FlowView(UI::FlowScene& scene)
 	}
 	menu.Finish();
 	menu.SetItemClickCallback([this](QTreeWidgetItem* item, int) {OnItemSelected(item, 0); });
+
+	clrselect.setShortcut(Qt::Key::Key_Escape);
+	delet.setShortcut(Qt::Key::Key_Delete);
+	connect(&clrselect, &QAction::triggered, &scene, &UI::FlowScene::clearSelection);
+	connect(&delet, &QAction::triggered, &scene, &UI::FlowScene::DeleteSelected);
+	view_menu.addAction(&delet);
+	view_menu.addAction(&clrselect);
 }
 
 UI::Node* FlowView::LocateNode(QPointF pos) noexcept
@@ -80,7 +88,7 @@ void FlowView::OnItemSelected(QTreeWidgetItem* item, int)
 
 	auto& type = scene.CreateNode(modelName);
 	{
-		QPointF posView = this->mapToScene(last_event);
+		QPointF posView = mapToScene(last_event);
 		type.setPos(posView);
 	}
 

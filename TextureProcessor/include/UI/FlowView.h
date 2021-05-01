@@ -9,6 +9,10 @@ public:
 	FlowView(UI::FlowScene& scene);
 public:
 	UI::Node* LocateNode(QPointF pos)noexcept;
+	void AppendViewMenu(QMenuBar& mb)noexcept
+	{
+		mb.addMenu(&view_menu);
+	}
 
 private:
 	void wheelEvent(QWheelEvent* event) override;
@@ -21,4 +25,7 @@ private:
 	ContextMenu menu;
 
 	QPoint last_event;
+	QMenu view_menu;
+	QAction delet;
+	QAction clrselect;
 };

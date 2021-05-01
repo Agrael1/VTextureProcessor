@@ -22,6 +22,11 @@ Connection::Connection(Node& node, Port ty, uint8_t portidx)
 	}
 	Init();
 }
+Connection::~Connection()
+{
+	if (bFinished)
+		ConnMapper::Unmap(connector.first, this);
+}
 
 void Connection::Init()
 {
@@ -100,13 +105,8 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 	{
 		sinkN = port->second;
 		connector.second = node;
-		auto* pcon = static_cast<Connection*>(node->GetConnection(sinkN));
-		if (pcon)
-		{
-			auto* key = pcon->connector.first;
-			ConnMapper::Unmap(key, pcon);
-		}
 		node->SetConnection(ConnMapper::DetachTemporary(), sinkN);
+		node->update();
 		ConnMapper::Map(connector.first, this);
 		sink = node->GetPortPos(Port::Sink, sinkN);
 		break;
@@ -187,6 +187,11 @@ void Connection::Move(QPointF deltapos, Port ty)
 	default:
 		break;
 	}
+}
+void Connection::RemoveForce()noexcept
+{
+	if (bFinished)
+		connector.second->SetConnection(nullptr, sinkN);
 }
 
 /////////////////////////////////////////////////////////////////////////

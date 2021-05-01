@@ -5,7 +5,9 @@ Window::Window(int32_t width, int32_t height)
 	:menu("File"), Aclear("Clear", this), scene(this), view(scene)
 {
 	resize(width, height);
-	menuBar()->addMenu(&menu);
+	auto& mb = *menuBar();
+	mb.addMenu(&menu);
+	view.AppendViewMenu(mb);
 
 	connect(&Aclear, &QAction::triggered, this, &Window::onClearTriggered);
 	menu.addAction(&Aclear);
