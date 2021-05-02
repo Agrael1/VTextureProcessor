@@ -10,7 +10,7 @@ namespace UI
 {
 	class FlowCodex
 	{
-		struct RefCountPair: public pv::polymorphic_value<UI::Node>
+		struct RefCountPair : public pv::polymorphic_value<UI::Node>
 		{
 			template<typename T, typename ...Args>
 			static RefCountPair set(Args&&... in)
@@ -31,10 +31,14 @@ namespace UI
 			for (auto&& x : codex)
 				x.second.refcount = 0;
 		}
+		void RemoveEngine()
+		{
+			engine.reset();
+		}
 		std::pair<const pv::polymorphic_value<UI::Node>&, size_t> MakeNode(std::string_view in)const;
 	private:
 		std::unordered_map<std::string, RefCountPair> codex;
 		std::unordered_map<std::string, std::vector<std::string_view>> cats;
-		Engine engine;
+		std::optional<Engine> engine;
 	};
 }

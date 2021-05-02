@@ -16,6 +16,11 @@ public:
 	{
 		showNormal();
 	}
+	void closeEvent(QCloseEvent* event)override
+	{
+		scene.RemoveEngine();
+	}
+
 private:
 	QMenu menu;
 	QAction Aclear;

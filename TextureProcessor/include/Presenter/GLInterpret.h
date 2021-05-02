@@ -77,6 +77,10 @@ public:
 
         return frame.toImage();
 	}
+    void Remove()
+    {
+        vbuf.destroy();
+    }
 private:
     Context con;
     QOpenGLFramebufferObject frame;
