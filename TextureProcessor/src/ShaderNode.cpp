@@ -1,6 +1,7 @@
 #include <ShaderNode.h>
 #include <SourcesT.h>
 #include <SinksT.h>
+#include <Presenter/GLInterpret.h>
 
 using namespace ver;
 
@@ -52,7 +53,6 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 		}
 	}
 }
-
 ShaderNode::ShaderNode(const ShaderNode& other)
 	:shader(other.shader), e(other.e)
 {
@@ -80,4 +80,13 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 			break;
 		}
 	}
+}
+
+QImage ShaderNode::Update()
+{
+	//for (auto& i: inputs)
+		//i->bind();
+	//for (auto& i : outputs)
+		//i->bind();
+	return e.Render(shader->shader);
 }

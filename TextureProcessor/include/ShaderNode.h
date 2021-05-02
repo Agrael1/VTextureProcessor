@@ -17,6 +17,7 @@ namespace ver
 		ShaderNode(QJsonObject document, Engine& e);
 		ShaderNode(const ShaderNode& other);
 	public:
+		QImage Update();
 	private:
 		std::vector<std::shared_ptr<QOpenGLTexture>> inputs;
 		std::vector<std::shared_ptr<QOpenGLTexture>> outputs;

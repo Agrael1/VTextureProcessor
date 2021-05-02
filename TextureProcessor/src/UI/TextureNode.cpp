@@ -21,7 +21,7 @@ void UI::TextureNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 void UI::TextureNode::DrawTexture(QPainter* painter)
 {
 	QPointF point{ body_size.width() / 2 - 64, EffectiveHeight() / 2 - 64 + NodeStyle::title_height + NodeStyle::item_padding };
-	painter->drawImage(point, texture);
+	painter->drawImage(point, model.Update());
 }
 
 
