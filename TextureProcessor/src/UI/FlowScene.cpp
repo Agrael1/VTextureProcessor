@@ -13,38 +13,45 @@ constexpr std::string_view y = R"({
 			"TitleColor":[128,0,0],
 			"FontColor" : "white"
 		},
-		"Value":["varying lowp vec4 col;\n",
-				"void main() {\n",
-				"   gl_FragColor = col;\n",
+		"Value":["void main() {\n",
+				"   gl_FragColor = vec4(1.0);\n",
 				"}\n"]
 	},
 	
-	"Example2": {
+	"Circle": {
 		"Node": {
 			"Class": "Texture",
-			"Group": "Example",
-			"Sources": [{"Name": "Source1", "Type": "Grayscale"}, {"Name": "Source2", "Type": "Grayscale"}],
-			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
+			"Group": "Shapes",
+			"Sources": [{"Name": "Shape", "Type": "Grayscale"}]
 		},
 		"NodeStyle": {
-			"TitleColor": "green",
+			"TitleColor": [128,0,0],
 			"FontColor" : "white"
 		},
-		"Value":["varying lowp vec4 col;\n",
-				"void main() {\n",
-				"   gl_FragColor = col;\n",
-				"}\n"]
+		"Value":["#version 330 \n",
+				"float circle(in vec2 _st, in float _radius){	  \n",
+				"	vec2 dist = _st-vec2(0.5);					  \n",
+				"	return 1.-smoothstep(_radius-(_radius*0.01),  \n",
+				"		 _radius+(_radius*0.01),				  \n",
+				"		 dot(dist,dist)*4.0);					  \n",
+				"}												  \n",
+				"												  \n",
+				"out vec4 color;								  \n",
+				"void main() {									  \n",
+				"	vec2 st = gl_FragCoord.xy/vec2(128,128);	  \n",
+				"	vec3 xcolor = vec3(circle(st, 1.0));		  \n",
+				"	color = vec4(xcolor, 1.0);					  \n",
+			"}"]
 	},
 	
-	"Example3": {
+	"Triangle": {
 		"Node": {
 			"Class": "Texture",
-			"Group": "Example2",
-			"Sources": [{"Name": "Source1", "Type": "Grayscale"}, {"Name": "Source2", "Type": "Grayscale"}],
-			"Sinks": [{"Name": "Sink1", "Type": "Grayscale"}, {"Name": "Sink2", "Type": "Grayscale"}]
+			"Group": "Shapes",
+			"Sources": [{"Name": "Shape", "Type": "Grayscale"}]
 		},
 		"NodeStyle": {
-			"TitleColor": "cyan",
+			"TitleColor": [128,0,0],
 			"FontColor" : "white"
 		},
 		"Value":["varying lowp vec4 col;\n",
@@ -155,7 +162,6 @@ void FlowScene::DeleteSelected()
 			nodes.erase(n->GetName().data());
 	}
 }
-
 void FlowScene::Clear()
 {
 	nodes.clear();
