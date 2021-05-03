@@ -19,6 +19,18 @@ namespace ver
 	public:
 		QImage Update();
 	private:
+		QOpenGLTexture& Empty()
+		{
+			static QOpenGLTexture empty{ QOpenGLTexture::Target2D };
+			if (!empty.isCreated())
+			{
+				empty.setSize(1, 1, 1);
+				empty.create();
+				empty.allocateStorage();
+			}
+			return empty;
+		}
+	private:
 		std::vector<std::shared_ptr<QOpenGLTexture>> inputs;
 		std::vector<std::shared_ptr<QOpenGLTexture>> outputs;
 		std::shared_ptr<NodePrivate> shader;

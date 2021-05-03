@@ -52,7 +52,7 @@ constexpr std::string_view y = R"({
 			"Sources": [{"Name": "Out", "Type": "Grayscale"}]
 		},
 		"NodeStyle": {
-			"TitleColor": [128,0,0],
+			"TitleColor": [0,128,0],
 			"FontColor" : "white"
 		},
 		"Value":["#version 330\n",
@@ -61,19 +61,16 @@ constexpr std::string_view y = R"({
 				"	return mat2(_scale.x,0.0,								\n",
 				"		0.0,_scale.y);										\n",
 				"}															\n",
+				"in vec2 texcoords;\n",
 				"out vec4 color;\n",
 				"void main() {												\n",
-				"    vec2 st = gl_FragCoord.xy/vec2(128,128);				\n",
+				"    vec2 st = texcoords;				\n",
 				"    //vec3 color = vec3(0.0);								\n",
 				"															\n",
 				"    st -= vec2(0.5);										\n",
-				"    st = scale( vec2(0.1) ) * st;							\n",
+				"    st = scale( vec2(1.5) ) * st;							\n",
 				"    st += vec2(0.5);										\n",
-				"															\n",
-				"    // Show the coordinates of the space on the background	\n",
-				"    // color = vec3(st.x,st.y,0.0);						\n",
-				"															\n",
-				"    color = vec4(1.0,0.0,1.0,1.0);\n",
+				"    color = texture2D(u_Sampler, st);\n",
 				"}"]
 	},
 

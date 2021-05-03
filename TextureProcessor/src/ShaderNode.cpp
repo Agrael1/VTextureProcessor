@@ -93,5 +93,6 @@ QImage ShaderNode::Update()
 {
 	for (uint32_t s = 0; auto & i: inputs)
 		if (i)i->bind(s++);
+		else Empty().bind(s++);
 	return e.Render(shader->shader, outputs);
 }
