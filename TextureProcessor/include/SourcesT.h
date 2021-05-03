@@ -18,6 +18,10 @@ public:
 	{
 		return shader_value;
 	}
+	std::shared_ptr<QOpenGLTexture> YieldTexture()
+	{
+		return buffer;
+	}
 private:
 	std::shared_ptr<QOpenGLTexture>& buffer;
 	std::string_view shader_value;

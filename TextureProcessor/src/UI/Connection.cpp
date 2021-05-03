@@ -119,6 +119,7 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 		source = node->GetPortPos(Port::Source, sourceN);
 		break;
 	}
+	connector.second->OnConnect(sinkN, *connector.first, sourceN);
 	bFinished = true;
 }
 

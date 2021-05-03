@@ -89,9 +89,10 @@ constexpr std::string_view y = R"({
 		},
 		"Value":["#version 330\n",
 				"uniform sampler2D u_Sampler;								\n",
+				"in vec2 texcoords;\n",
 				"out vec4 color;\n",
 				"void main() {												\n",
-				"    color = texture(u_Sampler, gl_FragCoord.xy);\n",
+				"    color = texture2D(u_Sampler, texcoords);\n",
 				"}"]
 	},
 

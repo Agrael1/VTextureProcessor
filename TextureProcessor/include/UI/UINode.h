@@ -3,6 +3,10 @@
 #include <optional>
 #include <PortType.h>
 
+namespace ver
+{
+	class Node;
+}
 
 namespace UI
 {
@@ -22,6 +26,7 @@ namespace UI
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
 		virtual std::string_view GetName()const noexcept = 0;
+		virtual ver::Node& Model() = 0;
 
 		std::string_view GetStyleName()const noexcept
 		{
