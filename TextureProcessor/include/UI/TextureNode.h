@@ -10,6 +10,10 @@ namespace UI
 	public:
 		TextureNode(QJsonObject document, std::string_view name, Engine& engine);
 	public:
+		void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN)override
+		{
+			model.SetSinkLinkage
+		}
 		std::string_view GetName()const noexcept override { return model.GetName(); }
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,

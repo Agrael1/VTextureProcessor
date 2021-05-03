@@ -31,14 +31,10 @@ namespace UI
 			for (auto&& x : codex)
 				x.second.refcount = 0;
 		}
-		void RemoveEngine()
-		{
-			engine.reset();
-		}
 		std::pair<const pv::polymorphic_value<UI::Node>&, size_t> MakeNode(std::string_view in)const;
 	private:
 		std::unordered_map<std::string, RefCountPair> codex;
 		std::unordered_map<std::string, std::vector<std::string_view>> cats;
-		std::optional<Engine> engine;
+		Engine engine;
 	};
 }

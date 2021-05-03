@@ -46,7 +46,7 @@ public:
 		vbuf.bind();
 	}
 public:
-	auto Render(QOpenGLShader& ps)
+	QImage Render(QOpenGLShader& ps)
 	{
 		shaders.addShader(&ps);
 		shaders.link();

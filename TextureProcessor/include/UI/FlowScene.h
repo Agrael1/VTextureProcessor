@@ -19,10 +19,6 @@ namespace UI
 		UI::Connection& CreateConnection();
 		void DeleteSelected();
 		void Clear();
-		void RemoveEngine()
-		{
-			codex.RemoveEngine();
-		}
 	protected:
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
 	private:

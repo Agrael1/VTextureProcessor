@@ -4,8 +4,8 @@
 using namespace UI;
 
 FlowCodex::FlowCodex(QJsonDocument nodes)
+	:engine(QSize{ 128,128 })
 {
-	engine.emplace(QSize{ 128,128 });
 	QJsonObject topLevelObject = nodes.object();
 
 	for (auto key : topLevelObject.keys())
@@ -17,7 +17,7 @@ FlowCodex::FlowCodex(QJsonDocument nodes)
 		RefCountPair p;
 		
 		if(node["Class"].toString() == "Texture")
-			p = RefCountPair::set<TextureNode>(obj, wkey, engine.value());
+			p = RefCountPair::set<TextureNode>(obj, wkey, engine);
 
 		auto pair = codex.emplace(wkey, std::move(p));
 

@@ -63,8 +63,15 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 		switch (s->GetType())
 		{
 		case PortType::Grayscale:
+		{
+			auto r = std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D);
+			r->setSize(128, 128);
+			bool a = r->create();
+			r->allocateStorage();
+
 			RegisterSource(GrayscaleSource::Make(s->GetName(),
-				shader->shadercode, outputs.emplace_back(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D))));
+				shader->shadercode, outputs.emplace_back(std::move(r))));
+		}
 		default:
 			break;
 		}
@@ -84,9 +91,10 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 
 QImage ShaderNode::Update()
 {
-	//for (auto& i: inputs)
-		//i->bind();
-	//for (auto& i : outputs)
-		//i->bind();
+	for (uint32_t s = 0; auto& i: inputs)
+		if(i)i->bind(s++);
+	for (auto& i : outputs)
+		i->bind();
+
 	return e.Render(shader->shader);
 }

@@ -4,6 +4,12 @@
 
 class Window : public QMainWindow
 {
+	struct Internal
+	{
+		Internal(QObject* x):scene(x), view(scene){}
+		UI::FlowScene scene;
+		FlowView view;
+	};
 public:
 	Window(int32_t width, int32_t height);
 public:
@@ -18,13 +24,12 @@ public:
 	}
 	void closeEvent(QCloseEvent* event)override
 	{
-		scene.RemoveEngine();
+		a.reset();
 	}
 
 private:
 	QMenu menu;
 	QAction Aclear;
 	
-	UI::FlowScene scene;
-	FlowView view;
+	std::optional<Internal> a;
 };

@@ -38,7 +38,7 @@ namespace UI
 
 	private:
 		virtual void SetUniqueName(std::string_view xname) = 0;
-		//virtual void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN) = 0;
+		virtual void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN) = 0;
 		//virtual void OnDisconnect(uint8_t sinkN, Node& source, uint8_t sourceN) = 0;
 		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;
 		QVariant itemChange(GraphicsItemChange change, const QVariant& value)override;

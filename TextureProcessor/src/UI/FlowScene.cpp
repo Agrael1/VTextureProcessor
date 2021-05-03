@@ -43,7 +43,58 @@ constexpr std::string_view y = R"({
 				"	color = vec4(xcolor, 1.0);					  \n",
 			"}"]
 	},
-	
+
+	"Scale": {
+		"Node": {
+			"Class": "Texture",
+			"Group": "Transform",
+			"Sinks": [{"Name": "In", "Type": "Grayscale"}],
+			"Sources": [{"Name": "Out", "Type": "Grayscale"}]
+		},
+		"NodeStyle": {
+			"TitleColor": [128,0,0],
+			"FontColor" : "white"
+		},
+		"Value":["#version 330\n",
+				"uniform sampler2D u_Sampler;								\n",
+				"mat2 scale(vec2 _scale){									\n",
+				"	return mat2(_scale.x,0.0,								\n",
+				"		0.0,_scale.y);										\n",
+				"}															\n",
+				"out vec4 color;\n",
+				"void main() {												\n",
+				"    vec2 st = gl_FragCoord.xy/vec2(128,128);				\n",
+				"    //vec3 color = vec3(0.0);								\n",
+				"															\n",
+				"    st -= vec2(0.5);										\n",
+				"    st = scale( vec2(0.1) ) * st;							\n",
+				"    st += vec2(0.5);										\n",
+				"															\n",
+				"    // Show the coordinates of the space on the background	\n",
+				"    // color = vec3(st.x,st.y,0.0);						\n",
+				"															\n",
+				"    color = vec4(1.0,0.0,1.0,1.0);\n",
+				"}"]
+	},
+
+	"Dumpster": {
+		"Node": {
+			"Class": "Texture",
+			"Group": "Output",
+			"Sinks": [{"Name": "In", "Type": "Grayscale"}]
+		},
+		"NodeStyle": {
+			"TitleColor": "black",
+			"FontColor" : "white"
+		},
+		"Value":["#version 330\n",
+				"uniform sampler2D u_Sampler;								\n",
+				"out vec4 color;\n",
+				"void main() {												\n",
+				"    color = texture(u_Sampler, gl_FragCoord.xy);\n",
+				"}"]
+	},
+
 	"Triangle": {
 		"Node": {
 			"Class": "Texture",
@@ -61,8 +112,6 @@ constexpr std::string_view y = R"({
 	}
 })";
 
-QJsonParseError e;
-
 using namespace UI;
 
 FlowScene::FlowScene(QObject* parent)
@@ -73,7 +122,7 @@ FlowScene::FlowScene(QObject* parent)
 	, Plight(Clight)
 	, Pdark(Cdark)
 	, Bbackground(Cbackground)
-	, codex(QJsonDocument::fromJson(y.data(),&e))
+	, codex(QJsonDocument::fromJson(y.data()))
 {
 	Plight.setWidth(0);
 	Pdark.setWidth(0);

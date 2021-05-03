@@ -51,8 +51,6 @@ add_executable (TextureProcessor
 	"include/Source.h"
 	"src/Source.cpp"
 	"src/Sink.cpp"
-	"include/Link.h"
-	"src/Link.cpp"
 	"include/UI/UINode.h"
 	"include/Graph.h"
 	"include/utils/Exception.h"
