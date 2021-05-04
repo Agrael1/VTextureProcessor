@@ -29,6 +29,7 @@ namespace UI
 		void RemoveForce()noexcept;
 		void UpdateConnected();
 		void Update();
+		void UpdateDisconnect();
 	private:
 		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
@@ -54,14 +55,7 @@ namespace UI
 	{
 	public:
 		static void MakeTemporary(Node& node, Port port, uint8_t portidx);
-		static void AttachTemporary(std::unique_ptr<Connection>&& in)
-		{
-			auto& x = Instance().tmp;
-			x = std::move(in);
-
-			x->ResetSink();
-			x->grabMouse();
-		}
+		static void AttachTemporary(std::unique_ptr<Connection>&& in);
 		static void ClearTemporary();
 		static auto DetachTemporary()
 		{

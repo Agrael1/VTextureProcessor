@@ -127,6 +127,11 @@ void UI::Connection::Update()
 {
 	connector.second->OnConnect(sinkN, *connector.first, sourceN);
 }
+void UI::Connection::UpdateDisconnect()
+{
+	connector.second->OnDisconnect(sinkN);
+	UpdateConnected();
+}
 void UI::Connection::UpdateConnected()
 {
 	for (auto* c : ConnMapper::Get(connector.second))
@@ -204,7 +209,10 @@ void Connection::Move(QPointF deltapos, Port ty)
 void Connection::RemoveForce()noexcept
 {
 	if (bFinished)
+	{
+		UpdateDisconnect();
 		connector.second->SetConnection(nullptr, sinkN);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -231,6 +239,16 @@ void UI::ConnMapper::MakeTemporary(Node& node, Port port, uint8_t portidx)
 	Instance().tmp.reset(new Connection{ node, port, portidx });
 	Instance().tmp->grabMouse();
 }
+void UI::ConnMapper::AttachTemporary(std::unique_ptr<Connection>&& in)
+{
+	auto& x = Instance().tmp;
+	x = std::move(in);
+	Unmap(x->connector.first, x.get());
+	x->UpdateDisconnect();
+	x->ResetSink();
+	x->grabMouse();
+}
+
 void UI::ConnMapper::ConnectApply()
 {
 	auto& i = Instance();
