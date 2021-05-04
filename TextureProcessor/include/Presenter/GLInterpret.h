@@ -45,20 +45,11 @@ public:
 		vbuf.create();
 		vbuf.bind();
 	}
-public:
-	QImage Render(QOpenGLShader& ps)
+	~Engine()
 	{
-		shaders.addShader(&ps);
-		shaders.link();
-		shaders.bind();
-
-		con.funcs.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		con.funcs.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		con.funcs.glDrawArrays(GL_TRIANGLES, 0, 3);
-		shaders.removeShader(&ps);
-
-		return frame.toImage(false,0);
+		Empty().destroy();
 	}
+public:
 	QImage Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> outputs)
 	{
 		shaders.addShader(&ps);
@@ -79,9 +70,16 @@ public:
 	{
 		return con.funcs;
 	}
-	auto& Frame()
+	QOpenGLTexture& Empty()
 	{
-		return frame;
+		static QOpenGLTexture empty{ QOpenGLTexture::Target2D };
+		if (!empty.isCreated())
+		{
+			empty.setSize(1, 1, 1);
+			empty.create();
+			empty.allocateStorage();
+		}
+		return empty;
 	}
 private:
 	Context con;

@@ -27,12 +27,13 @@ namespace UI
 			bFinished = false;
 		}
 		void RemoveForce()noexcept;
+		void UpdateConnected();
+		void Update();
 	private:
 		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
 		void mouseReleaseEvent(QGraphicsSceneMouseEvent* event)override;
 		void PlaceConnection(std::optional<std::pair<Port, uint8_t>> port, Node* node);
-
 
 		std::pair<QPointF, QPointF> PointsC1C2()const;
 		Port Requires()const;
@@ -57,6 +58,7 @@ namespace UI
 		{
 			auto& x = Instance().tmp;
 			x = std::move(in);
+
 			x->ResetSink();
 			x->grabMouse();
 		}

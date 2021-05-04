@@ -120,7 +120,19 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 		break;
 	}
 	connector.second->OnConnect(sinkN, *connector.first, sourceN);
+	UpdateConnected();
 	bFinished = true;
+}
+void UI::Connection::Update()
+{
+	connector.second->OnConnect(sinkN, *connector.first, sourceN);
+}
+void UI::Connection::UpdateConnected()
+{
+	for (auto* c : ConnMapper::Get(connector.second))
+		c->Update();
+	for (auto* c : ConnMapper::Get(connector.second))
+		c->UpdateConnected();
 }
 
 std::pair<QPointF, QPointF> Connection::PointsC1C2()const

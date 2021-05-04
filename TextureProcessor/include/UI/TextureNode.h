@@ -19,6 +19,13 @@ namespace UI
 		{
 			auto& mo = source.Model();
 			model.GetSink(sinkN).Bind(mo.GetSource(sourceN));
+			model.Update();
+			update();
+		}
+		void OnDisconnect(uint8_t sinkN)override
+		{
+			model.GetSink(sinkN).Unlink();
+			model.Update();
 			update();
 		}
 		ver::Node& Model()

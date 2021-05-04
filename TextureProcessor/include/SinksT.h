@@ -19,7 +19,7 @@ public:
 	}
 	virtual void Unlink()override
 	{
-
+		target = nullptr;
 	}
 	void Bind(Source& source) override
 	{
