@@ -13,8 +13,9 @@ constexpr std::string_view y = R"({
 			"TitleColor":[128,0,0],
 			"FontColor" : "white"
 		},
-		"Value":["void main() {\n",
-				"   gl_FragColor = vec4(1.0);\n",
+		"Value":["out vec4 col;\n",
+				"void main() {\n",
+				"   col = vec4(1.0);\n",
 				"}\n"]
 	},
 	
@@ -28,8 +29,7 @@ constexpr std::string_view y = R"({
 			"TitleColor": [128,0,0],
 			"FontColor" : "white"
 		},
-		"Value":["#version 330 \n",
-				"float circle(in vec2 _st, in float _radius){	  \n",
+		"Value":["float circle(in vec2 _st, in float _radius){	  \n",
 				"	vec2 dist = _st-vec2(0.5);					  \n",
 				"	return 1.-smoothstep(_radius-(_radius*0.01),  \n",
 				"		 _radius+(_radius*0.01),				  \n",
@@ -48,6 +48,7 @@ constexpr std::string_view y = R"({
 		"Node": {
 			"Class": "Texture",
 			"Group": "Transform",
+			"Properties": [{"Tag": "Scale", "Type":"float", "Val":1.5}],
 			"Sinks": [{"Name": "In", "Type": "Grayscale"}],
 			"Sources": [{"Name": "Out", "Type": "Grayscale"}]
 		},
@@ -55,9 +56,7 @@ constexpr std::string_view y = R"({
 			"TitleColor": [0,128,0],
 			"FontColor" : "white"
 		},
-		"Value":["#version 330\n",
-				"uniform float Scale = 1.5;\n",
-				"uniform sampler2D u_Sampler;								\n",
+		"Value":["uniform sampler2D u_Sampler;								\n",
 				"mat2 scale(vec2 _scale){									\n",
 				"	return mat2(_scale.x,0.0,								\n",
 				"		0.0,_scale.y);										\n",
@@ -83,8 +82,7 @@ constexpr std::string_view y = R"({
 			"TitleColor": "black",
 			"FontColor" : "white"
 		},
-		"Value":["#version 330\n",
-				"uniform sampler2D u_Sampler;								\n",
+		"Value":["uniform sampler2D u_Sampler;								\n",
 				"in vec2 texcoords;\n",
 				"out vec4 color;\n",
 				"void main() {												\n",
@@ -96,15 +94,16 @@ constexpr std::string_view y = R"({
 		"Node": {
 			"Class": "Texture",
 			"Group": "Shapes",
+			"Properties": [{"Tag": "S", "Type":"float", "Val":0.2}],
 			"Sources": [{"Name": "Shape", "Type": "Grayscale"}]
 		},
 		"NodeStyle": {
 			"TitleColor": [128,0,0],
 			"FontColor" : "white"
 		},
-		"Value":["varying lowp vec4 col;\n",
+		"Value":["out vec4 col;\n",
 				"void main() {\n",
-				"   gl_FragColor = col;\n",
+				"   col = vec4(S, S, 0.0, 1.0);\n",
 				"}\n"]
 	}
 })";

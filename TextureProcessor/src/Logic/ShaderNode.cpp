@@ -12,10 +12,15 @@ ShaderNode::NodePrivate::NodePrivate(QString&& code)
 }
 
 ShaderNode::ShaderNode(QJsonObject document, Engine& e)
-	:e(e)
+	: e(e)
 {
 	auto node = document["Node"].toObject();
-	QString xshader;
+	QString xshader{ "#version 330 \n" };
+
+	if (node.contains("Properties"))
+		SetProperties(node["Properties"].toArray(), xshader);
+
+
 	auto val = document["Value"];
 	if (!val.isArray())
 	{
@@ -54,7 +59,7 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	}
 }
 ShaderNode::ShaderNode(const ShaderNode& other)
-	:shader(other.shader), e(other.e)
+	:shader(other.shader), e(other.e), buf(other.buf)
 {
 	sinks.reserve(other.SinksCount());
 	sources.reserve(other.SourcesCount());
@@ -94,5 +99,34 @@ QImage ShaderNode::Update()
 	for (uint32_t s = 0; auto & i: inputs)
 		if (i)i->bind(s++);
 		else e.Empty().bind(s++);
+	if (buf) return e.Render(shader->shader, outputs, &buf);
 	return e.Render(shader->shader, outputs);
+}
+
+void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
+{
+	if (props.isEmpty())return;
+	dc::Layout lay;
+
+	std::vector<std::string> tags;
+	std::vector<QVariant> vars;
+	for (auto it : props)
+	{
+		auto p = it.toObject();
+		scode += "uniform ";
+		auto qtype = p["Type"].toString();
+		scode += qtype + " ";
+		auto qtag = p["Tag"].toString();
+		scode += qtag + ";\n";
+		lay += { tags.emplace_back(qtag.toStdString()), dc::LayoutElement{ qtype.toStdString() }};
+	}
+
+
+	buf.Replace(std::move(lay));
+	for (size_t i = 0; auto it : props)
+	{
+		auto p = it.toObject();
+		if (p.contains("Val"))
+			buf[tags[i]] = p["Val"].toVariant();
+	}
 }

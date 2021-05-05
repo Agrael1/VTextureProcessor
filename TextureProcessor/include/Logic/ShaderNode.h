@@ -1,5 +1,6 @@
 #pragma once
 #include <Logic/Node.h>
+#include <Logic/DynamicConstant.h>
 
 class Engine;
 
@@ -19,11 +20,12 @@ namespace ver
 	public:
 		QImage Update();
 	private:
-
+		void SetProperties(const QJsonArray& props, QString& scode);
 	private:
 		std::vector<std::shared_ptr<QOpenGLTexture>> inputs;
 		std::vector<std::shared_ptr<QOpenGLTexture>> outputs;
 		std::shared_ptr<NodePrivate> shader;
+		dc::Buffer buf;
 		Engine& e;
 	};
 }

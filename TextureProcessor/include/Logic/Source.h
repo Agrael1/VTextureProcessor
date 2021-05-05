@@ -19,5 +19,4 @@ protected:
 private:
 	std::string name;
 	PortType type;
-	//std::vector<Node*> connections; //tmp update
 };

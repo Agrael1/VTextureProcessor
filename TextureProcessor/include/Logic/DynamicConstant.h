@@ -34,49 +34,56 @@ namespace ver::dc
 	{
 		using SysType = float;
 		static constexpr size_t hlslSize = sizeof(SysType);
+		static constexpr const uint16_t ocslot = 1;
 		static constexpr bool valid = true;
-		static constexpr const char* code = "F1";
+		static constexpr const char* code = "float";
 	};
 	template<> struct Map< Type::Float2 >
 	{
 		using SysType = QVector2D;
 		static constexpr size_t hlslSize = sizeof(SysType);
+		static constexpr const uint16_t ocslot = 1;
 		static constexpr bool valid = true;
-		static constexpr const char* code = "F2";
+		static constexpr const char* code = "vec2";
 	};
 	template<> struct Map< Type::Float3 >
 	{
 		using SysType = QVector3D;
 		static constexpr size_t hlslSize = sizeof(SysType);
+		static constexpr const uint16_t ocslot = 1;
 		static constexpr bool valid = true;
-		static constexpr const char* code = "F3";
+		static constexpr const char* code = "vec3";
 	};
 	template<> struct Map< Type::Float4 >
 	{
 		using SysType = QVector4D;
 		static constexpr size_t hlslSize = sizeof(SysType);
+		static constexpr const uint16_t ocslot = 1;
 		static constexpr bool valid = true;
-		static constexpr const char* code = "F4";
+		static constexpr const char* code = "vec4";
 	};
 	template<> struct Map< Type::Matrix >
 	{
 		using SysType = QMatrix4x4;
 		static constexpr size_t hlslSize = sizeof(SysType);
+		static constexpr const uint16_t ocslot = 4;
 		static constexpr bool valid = true;
-		static constexpr const char* code = "F4x4";
+		static constexpr const char* code = "mat4";
 	};
 	template<> struct Map< Type::Bool >
 	{
 		using SysType = bool;
 		static constexpr size_t hlslSize = 4u;
+		static constexpr const uint16_t ocslot = 1;
 		static constexpr bool valid = true;
-		static constexpr const char* code = "B";
+		static constexpr const char* code = "bool";
 	};
 	template<> struct Map< Type::Integer >
 	{
 		using SysType = int;
 		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const char* code = "IN";
+		static constexpr const uint16_t ocslot = 1;
+		static constexpr const char* code = "int";
 		static constexpr bool valid = true;
 	};
 
@@ -105,13 +112,31 @@ namespace ver::dc
 		constexpr LayoutElement() noexcept = default;
 		constexpr LayoutElement(Type typeIn) noexcept
 			:type(typeIn)
+		{}
+		constexpr LayoutElement(std::string_view signature)noexcept
 		{
-			if (!std::is_constant_evaluated())
-			{
-				assert(typeIn != Type::Empty);
-			}
+			if (signature == "float")
+				type = Type::Float;
+			else if (signature == "vec2")
+				type = Type::Float2;
+			else if (signature == "vec3")
+				type = Type::Float3;
+			else if (signature == "vec4")
+				type = Type::Float4;
+			else if (signature == "mat4")
+				type = Type::Matrix;
+			else if (signature == "bool")
+				type = Type::Bool;
+			else if (signature == "int")
+				type = Type::Integer;
+			else type = Type::Empty;
+			assert(type != Type::Empty);
 		}
 	public:
+		constexpr Type Get()const noexcept
+		{
+			return type;
+		}
 		constexpr std::string_view GetSignature() const noexcept
 		{
 			switch (type)
@@ -146,11 +171,21 @@ namespace ver::dc
 				return 0;
 			}
 		}
+		constexpr uint16_t GetSlot() const noexcept
+		{
+			switch (type)
+			{
+#define X(el) case Type::el: return Map<Type::el>::ocslot;
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				assert("Bad type in signature generation" && false);
+				return 0;
+			}
+		}
 	private:
 		Type type = Type::Empty;
 	};
-
-
 
 	class Layout
 	{
@@ -171,6 +206,18 @@ namespace ver::dc
 		{
 			lay.emplace_back(std::move(element));
 			return *this;
+		}
+		std::span<const std::pair<std::string, LayoutElement>> Get()const noexcept
+		{
+			return lay;
+		}
+		auto& operator[](size_t in)
+		{
+			return lay[in];
+		}
+		size_t count()const noexcept
+		{
+			return lay.size();
 		}
 	public:
 		std::pair<size_t, LayoutElement> GetOffsetAndType(std::string_view key) const
@@ -207,6 +254,21 @@ namespace ver::dc
 			}
 			sig += "}"s;
 			return sig;
+		}
+		uint16_t GetSlot(std::string_view key)
+		{
+			uint16_t out = 0;
+			LayoutElement out2;
+			for (const auto& x : lay)
+			{
+				if (key == x.first)
+				{
+					out2 = x.second;
+					break;
+				}
+				out += x.second.GetSlot();
+			}
+			return out;
 		}
 	private:
 		std::vector<std::pair<std::string, LayoutElement>> lay;
@@ -266,25 +328,72 @@ namespace ver::dc
 		void operator=(const T& rhs) const noexcept
 		{
 			static_assert(ReverseMap<std::remove_const_t<T>>::valid, "Unsupported SysType used in assignment");
-			if (type && ReverseMap<std::remove_const_t<T>>::type == type)
+			if (type && ReverseMap<std::remove_const_t<T>>::type == type.Get())
+			{
 				static_cast<T&>(*this) = rhs;
+				return;
+			}
 			assert(false && "Attemt to set non existent element");
 		}
+		void operator=(const QVariant& rhs) const noexcept
+		{
+			switch (type.Get())
+			{
+#define X(el) case Type::el: this->operator=(rhs.value<Map<Type::el>::SysType>());return;
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+			assert(false && "Attemt to set non existent element");
+		}
+		Type GetType()const noexcept
+		{
+			return type.Get();
+		}
+		uint16_t GetSlot()const noexcept
+		{
+			return slot;
+		}
 	private:
-		ElementRef(std::byte* pBytes, LayoutElement type) noexcept
-			:type(type), pBytes(pBytes)
+		ElementRef(std::byte* pBytes, LayoutElement type, uint16_t slot) noexcept
+			:type(type), pBytes(pBytes), slot(slot)
 		{
 
 		}
 	private:
 		LayoutElement type;
+		uint16_t slot;
 		std::byte* pBytes;
 	};
 
 	class Buffer
 	{
+		class Iterator
+		{
+		public:
+			explicit Iterator(Buffer *b, ElementRef r, size_t index) :ref(r), b(b), index(index) {}
+		public:
+			void operator++()
+			{
+				ref = b->Get(++index);
+			}
+			bool operator==(Iterator& o)
+			{
+				return (b == o.b) && (index == o.index);
+			}
+			ElementRef operator*()const noexcept
+			{
+				return ref;
+			}
+		private:
+			ElementRef ref;
+			Buffer* b;
+			size_t index;
+		};
 	public:
-		Buffer(const Layout&& lay) noexcept
+		Buffer() = default;
+		Buffer(Layout&& lay) noexcept
 			:lay(lay)
 		{
 			bytes.resize(lay.GetSizeInBytes());
@@ -293,9 +402,26 @@ namespace ver::dc
 		ElementRef operator[](std::string_view key) noexcept
 		{
 			auto x = lay.GetOffsetAndType(key);
-			return { bytes.data() + x.first, x.second };
+			return { bytes.data() + x.first, x.second, lay.GetSlot(key) };
+		}
+		operator bool()const
+		{
+			return !bytes.empty();
+		}
+		Iterator begin()
+		{
+			return Iterator{ this, Get(0), 0 };
+		}
+		Iterator end()
+		{
+			return Iterator{ this, Get(lay.count()), lay.count() };
 		}
 	public:
+		void Replace(Layout&& xlay)
+		{
+			lay = std::move(xlay);
+			bytes.resize(lay.GetSizeInBytes());
+		}
 		constexpr std::span<const std::byte> GetData() const noexcept
 		{
 			return bytes;
@@ -305,7 +431,15 @@ namespace ver::dc
 			return lay.GetSizeInBytes();
 		}
 	private:
-		const Layout lay;
+		ElementRef Get(size_t in)
+		{
+			if (in == lay.count())
+				return { bytes.data() + bytes.size(), { Type::Empty }, 65535 };
+			auto x = lay.GetOffsetAndType(lay[in].first);
+			return { bytes.data() + x.first, x.second, lay.GetSlot(lay[in].first) };
+		}
+	private:
+		Layout lay;
 		std::vector<std::byte> bytes;
 	};
 
