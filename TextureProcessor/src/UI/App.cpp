@@ -1,5 +1,4 @@
 #include <UI/App.h>
-#include <Presenter/GLInterpret.h>
 
 App::App(int argc, char** argv)
 	:app(argc, argv)

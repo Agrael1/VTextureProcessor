@@ -1,5 +1,5 @@
 #pragma once
-#include <Source.h>
+#include <Logic/Source.h>
 
 template <PortType ty = PortType::Grayscale>
 class DirectTextureSource : public Source

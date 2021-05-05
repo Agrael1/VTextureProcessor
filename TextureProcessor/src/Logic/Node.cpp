@@ -1,4 +1,4 @@
-#include <Node.h>
+#include <Logic/Node.h>
 #include <utils/Exception.h>
 #include <utils/Utils.h>
 

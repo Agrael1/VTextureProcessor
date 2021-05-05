@@ -1,6 +1,6 @@
-#include <ShaderNode.h>
-#include <SourcesT.h>
-#include <SinksT.h>
+#include <Logic/ShaderNode.h>
+#include <Logic/SourcesT.h>
+#include <Logic/SinksT.h>
 #include <Presenter/GLInterpret.h>
 
 using namespace ver;

@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <span>
 #include <optional>
-#include <PortType.h>
+#include <Logic/PortType.h>
 
 namespace UI
 {

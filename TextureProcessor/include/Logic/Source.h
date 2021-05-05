@@ -1,5 +1,5 @@
 #pragma once
-#include <PortType.h>
+#include <Logic/PortType.h>
 #include <memory>
 #include <string>
 

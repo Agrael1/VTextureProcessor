@@ -56,6 +56,7 @@ constexpr std::string_view y = R"({
 			"FontColor" : "white"
 		},
 		"Value":["#version 330\n",
+				"uniform float Scale = 1.5;\n",
 				"uniform sampler2D u_Sampler;								\n",
 				"mat2 scale(vec2 _scale){									\n",
 				"	return mat2(_scale.x,0.0,								\n",
@@ -65,10 +66,8 @@ constexpr std::string_view y = R"({
 				"out vec4 color;\n",
 				"void main() {												\n",
 				"    vec2 st = texcoords;				\n",
-				"    //vec3 color = vec3(0.0);								\n",
-				"															\n",
 				"    st -= vec2(0.5);										\n",
-				"    st = scale( vec2(1.5) ) * st;							\n",
+				"    st = scale( vec2(Scale) ) * st;						\n",
 				"    st += vec2(0.5);										\n",
 				"    color = texture2D(u_Sampler, st);\n",
 				"}"]

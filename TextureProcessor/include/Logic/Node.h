@@ -1,6 +1,6 @@
 #pragma once
-#include <Source.h>
-#include <Sink.h>
+#include <Logic/Source.h>
+#include <Logic/Sink.h>
 #include <vector>
 #include <memory>
 #include <span>

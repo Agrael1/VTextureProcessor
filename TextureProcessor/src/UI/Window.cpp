@@ -17,6 +17,7 @@ Window::Window(int32_t width, int32_t height)
 	a->scene.setSceneRect(-32000, -32000, 64000, 64000);
 
 	setCentralWidget(&a->view);
+	addDockWidget(Qt::RightDockWidgetArea, &a->props);
 }
 
 void Window::onClearTriggered()

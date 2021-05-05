@@ -1,7 +1,7 @@
 #pragma once
 #include <UI/NodeStyle.h>
 #include <optional>
-#include <PortType.h>
+#include <Logic/PortType.h>
 
 namespace ver
 {

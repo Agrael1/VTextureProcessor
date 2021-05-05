@@ -47,14 +47,13 @@ add_compile_definitions(_HAS_DEPRECATED_RESULT_OF=1)
 add_executable (TextureProcessor
 	"src/EntryMain.cpp"
 
-	"include/Sink.h"
-	"include/Source.h"
-	"src/Source.cpp"
-	"src/Sink.cpp"
+	"include/Logic/Sink.h"
+	"include/Logic/Source.h"
+	"src/Logic/Source.cpp"
+	"src/Logic/Sink.cpp"
 	"include/UI/UINode.h"
-	"include/Graph.h"
 	"include/utils/Exception.h"
-	"src/Node.cpp"   "include/GraphCodex.h"  "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp" "src/UI/FlowScene.cpp" "include/UI/FlowScene.h" "include/UI/FlowView.h" "src/UI/FlowView.cpp" "src/UI/UINode.cpp"   "include/UI/NodeStyle.h" "src/UI/NodeStyle.cpp" "include/UI/ContextMenu.h" "include/pch.h" "src/UI/ContextMenu.cpp" "include/UI/FlowCodex.h" "src/UI/FlowCodex.cpp"  "include/SinksT.h" "include/SourcesT.h" "include/Presenter/GLInterpret.h" "src/Presenter/GLInterpret.cpp" "include/ShaderNode.h" "src/ShaderNode.cpp" "include/UI/TextureNode.h" "src/UI/TextureNode.cpp" "include/PortType.h" "include/UI/Connection.h" "src/UI/Connection.cpp" "include/CompositeNode.h" "src/CompositeNode.cpp" "include/UI/INodePrivate.h" )
+	"src/Logic/Node.cpp" "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp" "src/UI/FlowScene.cpp" "include/UI/FlowScene.h" "include/UI/FlowView.h" "src/UI/FlowView.cpp" "src/UI/UINode.cpp"   "include/UI/NodeStyle.h" "src/UI/NodeStyle.cpp" "include/UI/ContextMenu.h" "include/pch.h" "src/UI/ContextMenu.cpp" "include/UI/FlowCodex.h" "src/UI/FlowCodex.cpp"  "include/Logic/SinksT.h" "include/Logic/SourcesT.h" "include/Presenter/GLInterpret.h" "src/Presenter/GLInterpret.cpp" "include/Logic/ShaderNode.h" "src/Logic/ShaderNode.cpp" "include/UI/TextureNode.h" "src/UI/TextureNode.cpp" "include/Logic/PortType.h" "include/UI/Connection.h" "src/UI/Connection.cpp" "include/Logic/CompositeNode.h" "src/Logic/CompositeNode.cpp"   "include/Editor/Editor.h" "src/Editor/Editor.cpp" "include/Editor/SyntaxHighlight.h" "include/Editor/SyntaxStyle.h" "include/UI/Properties.h" "src/UI/Properties.cpp" "include/Logic/DynamicConstant.h" "src/Logic/DynamicConstant.cpp")
 
 # TODO: Добавьте тесты и целевые объекты, если это необходимо.
 target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt5Widgets_INCLUDE_DIRS}")

@@ -1,4 +1,4 @@
-#include <Sink.h>
+#include <Logic/Sink.h>
 #include <utils/Exception.h>
 
 std::string_view Sink::GetRegisteredName() const noexcept

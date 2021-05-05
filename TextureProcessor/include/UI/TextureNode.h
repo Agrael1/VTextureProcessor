@@ -1,5 +1,5 @@
 #include <UI/UINode.h>
-#include <ShaderNode.h>
+#include <Logic/ShaderNode.h>
 
 class Engine;
 
