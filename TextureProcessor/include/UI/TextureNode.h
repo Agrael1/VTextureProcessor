@@ -5,6 +5,7 @@ class Engine;
 
 namespace UI
 {
+	class Properties;
 	class TextureNode : public Node
 	{
 	public:
@@ -14,20 +15,19 @@ namespace UI
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
+		void UpdateProperties(Properties& properties);
 	private:
 		void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN)override
 		{
-			auto& mo = source.Model();
-			model.GetSink(sinkN).Bind(mo.GetSource(sourceN));
-			model.Update();
-			update();
+			model.GetSink(sinkN).Bind(source.Model().GetSource(sourceN));
+			Update();
 		}
 		void OnDisconnect(uint8_t sinkN)override
 		{
 			model.GetSink(sinkN).Unlink();
-			model.Update();
-			update();
+			Update();
 		}
+		void Update()override;
 		ver::Node& Model()
 		{
 			return model;

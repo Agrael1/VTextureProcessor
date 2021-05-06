@@ -7,15 +7,16 @@ class Window : public QMainWindow
 {
 	struct Internal
 	{
-		Internal(QWidget* x) :scene(x), view(scene), props(nullptr) { }
+		Internal(QWidget* x) :scene(x, props), view(scene) { }
+		UI::Properties props;
 		UI::FlowScene scene;
 		FlowView view;
-		Properties props;
 	};
 public:
 	Window(int32_t width, int32_t height);
 public:
-	void onClearTriggered();
+	void OnClearTriggered();
+	void OnProps();
 	void ShowMaximized()
 	{
 		showMaximized();
@@ -30,7 +31,9 @@ public:
 	}
 
 private:
-	QMenu menu;
+	QMenu file;
+	QMenu windows;
 	QAction Aclear;
+	QAction Aprops;
 	std::optional<Internal> a;
 };

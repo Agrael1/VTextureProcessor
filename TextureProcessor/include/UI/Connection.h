@@ -27,7 +27,6 @@ namespace UI
 			bFinished = false;
 		}
 		void RemoveForce()noexcept;
-		void UpdateConnected();
 		void Update();
 		void UpdateDisconnect();
 	private:
@@ -62,6 +61,11 @@ namespace UI
 			return std::move(Instance().tmp);
 		}
 		static void ConnectApply();
+		static void UpdateGraph(Node* from)
+		{
+			for (auto* c : Get(from))
+				c->Update();
+		}
 		static ConnMapper& Instance();
 		static void Map(Node* n, Connection* c);
 		static void Unmap(Node* n, Connection* c)

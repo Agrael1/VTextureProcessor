@@ -219,6 +219,13 @@ namespace ver::dc
 		{
 			return lay.size();
 		}
+		bool contains(std::string_view key)const noexcept
+		{
+			for (const auto& x : lay)
+				if (key == x.first)
+					return true;
+			return false;
+		}
 	public:
 		std::pair<size_t, LayoutElement> GetOffsetAndType(std::string_view key) const
 		{
@@ -355,13 +362,18 @@ namespace ver::dc
 		{
 			return slot;
 		}
+		std::string_view GetName()const noexcept
+		{
+			return name;
+		}
 	private:
-		ElementRef(std::byte* pBytes, LayoutElement type, uint16_t slot) noexcept
-			:type(type), pBytes(pBytes), slot(slot)
+		ElementRef(std::byte* pBytes, LayoutElement type, uint16_t slot, std::string_view name) noexcept
+			:type(type), pBytes(pBytes), slot(slot), name(name)
 		{
 
 		}
 	private:
+		std::string_view name;
 		LayoutElement type;
 		uint16_t slot;
 		std::byte* pBytes;
@@ -402,7 +414,7 @@ namespace ver::dc
 		ElementRef operator[](std::string_view key) noexcept
 		{
 			auto x = lay.GetOffsetAndType(key);
-			return { bytes.data() + x.first, x.second, lay.GetSlot(key) };
+			return { bytes.data() + x.first, x.second, lay.GetSlot(key), key };
 		}
 		operator bool()const
 		{
@@ -434,9 +446,10 @@ namespace ver::dc
 		ElementRef Get(size_t in)
 		{
 			if (in == lay.count())
-				return { bytes.data() + bytes.size(), { Type::Empty }, 65535 };
-			auto x = lay.GetOffsetAndType(lay[in].first);
-			return { bytes.data() + x.first, x.second, lay.GetSlot(lay[in].first) };
+				return { bytes.data() + bytes.size(), { Type::Empty }, 65535, "" };
+			std::string_view name = lay[in].first;
+			auto x = lay.GetOffsetAndType(name);
+			return { bytes.data() + x.first, x.second, lay.GetSlot(name), name };
 		}
 	private:
 		Layout lay;

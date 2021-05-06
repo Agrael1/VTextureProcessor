@@ -8,7 +8,7 @@ namespace UI
 	class FlowScene : public QGraphicsScene
 	{
 	public:
-		FlowScene(QObject* parent);
+		FlowScene(QObject* parent, Properties& props);
 	public:
 		auto& GetGroupList()const noexcept
 		{
@@ -21,6 +21,7 @@ namespace UI
 		void Clear();
 	protected:
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
+		void OnSelectionChanged();
 	private:
 		QColor Cbackground;
 		QColor Clight;
@@ -30,6 +31,7 @@ namespace UI
 		QPen Pdark;
 
 		QBrush Bbackground;
+		Properties& props;
 
 		UI::FlowCodex codex;
 		std::unordered_map<std::string, pv::polymorphic_value<UI::Node>> nodes;

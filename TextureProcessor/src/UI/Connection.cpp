@@ -106,7 +106,6 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 		sinkN = port->second;
 		connector.second = node;
 		node->SetConnection(ConnMapper::DetachTemporary(), sinkN);
-		node->update();
 		ConnMapper::Map(connector.first, this);
 		sink = node->GetPortPos(Port::Sink, sinkN);
 		break;
@@ -120,7 +119,6 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 		break;
 	}
 	connector.second->OnConnect(sinkN, *connector.first, sourceN);
-	UpdateConnected();
 	bFinished = true;
 }
 void UI::Connection::Update()
@@ -130,14 +128,6 @@ void UI::Connection::Update()
 void UI::Connection::UpdateDisconnect()
 {
 	connector.second->OnDisconnect(sinkN);
-	UpdateConnected();
-}
-void UI::Connection::UpdateConnected()
-{
-	for (auto* c : ConnMapper::Get(connector.second))
-		c->Update();
-	for (auto* c : ConnMapper::Get(connector.second))
-		c->UpdateConnected();
 }
 
 std::pair<QPointF, QPointF> Connection::PointsC1C2()const

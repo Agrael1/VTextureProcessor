@@ -1,5 +1,6 @@
 #include <UI/FlowScene.h>
 #include <fmt/printf.h>
+#include <UI/Properties.h>
 
 constexpr std::string_view y = R"({
 	"Square": {
@@ -110,7 +111,7 @@ constexpr std::string_view y = R"({
 
 using namespace UI;
 
-FlowScene::FlowScene(QObject* parent)
+FlowScene::FlowScene(QObject* parent, Properties& props)
 	:QGraphicsScene(parent)
 	, Cbackground("#393939")
 	, Clight("#2F2F2F")
@@ -119,11 +120,13 @@ FlowScene::FlowScene(QObject* parent)
 	, Pdark(Cdark)
 	, Bbackground(Cbackground)
 	, codex(QJsonDocument::fromJson(y.data()))
+	, props(props)
 {
 	Plight.setWidth(0);
 	Pdark.setWidth(0);
 	setBackgroundBrush(Bbackground);
 	setItemIndexMethod(QGraphicsScene::NoIndex);
+	connect(this, &QGraphicsScene::selectionChanged, this, &FlowScene::OnSelectionChanged);
 }
 
 void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
@@ -165,6 +168,16 @@ void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 	painter->setPen(Pdark);
 	painter->drawLines(lines_dark.data(), int(lines_dark.size()));
+}
+void FlowScene::OnSelectionChanged()
+{
+	props.Clear();
+	for (auto* i : selectedItems())
+	{
+		auto* focus = dynamic_cast<TextureNode*>(i);
+		if (focus) { focus->UpdateProperties(props); }
+	}
+	props.Set();
 }
 
 UI::Node& FlowScene::CreateNode(std::string_view name)

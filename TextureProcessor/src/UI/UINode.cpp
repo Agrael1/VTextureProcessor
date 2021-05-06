@@ -121,6 +121,12 @@ void Node::MoveConnections(QPointF newpos)
 	}
 }
 
+void UI::Node::Update()
+{
+	ConnMapper::UpdateGraph(this);
+}
+
+
 void Node::DrawNodeRect(QPainter* painter)
 {
 	constexpr qreal edge_size = 10.0;

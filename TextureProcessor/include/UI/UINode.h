@@ -2,6 +2,7 @@
 #include <UI/NodeStyle.h>
 #include <optional>
 #include <Logic/PortType.h>
+#include <UI/INode.h>
 
 namespace ver
 {
@@ -10,7 +11,7 @@ namespace ver
 
 namespace UI
 {
-	class Node : public QGraphicsItem
+	class Node : public QGraphicsItem, public INode
 	{
 		friend class Connection;
 		friend class FlowScene;
@@ -40,11 +41,9 @@ namespace UI
 		{
 			return sources[pos];
 		}
-
+		void Update()override;
 	private:
 		virtual void SetUniqueName(std::string_view xname) = 0;
-		virtual void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN) = 0;
-		virtual void OnDisconnect(uint8_t sinkN) = 0;
 		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;
 		QVariant itemChange(GraphicsItemChange change, const QVariant& value)override;
 
