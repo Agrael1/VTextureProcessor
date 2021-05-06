@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <utils/polymorphic_value.h>
 #include <Presenter/GLInterpret.h>
+#include <filesystem>
 
 namespace pv = isocpp_p0201;
 
@@ -20,6 +21,7 @@ namespace UI
 			mutable size_t refcount = 0;
 		};
 	public:
+		FlowCodex();
 		FlowCodex(QJsonDocument nodes);
 	public:
 		const auto& CatMap()const noexcept
@@ -32,6 +34,8 @@ namespace UI
 				x.second.refcount = 0;
 		}
 		std::pair<const pv::polymorphic_value<UI::Node>&, size_t> MakeNode(std::string_view in)const;
+	private:
+		void ParseJson(const QJsonDocument& json);
 	private:
 		std::unordered_map<std::string, RefCountPair> codex;
 		std::unordered_map<std::string, std::vector<std::string_view>> cats;

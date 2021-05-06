@@ -8,7 +8,7 @@ using namespace UI;
 FloatSlider::FloatSlider(float& value, float min, float max)
 	:slider(Qt::Horizontal), value(value), valid(min, max, 2)
 {
-	dpi = (max - min) / 100.0;
+	dpi = (value * 2) / 100.0f;
 
 	setLayout(&lay);
 	text.setValidator(&valid);
@@ -33,6 +33,16 @@ void FloatSlider::ValueChanged(int xvalue)
 {
 	value = xvalue * dpi;
 	text.setText(fmt::sprintf("%.2g", value).c_str());
+	if (xvalue == 100 && value < 20)
+	{
+		dpi = value < 10 ? (value * 2.0f) / 100.0f : 0.2f;
+		slider.setValue(int(value / dpi));
+	}
+	if (xvalue == 1)
+	{
+		dpi = 0.01f;
+		slider.setValue(int(value / dpi));
+	}
 }
 
 void FloatSlider::TextEdited(const QString& text)

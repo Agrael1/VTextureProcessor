@@ -128,5 +128,6 @@ void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 		auto p = it.toObject();
 		if (p.contains("Val"))
 			buf[tags[i]] = p["Val"].toVariant();
+		i++;
 	}
 }

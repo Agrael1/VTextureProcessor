@@ -19,31 +19,6 @@ constexpr std::string_view y = R"({
 				"   col = vec4(1.0);\n",
 				"}\n"]
 	},
-	
-	"Circle": {
-		"Node": {
-			"Class": "Texture",
-			"Group": "Shapes",
-			"Sources": [{"Name": "Shape", "Type": "Grayscale"}]
-		},
-		"NodeStyle": {
-			"TitleColor": [128,0,0],
-			"FontColor" : "white"
-		},
-		"Value":["float circle(in vec2 _st, in float _radius){	  \n",
-				"	vec2 dist = _st-vec2(0.5);					  \n",
-				"	return 1.-smoothstep(_radius-(_radius*0.01),  \n",
-				"		 _radius+(_radius*0.01),				  \n",
-				"		 dot(dist,dist)*4.0);					  \n",
-				"}												  \n",
-				"												  \n",
-				"out vec4 color;								  \n",
-				"void main() {									  \n",
-				"	vec2 st = gl_FragCoord.xy/vec2(128,128);	  \n",
-				"	vec3 xcolor = vec3(circle(st, 1.0));		  \n",
-				"	color = vec4(xcolor, 1.0);					  \n",
-			"}"]
-	},
 
 	"Scale": {
 		"Node": {
@@ -119,7 +94,6 @@ FlowScene::FlowScene(QObject* parent, Properties& props)
 	, Plight(Clight)
 	, Pdark(Cdark)
 	, Bbackground(Cbackground)
-	, codex(QJsonDocument::fromJson(y.data()))
 	, props(props)
 {
 	Plight.setWidth(0);

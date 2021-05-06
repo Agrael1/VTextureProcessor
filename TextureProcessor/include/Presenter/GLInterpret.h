@@ -92,23 +92,23 @@ private:
 			switch (r.GetType())
 			{
 			case ver::dc::Type::Float:
-				shaders.setUniformValue(int(r.GetSlot()), (const float&)r);
+				shaders.setUniformValue(r.GetName().data(), (const float&)r);
 				break;
 			case ver::dc::Type::Float2:
-				shaders.setUniformValue(int(r.GetSlot()), (const QVector2D&)r);
+				shaders.setUniformValue(r.GetName().data(), (const QVector2D&)r);
 				break;
 			case ver::dc::Type::Float3:
-				shaders.setUniformValue(int(r.GetSlot()), (const QVector3D&)r);
+				shaders.setUniformValue(r.GetName().data(), (const QVector3D&)r);
 				break;
 			case ver::dc::Type::Float4:
-				shaders.setUniformValue(int(r.GetSlot()), (const QVector4D&)r);
+				shaders.setUniformValue(r.GetName().data(), (const QVector4D&)r);
 				break;
 			case ver::dc::Type::Matrix:
-				shaders.setUniformValue(int(r.GetSlot()), (const QMatrix4x4&)r);
+				shaders.setUniformValue(r.GetName().data(), (const QMatrix4x4&)r);
 				break;
 			case ver::dc::Type::Bool:
 			case ver::dc::Type::Integer:
-				shaders.setUniformValue(int(r.GetSlot()), (const int&)r);
+				shaders.setUniformValue(r.GetName().data(), (const int&)r);
 				break;
 			default:
 				break;
