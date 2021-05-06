@@ -20,34 +20,6 @@ constexpr std::string_view y = R"({
 				"}\n"]
 	},
 
-	"Scale": {
-		"Node": {
-			"Class": "Texture",
-			"Group": "Transform",
-			"Properties": [{"Tag": "Scale", "Type":"float", "Val":1.5}],
-			"Sinks": [{"Name": "In", "Type": "Grayscale"}],
-			"Sources": [{"Name": "Out", "Type": "Grayscale"}]
-		},
-		"NodeStyle": {
-			"TitleColor": [0,128,0],
-			"FontColor" : "white"
-		},
-		"Value":["uniform sampler2D u_Sampler;								\n",
-				"mat2 scale(vec2 _scale){									\n",
-				"	return mat2(_scale.x,0.0,								\n",
-				"		0.0,_scale.y);										\n",
-				"}															\n",
-				"in vec2 texcoords;\n",
-				"out vec4 color;\n",
-				"void main() {												\n",
-				"    vec2 st = texcoords;				\n",
-				"    st -= vec2(0.5);										\n",
-				"    st = scale( vec2(Scale) ) * st;						\n",
-				"    st += vec2(0.5);										\n",
-				"    color = texture2D(u_Sampler, st);\n",
-				"}"]
-	},
-
 	"Dumpster": {
 		"Node": {
 			"Class": "Texture",

@@ -57,3 +57,17 @@ void FloatSlider::SetChangedCallback(INode* to)
 			to->Update();
 		});
 }
+
+Vec2Slider::Vec2Slider(QVector2D& value, float min, float max)
+	:value(value), upper(value[0], min, max), lower(value[1], min, max)
+{
+	lay.setAlignment(Qt::AlignmentFlag::AlignTop);
+	setLayout(&lay);
+	lay.addWidget(&upper);
+	lay.addWidget(&lower);
+}
+void Vec2Slider::SetChangedCallback(INode* to)
+{
+	upper.SetChangedCallback(to);
+	lower.SetChangedCallback(to);
+}

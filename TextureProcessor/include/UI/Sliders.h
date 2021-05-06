@@ -21,4 +21,17 @@ namespace UI
 		float& value;
 		float dpi;
 	};
+
+	class Vec2Slider : public Updater
+	{
+	public:
+		Vec2Slider(QVector2D& value, float min = 0.0f, float max = 20.0f);
+	public:
+		void SetChangedCallback(INode* to)override;
+	private:
+		QVBoxLayout lay;
+		FloatSlider upper;
+		FloatSlider lower;
+		QVector2D& value;
+	};
 }

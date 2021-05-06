@@ -103,6 +103,7 @@ QImage ShaderNode::Update()
 	return e.Render(shader->shader, outputs);
 }
 
+
 void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 {
 	if (props.isEmpty())return;
@@ -127,7 +128,7 @@ void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 	{
 		auto p = it.toObject();
 		if (p.contains("Val"))
-			buf[tags[i]] = p["Val"].toVariant();
+			buf[tags[i]]= p["Val"].toVariant();
 		i++;
 	}
 }

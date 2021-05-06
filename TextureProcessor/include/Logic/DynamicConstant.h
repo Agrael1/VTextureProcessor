@@ -35,6 +35,7 @@ namespace ver::dc
 		using SysType = float;
 		static constexpr size_t hlslSize = sizeof(SysType);
 		static constexpr const uint16_t ocslot = 1;
+		static constexpr const uint16_t floats = 1;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "float";
 	};
@@ -43,6 +44,7 @@ namespace ver::dc
 		using SysType = QVector2D;
 		static constexpr size_t hlslSize = sizeof(SysType);
 		static constexpr const uint16_t ocslot = 1;
+		static constexpr const uint16_t floats = 2;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "vec2";
 	};
@@ -51,6 +53,7 @@ namespace ver::dc
 		using SysType = QVector3D;
 		static constexpr size_t hlslSize = sizeof(SysType);
 		static constexpr const uint16_t ocslot = 1;
+		static constexpr const uint16_t floats = 3;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "vec3";
 	};
@@ -59,6 +62,7 @@ namespace ver::dc
 		using SysType = QVector4D;
 		static constexpr size_t hlslSize = sizeof(SysType);
 		static constexpr const uint16_t ocslot = 1;
+		static constexpr const uint16_t floats = 4;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "vec4";
 	};
@@ -67,6 +71,7 @@ namespace ver::dc
 		using SysType = QMatrix4x4;
 		static constexpr size_t hlslSize = sizeof(SysType);
 		static constexpr const uint16_t ocslot = 4;
+		static constexpr const uint16_t floats = 16;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "mat4";
 	};
@@ -75,6 +80,7 @@ namespace ver::dc
 		using SysType = bool;
 		static constexpr size_t hlslSize = 4u;
 		static constexpr const uint16_t ocslot = 1;
+		static constexpr const uint16_t floats = 1;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "bool";
 	};
@@ -83,6 +89,7 @@ namespace ver::dc
 		using SysType = int;
 		static constexpr size_t hlslSize = sizeof(SysType);
 		static constexpr const uint16_t ocslot = 1;
+		static constexpr const uint16_t floats = 1;
 		static constexpr const char* code = "int";
 		static constexpr bool valid = true;
 	};
@@ -284,6 +291,20 @@ namespace ver::dc
 
 	class Buffer;
 
+
+	template <typename T, typename Array, std::size_t... I>
+	T v2T(const Array& a, std::index_sequence<I...>)
+	{
+		return T( a[I].toFloat()... );
+	}
+	template<dc::Type type, class T = dc::Map<type>::SysType, typename Indices = std::make_index_sequence<dc::Map<type>::floats>>
+	T FromVariant(const QVariant& va)
+	{
+		if constexpr (std::same_as<T, int> || std::same_as<T, float> || std::same_as<T, bool>)
+			return T{ va.value<T>() };
+		return v2T<T>(va.toList(), Indices{});
+	}
+
 	class ElementRef
 	{
 		friend class Buffer;
@@ -346,7 +367,7 @@ namespace ver::dc
 		{
 			switch (type.Get())
 			{
-#define X(el) case Type::el: this->operator=(rhs.value<Map<Type::el>::SysType>());return;
+#define X(el) case Type::el: return this->operator=(FromVariant<Type::el>(rhs));
 				LEAF_ELEMENT_TYPES
 #undef X
 			default:

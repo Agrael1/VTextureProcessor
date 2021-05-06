@@ -48,6 +48,8 @@ void UI::TextureNode::UpdateProperties(Properties& props)
 			prop.AppendWidget<FloatSlider>((float&)ref);
 			break;
 		case ver::dc::Type::Float2:
+			prop.AppendWidget<QLabel>(ref.GetName().data());
+			prop.AppendWidget<Vec2Slider>((QVector2D&)ref);
 			break;
 		case ver::dc::Type::Float3:
 			break;
