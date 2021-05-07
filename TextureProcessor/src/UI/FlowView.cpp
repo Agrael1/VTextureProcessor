@@ -1,6 +1,5 @@
 #include <UI/FlowView.h>
 
-
 FlowView::FlowView(UI::FlowScene& scene)
 	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr), view_menu("View"),
 	delet("Delete selected"), clrselect("Clear Selection")
@@ -34,11 +33,6 @@ FlowView::FlowView(UI::FlowScene& scene)
 	view_menu.addAction(&clrselect);
 }
 
-UI::Node* FlowView::LocateNode(QPointF pos) noexcept
-{
-	return scene.LocateNode(pos);
-}
-
 void FlowView::wheelEvent(QWheelEvent* event)
 {
 	QPoint delta = event->angleDelta();
@@ -59,6 +53,15 @@ void FlowView::wheelEvent(QWheelEvent* event)
 void FlowView::contextMenuEvent(QContextMenuEvent* event)
 {
 	last_event = event->pos();
+	if (auto* x = itemAt(event->pos()); x && x->isSelected())
+	{
+		QGraphicsSceneContextMenuEvent e{ QGraphicsSceneContextMenuEvent::GraphicsSceneContextMenu };
+		e.setPos(event->pos());
+		e.setScreenPos(event->globalPos());
+		scene.sendEvent(x, &e);
+		return;
+	}
+
 	menu.Execute(event->globalPos());
 }
 
@@ -74,7 +77,7 @@ void FlowView::scaleUp()
 }
 void FlowView::scaleDown()
 {
-	constexpr double factor = 1/1.2;
+	constexpr double factor = 1 / 1.2;
 	QTransform t = transform();
 	if (t.m11() < 0.2)
 		return;

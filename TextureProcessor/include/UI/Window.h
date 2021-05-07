@@ -17,6 +17,7 @@ public:
 public:
 	void OnClearTriggered();
 	void OnProps();
+	void OnExport();
 	void ShowMaximized()
 	{
 		showMaximized();
@@ -34,6 +35,7 @@ private:
 	QMenu file;
 	QMenu windows;
 	QAction Aclear;
+	QAction Aexport;
 	QAction Aprops;
 	std::optional<Internal> a;
 };

@@ -21,24 +21,6 @@ constexpr std::string_view y = R"({
 				"}\n"]
 	},
 
-	"Dumpster": {
-		"Node": {
-			"Class": "Texture",
-			"Group": "Output",
-			"Sinks": [{"Name": "In", "Type": "Grayscale"}]
-		},
-		"NodeStyle": {
-			"TitleColor": "black",
-			"FontColor" : "white"
-		},
-		"Value":["uniform sampler2D u_Sampler;								\n",
-				"in vec2 texcoords;\n",
-				"out vec4 color;\n",
-				"void main() {												\n",
-				"    color = texture2D(u_Sampler, texcoords);\n",
-				"}"]
-	},
-
 	"Triangle": {
 		"Node": {
 			"Class": "Texture",
@@ -56,6 +38,20 @@ constexpr std::string_view y = R"({
 				"}\n"]
 	}
 })";
+
+std::filesystem::path generate(const std::filesystem::path& p)
+{
+	namespace fs = std::filesystem;
+	std::filesystem::path rp{ p };
+	auto f = rp.filename().replace_extension().string();
+	auto x = rp.extension().string();
+	f += "_";
+	auto v = 0;
+
+	while (fs::exists(rp))
+		rp.replace_filename(f + std::to_string(v++) + x);
+	return rp;
+}
 
 using namespace UI;
 
@@ -136,6 +132,8 @@ UI::Node& FlowScene::CreateNode(std::string_view name)
 	);
 	x.first->second->SetUniqueName(x.first->first);
 	addItem(&*x.first->second);
+	if (name == "Output")
+		outputs.push_back(x.first->second.operator->());
 	return *x.first->second;
 }
 UI::Node* FlowScene::LocateNode(QPointF pos)noexcept
@@ -164,7 +162,11 @@ void FlowScene::DeleteSelected()
 	for (QGraphicsItem* item : selectedItems())
 	{
 		if (auto n = dynamic_cast<Node*>(item))
+		{
+			if (n->GetStyleName() == "Output")
+				outputs.erase(std::find(outputs.begin(), outputs.end(), n));
 			nodes.erase(n->GetName().data());
+		}
 	}
 }
 void FlowScene::Clear()
@@ -172,4 +174,17 @@ void FlowScene::Clear()
 	nodes.clear();
 	codex.ClearCounts();
 	clear();
+}
+void FlowScene::ExportAll()
+{
+	std::filesystem::path name;
+	for (auto* x : outputs)
+	{
+		if (name.empty())
+		{
+			name = x->Export();
+			continue;
+		}
+		x->ExportSilent(generate(name).string());
+	}
 }

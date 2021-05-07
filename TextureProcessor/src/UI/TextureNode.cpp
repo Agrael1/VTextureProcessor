@@ -3,6 +3,7 @@
 #include <UI/Properties.h>
 #include <UI/Sliders.h>
 #include <QLabel>
+#include <QFileDialog>
 
 
 UI::TextureNode::TextureNode(QJsonObject document, std::string_view name, Engine& engine)
@@ -23,7 +24,8 @@ void UI::TextureNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 void UI::TextureNode::DrawTexture(QPainter* painter)
 {
 	QPointF point{ body_size.width() / 2 - 64, EffectiveHeight() / 2 - 64 + NodeStyle::title_height + NodeStyle::item_padding };
-	painter->drawImage(point, model.Update());
+	texture = model.Update().scaled(texture.size());
+	painter->drawImage(point, texture);
 }
 
 void UI::TextureNode::Update()
@@ -66,5 +68,20 @@ void UI::TextureNode::UpdateProperties(Properties& props)
 		}
 	}
 	props.AppendProperty(std::move(prop));
+}
+
+std::string UI::TextureNode::Export()
+{
+	auto str = QFileDialog::getSaveFileName(nullptr,
+		"Export As",
+		"",
+		"All files (*.*);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PNG (*.png);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm)"
+	);
+	model.Update().save(str);
+	return str.toStdString();
+}
+void UI::TextureNode::ExportSilent(std::string_view hint)
+{
+	model.Update().save(hint.data());
 }
 

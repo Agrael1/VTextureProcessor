@@ -28,11 +28,11 @@ namespace UI
 			Update();
 		}
 		void Update()override;
-		ver::Node& Model()
-		{
-			return model;
-		}
-		void SetUniqueName(std::string_view xname)override{	model.SetUniqueName(xname);}
+		ver::Node& Model()override { return model; }
+		void SetUniqueName(std::string_view xname)override { model.SetUniqueName(xname); }
+		std::string Export()override;
+		void ExportSilent(std::string_view hint)override;
+
 		void DrawTexture(QPainter* painter);
 	private:
 		QImage texture;

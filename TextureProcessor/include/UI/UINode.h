@@ -29,10 +29,7 @@ namespace UI
 		virtual std::string_view GetName()const noexcept = 0;
 		virtual ver::Node& Model() = 0;
 
-		std::string_view GetStyleName()const noexcept
-		{
-			return style.StyleName();
-		}
+		std::string_view GetStyleName()const noexcept{return style.StyleName();	}
 		auto GetSourceType(size_t pos)
 		{
 			return sinks[pos];
@@ -45,7 +42,9 @@ namespace UI
 	private:
 		virtual void SetUniqueName(std::string_view xname) = 0;
 		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;
+		void contextMenuEvent(QGraphicsSceneContextMenuEvent* event)override;
 		QVariant itemChange(GraphicsItemChange change, const QVariant& value)override;
+		
 
 		void SetConnection(std::unique_ptr<QGraphicsItem>&& in, uint8_t portN)
 		{
@@ -68,10 +67,7 @@ namespace UI
 		void CalculateSize(QSizeF minsize = {})noexcept;
 		qreal EffectiveHeight()const noexcept { return body_size.height() - NodeStyle::title_height - 2 * NodeStyle::item_padding; }
 		std::optional<std::pair<Port, uint8_t>> PortHit(QPointF point);
-		std::optional<std::pair<Port, uint8_t>> PortHitScene(QPointF scene_point)
-		{
-			return PortHit(mapFromScene(scene_point));
-		}
+		std::optional<std::pair<Port, uint8_t>> PortHitScene(QPointF scene_point){return PortHit(mapFromScene(scene_point));}
 	protected:
 		std::basic_string<PortType> sinks;
 		std::basic_string<PortType> sources;
@@ -81,6 +77,7 @@ namespace UI
 		qreal pdelta_sink;
 		qreal pdelta_source;
 
+		static std::optional<QMenu> conMenu;
 	private:
 		NodeStyle style;
 	};

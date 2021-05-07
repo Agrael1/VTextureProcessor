@@ -14,5 +14,7 @@ namespace UI
 		virtual void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN) = 0;
 		virtual void OnDisconnect(uint8_t sinkN) = 0;
 		virtual void Update() = 0;
+		virtual std::string Export() = 0;
+		virtual void ExportSilent(std::string_view hint) = 0;
 	};
 }

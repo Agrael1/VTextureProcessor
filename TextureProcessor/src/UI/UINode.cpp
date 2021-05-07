@@ -7,8 +7,9 @@ std::unique_ptr<TO> static_unique_pointer_cast(std::unique_ptr<FROM>&& old) {
 }
 
 
-
 using namespace UI;
+
+std::optional<QMenu> Node::conMenu;
 
 void Node::Init()
 {
@@ -98,6 +99,17 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent* event)
 		ConnMapper::MakeTemporary(*this, port->first, port->second);
 	}
 }
+void Node::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+	if (conMenu) { event->accept(); return; }
+	conMenu.emplace();
+	auto* a = conMenu->addAction("Edit");
+	auto* b = conMenu->addAction("Export");
+	conMenu->popup(event->screenPos());
+
+	conMenu->connect(b, &QAction::triggered, [this](bool) {Export(); });
+	event->accept();
+}
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant& value)
 {
 	if (change == ItemPositionChange)
@@ -186,12 +198,12 @@ void Node::DrawCaptionName(QPainter* painter)
 void UI::Node::DrawConnectionPoints(QPainter* painter)
 {
 	auto& style = PortStyle::Grayscale;
-	
+
 	painter->setPen(style.port);
 	auto ypos = NodeStyle::title_height + NodeStyle::item_padding + pdelta_sink - PortStyle::diameter / 2;
 	for (auto si = 0; si < sinks.size(); si++)
 	{
-		painter->setBrush(Sink_conns[si]?style.brSinkUsed:style.brSink);
+		painter->setBrush(Sink_conns[si] ? style.brSinkUsed : style.brSink);
 		painter->drawEllipse(-PortStyle::diameter / 2, ypos, PortStyle::diameter, PortStyle::diameter);
 		ypos += pdelta_sink;
 	}

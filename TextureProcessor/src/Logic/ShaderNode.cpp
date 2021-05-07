@@ -70,7 +70,7 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 		case PortType::Grayscale:
 		{
 			auto r = std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D);
-			r->setSize(128, 128);
+			r->setSize(256, 256);
 			r->create();
 			r->allocateStorage();
 

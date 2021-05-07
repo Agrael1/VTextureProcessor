@@ -3,12 +3,32 @@
 #include <fstream>
 #include <streambuf>
 
+constexpr const char* output = R"(
+{"Output": {
+	"Node": {
+		"Class": "Texture",
+			"Group" : "Output",
+			"Sinks" : [{"Name": "In", "Type" : "Grayscale"}]
+	},
+		"NodeStyle" : {
+			"TitleColor": "black",
+				"FontColor" : "white"
+		},
+			"Value" : ["uniform sampler2D u_Sampler;								\n",
+				"in vec2 texcoords;\n",
+				"out vec4 color;\n",
+				"void main() { color = texture2D(u_Sampler, texcoords);}"]
+}})";
+
 using namespace UI;
 
 FlowCodex::FlowCodex()
-	:engine(QSize{ 128,128 })
+	:engine(QSize{ 256,256 })
 {
 	namespace fs = std::filesystem;
+
+	ParseJson(QJsonDocument::fromJson( output ));
+
 	fs::path ndir{ NodesDir };
 	if (!fs::is_directory(ndir))
 	{
@@ -43,11 +63,6 @@ FlowCodex::FlowCodex(QJsonDocument nodes)
 	ParseJson(nodes);
 }
 
-std::pair<const pv::polymorphic_value<UI::Node>&, size_t> FlowCodex::MakeNode(std::string_view in)const
-{
-	const auto& r = codex.at(in.data());
-	return { r, r.refcount++ };
-}
 void FlowCodex::ParseJson(const QJsonDocument& json)
 {
 	QJsonObject topLevelObject = json.object();
@@ -68,4 +83,10 @@ void FlowCodex::ParseJson(const QJsonDocument& json)
 		auto x = node["Group"].toString().toStdString();
 		cats[x].emplace_back(pair.first->second->GetStyleName());
 	}
+}
+
+std::pair<const pv::polymorphic_value<UI::Node>&, size_t> FlowCodex::MakeNode(std::string_view in)const
+{
+	const auto& r = codex.at(in.data());
+	return { r, r.refcount++ };
 }

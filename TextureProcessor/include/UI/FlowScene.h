@@ -16,6 +16,7 @@ namespace UI
 		UI::Node* LocateNode(QPointF pos)noexcept;
 		void DeleteSelected();
 		void Clear();
+		void ExportAll();
 	protected:
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
 		void OnSelectionChanged();
@@ -32,5 +33,6 @@ namespace UI
 
 		UI::FlowCodex codex;
 		std::unordered_map<std::string, pv::polymorphic_value<UI::Node>> nodes;
+		std::vector<UI::Node*> outputs;
 	};
 }

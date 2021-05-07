@@ -8,7 +8,6 @@ class FlowView : public QGraphicsView
 public:
 	FlowView(UI::FlowScene& scene);
 public:
-	UI::Node* LocateNode(QPointF pos)noexcept;
 	void AppendViewMenu(QMenuBar& mb)noexcept { mb.addMenu(&view_menu); }
 private:
 	void wheelEvent(QWheelEvent* event) override;
