@@ -9,13 +9,14 @@ FlowCodex::FlowCodex()
 	:engine(QSize{ 128,128 })
 {
 	namespace fs = std::filesystem;
-	if (!fs::is_directory("Nodes"))
+	fs::path ndir{ NodesDir };
+	if (!fs::is_directory(ndir))
 	{
-		fs::create_directory("Nodes");
+		fs::create_directory(ndir);
 		return;
 	}
 	QJsonParseError e;
-	for (auto& p : fs::directory_iterator("Nodes"))
+	for (auto& p : fs::directory_iterator(ndir))
 	{
 		if (!p.is_regular_file())continue;
 		if (p.path().extension() == ".json")

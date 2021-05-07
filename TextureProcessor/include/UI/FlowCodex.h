@@ -11,6 +11,7 @@ namespace UI
 {
 	class FlowCodex
 	{
+		static constexpr std::string_view NodesDir = "nodes";
 		struct RefCountPair : public pv::polymorphic_value<UI::Node>
 		{
 			template<typename T, typename ...Args>

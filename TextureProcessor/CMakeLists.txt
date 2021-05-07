@@ -62,6 +62,10 @@ target_precompile_headers("${PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}
 target_link_libraries("${PROJECT_NAME}" fmt::fmt)
 target_link_libraries("${PROJECT_NAME}" Qt5::Widgets)
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_CURRENT_SOURCE_DIR}/nodes $<TARGET_FILE_DIR:${PROJECT_NAME}>/nodes)
+
 if(WIN32)
     if($<CONFIG:Debug>)
         get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
@@ -77,3 +81,6 @@ if(WIN32)
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 endif(WIN32)
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/nodes" DESTINATION ${INSTALL_PATH}/nodes FILES_MATCHING PATTERN "*.json")
+
