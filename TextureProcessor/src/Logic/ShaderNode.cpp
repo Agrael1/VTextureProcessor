@@ -99,8 +99,7 @@ QImage ShaderNode::Update()
 	for (uint32_t s = 0; auto & i: inputs)
 		if (i)i->bind(s++);
 		else e.Empty().bind(s++);
-	if (buf) return e.Render(shader->shader, outputs, &buf);
-	return e.Render(shader->shader, outputs);
+	return e.Render(shader->shader, outputs, buf);
 }
 
 

@@ -19,10 +19,7 @@ namespace ver
 		ShaderNode(const ShaderNode& other);
 	public:
 		QImage Update();
-		dc::Buffer& GetBuffer()
-		{
-			return buf;
-		}
+		dc::Buffer& GetBuffer() { return buf; }
 	private:
 		void SetProperties(const QJsonArray& props, QString& scode);
 	private:

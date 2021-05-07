@@ -1,7 +1,5 @@
 #pragma once
-#include <UI/UINode.h>
 #include <UI/FlowCodex.h>
-#include <UI/Connection.h>
 
 namespace UI
 {
@@ -16,7 +14,6 @@ namespace UI
 		}
 		UI::Node& CreateNode(std::string_view name);
 		UI::Node* LocateNode(QPointF pos)noexcept;
-		UI::Connection& CreateConnection();
 		void DeleteSelected();
 		void Clear();
 	protected:

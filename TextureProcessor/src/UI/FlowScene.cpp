@@ -1,6 +1,7 @@
 #include <UI/FlowScene.h>
 #include <fmt/printf.h>
 #include <UI/Properties.h>
+#include <UI/Connection.h>
 
 constexpr std::string_view y = R"({
 	"Square": {
