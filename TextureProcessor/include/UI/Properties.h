@@ -47,7 +47,10 @@ namespace UI
 		class Dummy :public QWidget
 		{
 		public:
-			Dummy() { lay.setAlignment(Qt::AlignTop); setLayout(&lay); }
+			Dummy() { 
+				lay.setAlignment(Qt::AlignTop); setLayout(&lay); 
+				setSizePolicy(QSizePolicy{ QSizePolicy::Ignored, QSizePolicy::Preferred });
+			}
 		public:
 			QVBoxLayout lay;
 		};
@@ -69,8 +72,10 @@ namespace UI
 		}
 		void Set()
 		{
+			auto s = size();
 			for (auto& w : props)
 				dum.lay.addWidget(&w);
+			resize(s);
 		}
 		void Clear()
 		{

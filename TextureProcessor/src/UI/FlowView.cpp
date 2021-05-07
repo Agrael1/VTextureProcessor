@@ -21,9 +21,7 @@ FlowView::FlowView(UI::FlowScene& scene)
 	{
 		menu.AppendGroup(x.first);
 		for (const auto& y : x.second)
-		{
 			menu.AppendItem(y);
-		}
 	}
 	menu.Finish();
 	menu.SetItemClickCallback([this](QTreeWidgetItem* item, int) {OnItemSelected(item, 0); });
@@ -77,6 +75,9 @@ void FlowView::scaleUp()
 void FlowView::scaleDown()
 {
 	constexpr double factor = 1/1.2;
+	QTransform t = transform();
+	if (t.m11() < 0.2)
+		return;
 	scale(factor, factor);
 }
 

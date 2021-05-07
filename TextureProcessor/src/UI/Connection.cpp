@@ -30,7 +30,7 @@ Connection::~Connection()
 
 void Connection::Init()
 {
-	setFlag(QGraphicsItem::ItemIsMovable, true);
+	setFlag(QGraphicsItem::ItemIsMovable, false);
 	setFlag(QGraphicsItem::ItemIsFocusable, true);
 	setFlag(QGraphicsItem::ItemIsSelectable, true);
 

@@ -16,6 +16,7 @@ public:
 	{
 		connect(&selection, &QTreeWidget::itemClicked, std::forward<Functor>(fn) );
 	}
+	void OnItemDoubleClicked(QTreeWidgetItem* item, int column);
 private:
 	QVBoxLayout layout;
 	QLineEdit filter;

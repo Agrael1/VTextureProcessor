@@ -43,3 +43,10 @@ void ContextMenu::Execute(const QPoint& where)
 	filter.setFocus();
 	exec(where);
 }
+void OnItemDoubleClicked(QTreeWidgetItem* item, int column)
+{
+	if (item && item->data(column, Qt::UserRole).toString() == skipper.data())
+	{
+
+	}
+}
