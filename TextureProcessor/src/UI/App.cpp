@@ -7,6 +7,7 @@ App::App(int argc, char** argv)
 	QCoreApplication::setApplicationName(AppName.data());
 	QCoreApplication::setApplicationVersion(AppVer.data());
 	app.setStyle(QStyleFactory::create(AppTheme.data()));
+    app.setWindowIcon(QIcon{ ":/tlr.ico" });
 
     QPalette darkPalette;
     darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));

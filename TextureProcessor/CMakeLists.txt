@@ -13,7 +13,7 @@ else(MSVC)
 endif()
 
 #set(CMAKE_AUTOMOC ON)
-#set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTORCC ON)
 #set(CMAKE_AUTOUIC ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
@@ -46,7 +46,7 @@ add_compile_definitions(_HAS_DEPRECATED_RESULT_OF=1)
 # Добавьте источник в исполняемый файл этого проекта.
 add_executable (TextureProcessor
 	"src/EntryMain.cpp"
-
+    "resources/resources.qrc"
 	"include/Logic/Sink.h"
 	"include/Logic/Source.h"
 	"src/Logic/Source.cpp"
