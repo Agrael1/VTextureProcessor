@@ -6,22 +6,41 @@
 #include <QFileDialog>
 #include <charconv>
 
-
+/**
+ * @brief Construct a new UI::TextureNode::TextureNode object
+ *
+ * @param document JSON specification of the texture node
+ * @param name Node name
+ * @param engine Rendering engine of the texture node
+ */
 UI::TextureNode::TextureNode(QJsonObject document, std::string_view name, Engine& engine)
 	:Node(document, name), model(document, engine), texture(128, 128, QImage::Format::Format_ARGB32)
 {
+	// Registers Sinks
 	for (auto& s : model.GetSinks())
 		sinks.push_back(s->GetType());
+
+	// Registers Sources
 	for (auto& s : model.GetSources())
 		sources.push_back(s->GetType());
+
+	// Size of the Node
 	CalculateSize({ 128,128 });
 }
 
+/**
+ * @brief
+ *
+ * @param painter
+ * @param option
+ * @param widget
+ */
 void UI::TextureNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	Node::paint(painter, option);
 	DrawTexture(painter);
 }
+
 void UI::TextureNode::DrawTexture(QPainter* painter)
 {
 	QPointF point{ body_size.width() / 2 - 64, EffectiveHeight() / 2 - 64 + NodeStyle::title_height + NodeStyle::item_padding };
