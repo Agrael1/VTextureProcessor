@@ -61,6 +61,7 @@ namespace UI
 			setMinimumWidth(150);
 			setWidget(&dum);
 		}
+
 	public:
 		PropertyElement& AppendProperty(INode& node, std::string_view name)
 		{

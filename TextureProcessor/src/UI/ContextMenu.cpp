@@ -52,16 +52,22 @@ void ContextMenu::OnItemDoubleClicked(QTreeWidgetItem* item, int column)
 
 	}
 }
-void ContextMenu::OnFilterChanged(const QString& str)
+void ContextMenu::OnFilterChanged(const QString& text)
 {
-	//for (auto& topLvlItem : topLevelItems)
-//{
-//	for (int i = 0; i < topLvlItem->childCount(); ++i)
-//	{
-//		auto child = topLvlItem->child(i);
-//		auto modelName = child->data(0, Qt::UserRole).toString();
-//		const bool match = (modelName.contains(text, Qt::CaseInsensitive));
-//		child->setHidden(!match);
-//	}
-//}
+	auto cnt = selection.topLevelItemCount();
+	for (int j = 0; j < cnt; j++)
+	{
+		auto* topLvlItem = selection.topLevelItem(j);
+		auto chcnt = topLvlItem->childCount();
+		int hidden = 0;
+		for (int i = 0; i < chcnt; ++i)
+		{
+			auto child = topLvlItem->child(i);
+			auto modelName = child->data(0, Qt::UserRole).toString();
+			const bool match = (modelName.contains(text, Qt::CaseInsensitive));
+			child->setHidden(!match);
+			hidden += !match;
+		}
+		topLvlItem->setHidden(hidden == chcnt);
+	}
 }
