@@ -151,6 +151,20 @@ std::pair<QPointF, QPointF> Connection::PointsC1C2()const
 		{sink.x() - horizontalOffset, sink.y() - verticalOffset } };
 }
 
+QJsonObject Connection::Serialize()
+{
+	QJsonObject top;
+	QJsonArray source;
+	source.append(connector.first->GetName().data());
+	source.append(sourceN);
+	top.insert("Source", source);
+	QJsonArray sink;
+	sink.append(connector.second->GetName().data());
+	sink.append(sinkN);
+	top.insert("Sink", sink);
+	return top;
+}
+
 Port Connection::Requires()const
 {
 	if (!connector.first)

@@ -305,6 +305,18 @@ namespace ver::dc
 		return v2T<T>(va.toList(), Indices{});
 	}
 
+	template<dc::Type type, class T = dc::Map<type>::SysType>
+	QVariant GetVariant(const std::byte* va)
+	{
+		if constexpr (std::same_as<T, int> || std::same_as<T, float> || std::same_as<T, bool>)
+			return *((T*)va);
+		QVariantList qw;
+		qw.reserve(int(dc::Map<type>::floats));
+		for (auto el : std::span<const float>((const float*)va, dc::Map<type>::floats))
+			qw.append(el);
+		return qw;
+	}
+
 	class ElementRef
 	{
 		friend class Buffer;
@@ -374,6 +386,19 @@ namespace ver::dc
 				break;
 			}
 			assert(false && "Attemt to set non existent element");
+		}
+		QVariant ToVariant()const noexcept
+		{
+			switch (type.Get())
+			{
+#define X(el) case Type::el: return GetVariant<Type::el>(pBytes);
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+			assert(false && "Attemt to get non existent element");
+			return{};
 		}
 		Type GetType()const noexcept
 		{

@@ -1,5 +1,6 @@
 #include <UI/UINode.h>
 #include <UI/Connection.h>
+#include <fstream>
 
 template<typename TO, typename FROM>
 std::unique_ptr<TO> static_unique_pointer_cast(std::unique_ptr<FROM>&& old) {

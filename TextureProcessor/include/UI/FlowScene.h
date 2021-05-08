@@ -3,7 +3,7 @@
 
 namespace UI
 {
-	class FlowScene : public QGraphicsScene
+	class FlowScene : public QGraphicsScene, public ISerialize
 	{
 	public:
 		FlowScene(QObject* parent, Properties& props);
@@ -17,7 +17,10 @@ namespace UI
 		void DeleteSelected();
 		void Clear();
 		void ExportAll();
+		virtual QJsonObject Serialize()override;
+		virtual void Deserialize(QJsonObject)override;
 	protected:
+		UI::Node& InsertNode(std::string_view name, std::string&& unique_name);
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
 		void OnSelectionChanged();
 	private:

@@ -11,7 +11,9 @@ namespace ver
 
 namespace UI
 {
-	class Node : public QGraphicsItem, public INode
+	class Node : public QGraphicsItem, 
+				public INode,
+				public ISerialize
 	{
 		friend class Connection;
 		friend class FlowScene;

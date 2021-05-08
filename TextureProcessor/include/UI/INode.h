@@ -17,4 +17,10 @@ namespace UI
 		virtual std::string Export() = 0;
 		virtual void ExportSilent(std::string_view hint) = 0;
 	};
+	struct NOVTABLE ISerialize
+	{
+		virtual ~ISerialize() = default;
+		virtual QJsonObject Serialize() = 0;
+		virtual void Deserialize(QJsonObject) = 0;
+	};
 }

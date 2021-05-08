@@ -85,8 +85,16 @@ void FlowCodex::ParseJson(const QJsonDocument& json)
 	}
 }
 
-std::pair<const pv::polymorphic_value<UI::Node>&, size_t> FlowCodex::MakeNode(std::string_view in)const
+const pv::polymorphic_value<UI::Node>& FlowCodex::GetNode(std::string_view nodety)const
 {
-	const auto& r = codex.at(in.data());
-	return { r, r.refcount++ };
+	return codex.at(nodety.data());
+}
+void FlowCodex::SetMaxRef(std::string_view nodety, size_t cnt)
+{
+	auto& r = codex.at(nodety.data());
+	r.refcount = std::max(r.refcount, cnt);
+}
+size_t FlowCodex::AddRef(std::string_view nodety)
+{
+	return codex.at(nodety.data()).refcount++;
 }

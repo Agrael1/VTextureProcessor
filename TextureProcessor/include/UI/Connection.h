@@ -3,11 +3,12 @@
 #include <span>
 #include <optional>
 #include <Logic/PortType.h>
+#include <UI/INode.h>
 
 namespace UI
 {
 	class Node;
-	class Connection : public QGraphicsItem
+	class Connection : public QGraphicsItem, public ISerialize
 	{
 		friend class ConnMapper;
 	private:
@@ -29,6 +30,9 @@ namespace UI
 		void RemoveForce()noexcept;
 		void Update();
 		void UpdateDisconnect();
+
+		virtual QJsonObject Serialize()override;
+		virtual void Deserialize(QJsonObject)override {}
 	private:
 		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
@@ -54,6 +58,10 @@ namespace UI
 	{
 	public:
 		static void MakeTemporary(Node& node, Port port, uint8_t portidx);
+		static void ConnectTemporary(Node& node, Port port, uint8_t portidx)
+		{
+			Instance().tmp->PlaceConnection({ {port, portidx} }, &node);
+		}
 		static void AttachTemporary(std::unique_ptr<Connection>&& in);
 		static void ClearTemporary();
 		static auto DetachTemporary()

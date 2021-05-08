@@ -17,21 +17,23 @@ namespace UI
 			QWidget* widget = nullptr) override;
 		void UpdateProperties(Properties& properties);
 	private:
-		void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN)override
+		virtual void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN)override
 		{
 			model.GetSink(sinkN).Bind(source.Model().GetSource(sourceN));
 			Update();
 		}
-		void OnDisconnect(uint8_t sinkN)override
+		virtual void OnDisconnect(uint8_t sinkN)override
 		{
 			model.GetSink(sinkN).Unlink();
 			Update();
 		}
-		void Update()override;
-		ver::Node& Model()override { return model; }
-		void SetUniqueName(std::string_view xname)override { model.SetUniqueName(xname); }
-		std::string Export()override;
-		void ExportSilent(std::string_view hint)override;
+		virtual void Update()override;
+		virtual ver::Node& Model()override { return model; }
+		virtual void SetUniqueName(std::string_view xname)override { model.SetUniqueName(xname); }
+		virtual std::string Export()override;
+		virtual void ExportSilent(std::string_view hint)override;
+		virtual QJsonObject Serialize()override;
+		virtual void Deserialize(QJsonObject)override;
 
 		void DrawTexture(QPainter* painter);
 	private:

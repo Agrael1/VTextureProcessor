@@ -34,7 +34,9 @@ namespace UI
 			for (auto&& x : codex)
 				x.second.refcount = 0;
 		}
-		std::pair<const pv::polymorphic_value<UI::Node>&, size_t> MakeNode(std::string_view in)const;
+		const pv::polymorphic_value<UI::Node>& GetNode(std::string_view nodety)const;
+		void SetMaxRef(std::string_view nodety, size_t cnt);
+		size_t AddRef(std::string_view nodety);
 	private:
 		void ParseJson(const QJsonDocument& json);
 	private:

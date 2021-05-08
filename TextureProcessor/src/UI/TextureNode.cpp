@@ -4,6 +4,7 @@
 #include <UI/Sliders.h>
 #include <QLabel>
 #include <QFileDialog>
+#include <charconv>
 
 
 UI::TextureNode::TextureNode(QJsonObject document, std::string_view name, Engine& engine)
@@ -77,11 +78,55 @@ std::string UI::TextureNode::Export()
 		"",
 		"All files (*.*);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PNG (*.png);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm)"
 	);
+	if (str.isEmpty())return"";
 	model.Update().save(str);
 	return str.toStdString();
 }
 void UI::TextureNode::ExportSilent(std::string_view hint)
 {
+	if (hint.empty())return;
 	model.Update().save(hint.data());
 }
 
+QJsonObject UI::TextureNode::Serialize()
+{
+	QJsonObject j;
+	QJsonObject node;
+	QJsonArray xpos;
+	xpos.append(scenePos().x());
+	xpos.append(scenePos().y());
+	node.insert("Position", xpos);
+
+	auto name = model.GetName();
+	auto unders = name.find_last_of('_');
+	int ref;
+	std::from_chars(name.data() + unders + 1, name.data() + name.size(), ref);
+	node.insert("Ref", ref);
+
+	QJsonObject buffer;
+	for (auto x : model.GetBuffer())
+		buffer.insert(x.GetName().data(), QJsonValue::fromVariant(x.ToVariant()));
+	node.insert("Buffer", buffer);
+
+	j.insert(GetStyleName().data(), node);
+	return j;
+}
+void UI::TextureNode::Deserialize(QJsonObject in)
+{
+	if (in.contains("Position"))
+	{
+		auto v = in["Position"].toArray();
+		setPos(QPointF{ v[0].toDouble(), v[1].toDouble() });
+	}
+	if (in.contains("Buffer"))
+	{
+		auto& buf = model.GetBuffer();
+		auto v = in["Buffer"].toObject();
+		auto keys = v.keys();
+		for (const auto& k : keys)
+		{
+			auto sk = k.toStdString();
+			buf[sk].SetIfExists(v[k].toVariant());
+		}
+	}
+}

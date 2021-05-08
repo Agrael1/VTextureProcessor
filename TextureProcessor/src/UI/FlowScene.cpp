@@ -3,42 +3,6 @@
 #include <UI/Properties.h>
 #include <UI/Connection.h>
 
-constexpr std::string_view y = R"({
-	"Square": {
-		"Node": {
-			"Class": "Texture",
-			"Group": "Shapes",
-			"Sources": [{"Name": "Shape", "Type": "Grayscale"}],
-			"Sinks": []
-		},
-		"NodeStyle": {
-			"TitleColor":[128,0,0],
-			"FontColor" : "white"
-		},
-		"Value":["out vec4 col;\n",
-				"void main() {\n",
-				"   col = vec4(1.0);\n",
-				"}\n"]
-	},
-
-	"Triangle": {
-		"Node": {
-			"Class": "Texture",
-			"Group": "Shapes",
-			"Properties": [{"Tag": "S", "Type":"float", "Val":0.2}],
-			"Sources": [{"Name": "Shape", "Type": "Grayscale"}]
-		},
-		"NodeStyle": {
-			"TitleColor": [128,0,0],
-			"FontColor" : "white"
-		},
-		"Value":["out vec4 col;\n",
-				"void main() {\n",
-				"   col = vec4(S, S, 0.0, 1.0);\n",
-				"}\n"]
-	}
-})";
-
 std::filesystem::path generate(const std::filesystem::path& p)
 {
 	namespace fs = std::filesystem;
@@ -125,16 +89,11 @@ void FlowScene::OnSelectionChanged()
 
 UI::Node& FlowScene::CreateNode(std::string_view name)
 {
-	auto r = codex.MakeNode(name);
-	auto x = nodes.emplace(std::piecewise_construct,
-		std::forward_as_tuple(fmt::sprintf("%s_%zu",name, r.second)),
-		std::forward_as_tuple(r.first)
-	);
-	x.first->second->SetUniqueName(x.first->first);
-	addItem(&*x.first->second);
+	auto &node = InsertNode(name, fmt::sprintf("%s_%zu", name, codex.AddRef(name)));
+	addItem(&node);
 	if (name == "Output")
-		outputs.push_back(x.first->second.operator->());
-	return *x.first->second;
+		outputs.push_back(&node);
+	return node;
 }
 UI::Node* FlowScene::LocateNode(QPointF pos)noexcept
 {
@@ -150,6 +109,16 @@ UI::Node* FlowScene::LocateNode(QPointF pos)noexcept
 		return nullptr;
 
 	return static_cast<UI::Node*>(filteredItems.front());
+}
+UI::Node& FlowScene::InsertNode(std::string_view name, std::string&& unique_name)
+{
+	const auto &r = codex.GetNode(name);
+	auto x = nodes.emplace(std::piecewise_construct,
+		std::forward_as_tuple(std::move(unique_name)),
+		std::forward_as_tuple(r)
+	);
+	x.first->second->SetUniqueName(x.first->first);
+	return *x.first->second;
 }
 
 void FlowScene::DeleteSelected()
@@ -186,5 +155,91 @@ void FlowScene::ExportAll()
 			continue;
 		}
 		x->ExportSilent(generate(name).string());
+	}
+}
+
+QJsonObject FlowScene::Serialize()
+{
+	QJsonObject sc;
+	QJsonArray xnodes;
+	QJsonArray conns;
+
+	for (auto& x : nodes)
+	{
+		xnodes.append(x.second->Serialize());
+		auto* node = &*(x.second);
+		for (auto* c : ConnMapper::Get(node))
+			conns.append(c->Serialize());
+	}
+	sc.insert("Nodes", xnodes);
+	sc.insert("Connections", conns);
+
+	return sc;
+}
+void FlowScene::Deserialize(QJsonObject obj)
+{
+	if (!obj.contains("Nodes"))return;
+	QJsonArray arr{ obj["Nodes"].toArray() };
+	for (auto ref : arr)
+	{
+		QJsonObject obj{ ref.toObject() };
+		auto stype = obj.keys()[0];
+		auto type = stype.toStdString();
+		auto node = obj[stype].toObject();
+		if (!node.contains("Ref"))continue;
+		auto xref = node["Ref"].toInt();
+
+		auto& xnode = InsertNode(type, fmt::sprintf("%s_%zu", type, xref));
+		codex.SetMaxRef(type, xref + 1);
+		addItem(&xnode);
+		if (type == "Output")
+			outputs.push_back(&xnode);
+		xnode.Deserialize(node);
+	}
+
+	if (obj.contains("Connections"))
+	{
+		QJsonArray conns{ obj["Connections"].toArray() };
+		for (auto c : conns)
+		{
+			auto o = c.toObject();
+			if (!(o.contains("Sink") && o.contains("Source")))continue;
+			auto source = o["Source"].toArray();
+			UI::Node* node = nullptr;
+			uint8_t sourceN = 0;
+
+			for (auto v : source)
+			{
+				if (v.isString())
+				{
+					auto key = v.toString().toStdString();
+					auto xnode = nodes.find(key);
+					if (xnode == nodes.end())break;
+					node = xnode->second.operator->();
+					continue;
+				}
+				sourceN = v.toInt();
+			}
+			if (!node) continue;
+			ConnMapper::MakeTemporary(*node, Port::Source, sourceN);
+
+			auto sink = o["Sink"].toArray();
+			node = nullptr;
+			uint8_t sinkN = 0;
+			for (auto v : sink)
+			{
+				if (v.isString())
+				{
+					auto key = v.toString().toStdString();
+					auto xnode = nodes.find(key);
+					if (xnode == nodes.end())break;
+					node = xnode->second.operator->();
+					continue;
+				}
+				sinkN = v.toInt();
+			}
+			if (!node) { ConnMapper::ClearTemporary(); continue; }
+			ConnMapper::ConnectTemporary(*node, Port::Sink, sinkN);
+		}
 	}
 }
