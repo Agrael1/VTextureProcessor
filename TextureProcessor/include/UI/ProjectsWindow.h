@@ -96,7 +96,10 @@ class ProjectsWindow : public QMainWindow
 {
 public:
 	ProjectsWindow(int32_t width, int32_t height)
-		:QMainWindow(nullptr, Qt::FramelessWindowHint), window(this), f(this), name("Veritas Texture Flow")
+		:QMainWindow(nullptr, Qt::FramelessWindowHint), 
+		window(this), f(this)
+		, name("Veritas Texture Flow")
+		, recent("Open Recent")
 	{
 		resize(width, height);
 		setCentralWidget(&window);
@@ -107,6 +110,7 @@ public:
 		lay.setContentsMargins({ 40,0,40,0 });
 		lay.addWidget(&name);
 
+		lay.addLayout(&hlay);
 	}
 
 	void mouseMoveEvent(QMouseEvent* e)override
@@ -123,5 +127,7 @@ private:
 	ProjectsCW window;
 	FrameLess f;
 	QVBoxLayout lay;
+	QHBoxLayout hlay;
 	QLabel name;
+	QLabel recent;
 };
