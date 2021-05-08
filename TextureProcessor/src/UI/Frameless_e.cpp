@@ -1,4 +1,5 @@
 #include <UI/Frameless_e.h>
+// TODO: add source of code
 
 FrameLess::FrameLess(QWidget* target) :
 	_target(target),
