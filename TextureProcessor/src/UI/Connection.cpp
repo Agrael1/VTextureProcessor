@@ -3,17 +3,28 @@
 
 using namespace UI;
 
+/**
+ * @brief Construct a new Connection:: Connection object
+ *
+ * @param node Target node object
+ * @param ty Type of the target port (Sink or Source)
+ * @param portidx Index of the target port
+ */
 Connection::Connection(Node& node, Port ty, uint8_t portidx)
 {
+	// Renders the connection between nodes
 	node.scene()->addItem(this);
+	// Gets coordinates of the target port
 	sink = source = node.GetPortPos(ty, portidx);
 	switch (ty)
 	{
 	case Port::Sink:
+		// If this node is the connection Sink
 		connector.second = &node;
 		sinkN = portidx;
 		break;
 	case Port::Source:
+		// If this node is the connection Source
 		connector.first = &node;
 		sourceN = portidx;
 		break;
@@ -22,14 +33,17 @@ Connection::Connection(Node& node, Port ty, uint8_t portidx)
 	}
 	Init();
 }
+
 Connection::~Connection()
 {
+	// Only unmaps if the nodes were correctly connected
 	if (bFinished)
 		ConnMapper::Unmap(connector.first, this);
 }
 
 void Connection::Init()
 {
+	// Set Qt properties of the connection
 	setFlag(QGraphicsItem::ItemIsMovable, false);
 	setFlag(QGraphicsItem::ItemIsFocusable, true);
 	setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -38,8 +52,14 @@ void Connection::Init()
 	setZValue(-1.0);
 }
 
+/**
+ * @brief Calculates bounding rectangle for spline selection
+ *
+ * @return QRectF calculated bounding rectangle
+ */
 QRectF UI::Connection::boundingRect() const
 {
+	// TODO: Validate
 	auto points = PointsC1C2();
 	QRectF c1c2Rect = QRectF(points.first, points.second).normalized();
 	QRectF commonRect = QRectF(source, sink).normalized().united(c1c2Rect);
@@ -50,7 +70,6 @@ QRectF UI::Connection::boundingRect() const
 	commonRect.setBottomRight(commonRect.bottomRight() + 2 * cornerOffset);
 	return commonRect;
 }
-
 
 
 void Connection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -130,25 +149,33 @@ void UI::Connection::UpdateDisconnect()
 	connector.second->OnDisconnect(sinkN);
 }
 
-std::pair<QPointF, QPointF> Connection::PointsC1C2()const
+/**
+ * @brief Calculates spline pivot points based on relative Node position
+ *
+ * @return std::pair<QPointF, QPointF> spline pivot points
+ */
+std::pair<QPointF, QPointF> Connection::PointsC1C2() const
 {
 	constexpr qreal defaultOffset = 200;
 	qreal xDistance = sink.x() - source.x();
-	qreal horizontalOffset = qMin(defaultOffset, std::abs(xDistance));
+	// Maximum offset is 200
+	qreal horizontalOffset = std::min(defaultOffset, std::abs(xDistance));
 	qreal verticalOffset = 0;
 	qreal ratioX = 0.5;
 
+	// If the Sink is left of Source
 	if (xDistance <= 0)
 	{
-		qreal yDistance = sink.y() - sink.y() + 20;
-		qreal vector = yDistance < 0 ? -1.0 : 1.0;
-		verticalOffset = qMin(defaultOffset, std::abs(yDistance)) * vector;
+		verticalOffset = qMin(defaultOffset, 20.0);
 		ratioX = 1.0;
 	}
 	horizontalOffset *= ratioX;
 
-	return { {source.x() + horizontalOffset, source.y() + verticalOffset},
-		{sink.x() - horizontalOffset, sink.y() - verticalOffset } };
+	// Returns spline pivot points
+	return {
+		{source.x() + horizontalOffset, source.y() + verticalOffset},
+		{sink.x() - horizontalOffset, sink.y() - verticalOffset }
+	};
 }
 
 QJsonObject Connection::Serialize()

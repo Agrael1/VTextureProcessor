@@ -1,14 +1,22 @@
 #include <UI/App.h>
 
+/**
+ * @brief Construct a new App:: App object
+ *
+ * @param argc argument count
+ * @param argv argument list
+ */
 App::App(int argc, char** argv)
 	:app(argc, argv)
 {
     // TODO: Calling AppName and AppVer causes a segfault on Linux
+    // Basic setup of the application
 	QCoreApplication::setApplicationName(AppName.data());
 	QCoreApplication::setApplicationVersion(AppVer.data());
 	app.setStyle(QStyleFactory::create(AppTheme.data()));
     app.setWindowIcon(QIcon{ ":/tlr.ico" });
 
+    // Style definition (darkmode)
     QPalette darkPalette;
     darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
     darkPalette.setColor(QPalette::WindowText, Qt::white);
@@ -26,12 +34,18 @@ App::App(int argc, char** argv)
 
     app.setPalette(darkPalette);
 
+    // Set window size
 	window.emplace(1280, 720);
     //projects.emplace(1280, 720);
     //projects->show();
 	window->ShowMaximized();
 }
 
+/**
+ * @brief Starts the application
+ *
+ * @return int return code of the application
+ */
 int App::Start()
 {
 	return app.exec();
