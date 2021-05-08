@@ -17,6 +17,8 @@ ContextMenu::ContextMenu(QWidget* parent)
 
 	layout.addWidget(&filter);
 	layout.addWidget(&selection);
+
+	filter.connect(&filter, &QLineEdit::textEdited, this, &ContextMenu::OnFilterChanged);
 }
 
 void ContextMenu::AppendGroup(std::string_view groupName)
@@ -43,10 +45,23 @@ void ContextMenu::Execute(const QPoint& where)
 	filter.setFocus();
 	exec(where);
 }
-void OnItemDoubleClicked(QTreeWidgetItem* item, int column)
+void ContextMenu::OnItemDoubleClicked(QTreeWidgetItem* item, int column)
 {
 	if (item && item->data(column, Qt::UserRole).toString() == skipper.data())
 	{
 
 	}
+}
+void ContextMenu::OnFilterChanged(const QString& str)
+{
+	//for (auto& topLvlItem : topLevelItems)
+//{
+//	for (int i = 0; i < topLvlItem->childCount(); ++i)
+//	{
+//		auto child = topLvlItem->child(i);
+//		auto modelName = child->data(0, Qt::UserRole).toString();
+//		const bool match = (modelName.contains(text, Qt::CaseInsensitive));
+//		child->setHidden(!match);
+//	}
+//}
 }
