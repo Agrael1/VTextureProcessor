@@ -6,9 +6,17 @@ const PortStyle PortStyle::Grayscale;
 const ConnectionStyle ConnectionStyle::Grayscale;
 
 
-static inline QColor ReadColor(QJsonObject values, std::string_view varname)
+/**
+ * @brief Loads color from color map based on name
+ *
+ * @param values All mapped colors
+ * @param varname Target color name
+ * @return QColor Found target color
+ */
+static inline QColor ReadColor(QJsonObject values, std::string_view varname) noexcept
 {
     auto valueRef = values[varname.data()];
+    // RGB color name
     if (valueRef.isArray())
     {
         auto colorArray = valueRef.toArray();
@@ -17,9 +25,16 @@ static inline QColor ReadColor(QJsonObject values, std::string_view varname)
             rgb[i++] = it.toInt();
         return { rgb[0], rgb[1], rgb[2] };
     }
+    // Non-RGB color name ('green', 'red', etc.)
     return {valueRef.toString()};
 }
 
+/**
+ * @brief Gets Node style based from document on name
+ *
+ * @param document Node JSON data
+ * @param name Name of the Node style
+ */
 NodeStyle::NodeStyle(QJsonObject document, std::string_view name)
     :styleName(name)
 {

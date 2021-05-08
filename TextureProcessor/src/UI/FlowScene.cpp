@@ -3,6 +3,12 @@
 #include <UI/Properties.h>
 #include <UI/Connection.h>
 
+/**
+ * @brief Generates file name with incremented count if name already exists
+ *
+ * @param p File path
+ * @return std::filesystem::path Final filename
+ */
 std::filesystem::path generate(const std::filesystem::path& p)
 {
 	namespace fs = std::filesystem;
@@ -12,13 +18,21 @@ std::filesystem::path generate(const std::filesystem::path& p)
 	f += "_";
 	auto v = 0;
 
+	// Increment while file exists
 	while (fs::exists(rp))
 		rp.replace_filename(f + std::to_string(v++) + x);
+
 	return rp;
 }
 
 using namespace UI;
 
+/**
+ * @brief Construct a new Flow Scene:: Flow Scene object
+ *
+ * @param parent
+ * @param props
+ */
 FlowScene::FlowScene(QObject* parent, Properties& props)
 	:QGraphicsScene(parent)
 	, Cbackground("#393939")
@@ -36,6 +50,12 @@ FlowScene::FlowScene(QObject* parent, Properties& props)
 	connect(this, &QGraphicsScene::selectionChanged, this, &FlowScene::OnSelectionChanged);
 }
 
+/**
+ * @brief Draws background grid
+ *
+ * @param painter Painter object to use
+ * @param rect Bounding rectangle to draw in
+ */
 void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 {
 	// call parent method
@@ -56,26 +76,35 @@ void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 	std::vector<QLine> lines_light;
 	std::vector<QLine> lines_dark;
 
+	constexpr int gridSize = 100;
+	// Create vertical lines
 	for (auto x = first_left; x <= right; x += gridsize) {
-		if (x % 100 != 0)
+		if (x % gridSize != 0)
 			lines_light.push_back(QLine(x, top, x, bottom));
 		else
 			lines_dark.push_back(QLine(x, top, x, bottom));
 	}
+
+	// Create vertical lines
 	for (auto y = first_top; y <= bottom; y += gridsize) {
-		if (y % 100 != 0)
+		if (y % gridSize != 0)
 			lines_light.push_back(QLine(left, y, right, y));
 		else
 			lines_dark.push_back(QLine(left, y, right, y));
 	}
 
-	// draw calls
+	// Draw vertical and horizontal lines
 	painter->setPen(Plight);
 	painter->drawLines(lines_light.data(), int(lines_light.size()));
 
 	painter->setPen(Pdark);
 	painter->drawLines(lines_dark.data(), int(lines_dark.size()));
 }
+
+/**
+ * @brief Event to update properties of Nodes on selection change
+ *
+ */
 void FlowScene::OnSelectionChanged()
 {
 	props.Clear();
@@ -87,18 +116,35 @@ void FlowScene::OnSelectionChanged()
 	props.Set();
 }
 
+/**
+ * @brief Creates new Node on the canvas
+ *
+ * @param name Name of the new Node
+ * @return UI::Node& Newly created node
+ */
 UI::Node& FlowScene::CreateNode(std::string_view name)
 {
 	auto &node = InsertNode(name, fmt::sprintf("%s_%zu", name, codex.AddRef(name)));
 	addItem(&node);
+
+	// Add to Output nodes if output
 	if (name == "Output")
 		outputs.push_back(&node);
+
 	return node;
 }
+
+/**
+ * @brief Locates item that is at the target position
+ *
+ * @param pos Position to look at
+ * @return UI::Node* Found first found object
+ */
 UI::Node* FlowScene::LocateNode(QPointF pos)noexcept
 {
 	auto xitems = items(pos);
 
+	// TODO: Refactor?
 	std::vector<QGraphicsItem*> filteredItems;
 	std::copy_if(xitems.begin(), xitems.end(), std::back_inserter(filteredItems),
 		[](QGraphicsItem* item)
@@ -110,6 +156,14 @@ UI::Node* FlowScene::LocateNode(QPointF pos)noexcept
 
 	return static_cast<UI::Node*>(filteredItems.front());
 }
+
+/**
+ * @brief Creates new Node of selected type
+ *
+ * @param name Name of the Node type
+ * @param unique_name Name of the new Node (must be unique)
+ * @return UI::Node&
+ */
 UI::Node& FlowScene::InsertNode(std::string_view name, std::string&& unique_name)
 {
 	const auto &r = codex.GetNode(name);
@@ -121,29 +175,49 @@ UI::Node& FlowScene::InsertNode(std::string_view name, std::string&& unique_name
 	return *x.first->second;
 }
 
+/**
+ * @brief Deletes the object in focus
+ *
+ */
 void FlowScene::DeleteSelected()
 {
+	// Delete connections first to avoid double free
 	for (QGraphicsItem* item : selectedItems())
 	{
+		// Disconnects object from other scene objects
 		if (auto c = dynamic_cast<Connection*>(item))
 			c->RemoveForce();
 	}
+
+	// Delete Nodes
 	for (QGraphicsItem* item : selectedItems())
 	{
 		if (auto n = dynamic_cast<Node*>(item))
 		{
+			// Deregister output
 			if (n->GetStyleName() == "Output")
 				outputs.erase(std::find(outputs.begin(), outputs.end(), n));
+
 			nodes.erase(n->GetName().data());
 		}
 	}
 }
+
+/**
+ * @brief Clears all objects on canvas
+ *
+ */
 void FlowScene::Clear()
 {
 	nodes.clear();
 	codex.ClearCounts();
 	clear();
 }
+
+/**
+ * @brief Exports all outputs on canvas
+ *
+ */
 void FlowScene::ExportAll()
 {
 	std::filesystem::path name;
@@ -154,12 +228,30 @@ void FlowScene::ExportAll()
 			name = x->Export();
 			continue;
 		}
+		// Exports output silently if name already valid
 		x->ExportSilent(generate(name).string());
 	}
 }
 
+/**
+ * @brief Serializes all objects on canvas to JSON
+ *
+ * @return QJsonObject
+ */
 QJsonObject FlowScene::Serialize()
 {
+	/*
+	Output JSON is in the following format:
+
+	{
+		"Nodes": [
+			{ ... node data ... }, ...
+		],
+		"Connections": [
+			{ ... connection data ... }, ...
+		]
+	}
+	*/
 	QJsonObject sc;
 	QJsonArray xnodes;
 	QJsonArray conns;
@@ -176,9 +268,17 @@ QJsonObject FlowScene::Serialize()
 
 	return sc;
 }
+
+/**
+ * @brief
+ *
+ * @param obj
+ */
 void FlowScene::Deserialize(QJsonObject obj)
 {
-	if (!obj.contains("Nodes"))return;
+	// Nothing to draw if no Nodes
+	if (!obj.contains("Nodes")) return;
+
 	QJsonArray arr{ obj["Nodes"].toArray() };
 	for (auto ref : arr)
 	{
@@ -186,60 +286,71 @@ void FlowScene::Deserialize(QJsonObject obj)
 		auto stype = obj.keys()[0];
 		auto type = stype.toStdString();
 		auto node = obj[stype].toObject();
-		if (!node.contains("Ref"))continue;
+
+		// Skip if Node is not uniquely identifiable
+		if (!node.contains("Ref")) continue;
 		auto xref = node["Ref"].toInt();
 
+		// Create unique name from Ref and Type
 		auto& xnode = InsertNode(type, fmt::sprintf("%s_%zu", type, xref));
 		codex.SetMaxRef(type, xref + 1);
 		addItem(&xnode);
+
+		// Register output
 		if (type == "Output")
 			outputs.push_back(&xnode);
+
+		// Load config from JSON into the new Node
 		xnode.Deserialize(node);
 	}
 
-	if (obj.contains("Connections"))
+	if (!obj.contains("Connections")) return;
+
+	QJsonArray conns{ obj["Connections"].toArray() };
+	for (auto c : conns)
 	{
-		QJsonArray conns{ obj["Connections"].toArray() };
-		for (auto c : conns)
+		auto o = c.toObject();
+		// Skip incomplete connections
+		if (!(o.contains("Sink") && o.contains("Source"))) continue;
+		auto source = o["Source"].toArray();
+		UI::Node* node = nullptr;
+		uint8_t sourceN = 0;
+
+		// Lookup source index
+		for (auto v : source)
 		{
-			auto o = c.toObject();
-			if (!(o.contains("Sink") && o.contains("Source")))continue;
-			auto source = o["Source"].toArray();
-			UI::Node* node = nullptr;
-			uint8_t sourceN = 0;
-
-			for (auto v : source)
+			if (v.isString())
 			{
-				if (v.isString())
-				{
-					auto key = v.toString().toStdString();
-					auto xnode = nodes.find(key);
-					if (xnode == nodes.end())break;
-					node = xnode->second.operator->();
-					continue;
-				}
-				sourceN = v.toInt();
+				auto key = v.toString().toStdString();
+				auto xnode = nodes.find(key);
+				if (xnode == nodes.end()) break;
+				node = xnode->second.operator->();
+				continue;
 			}
-			if (!node) continue;
-			ConnMapper::MakeTemporary(*node, Port::Source, sourceN);
-
-			auto sink = o["Sink"].toArray();
-			node = nullptr;
-			uint8_t sinkN = 0;
-			for (auto v : sink)
-			{
-				if (v.isString())
-				{
-					auto key = v.toString().toStdString();
-					auto xnode = nodes.find(key);
-					if (xnode == nodes.end())break;
-					node = xnode->second.operator->();
-					continue;
-				}
-				sinkN = v.toInt();
-			}
-			if (!node) { ConnMapper::ClearTemporary(); continue; }
-			ConnMapper::ConnectTemporary(*node, Port::Sink, sinkN);
+			sourceN = v.toInt();
 		}
+
+		if (!node) continue;
+		// Similar to manual drag and drop connection
+		ConnMapper::MakeTemporary(*node, Port::Source, sourceN);
+
+		auto sink = o["Sink"].toArray();
+		node = nullptr;
+		uint8_t sinkN = 0;
+		// Lookup sink index
+		for (auto v : sink)
+		{
+			if (v.isString())
+			{
+				auto key = v.toString().toStdString();
+				auto xnode = nodes.find(key);
+				if (xnode == nodes.end())break;
+				node = xnode->second.operator->();
+				continue;
+			}
+			sinkN = v.toInt();
+		}
+		if (!node) { ConnMapper::ClearTemporary(); continue; }
+		ConnMapper::ConnectTemporary(*node, Port::Sink, sinkN);
 	}
 }

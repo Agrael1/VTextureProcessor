@@ -71,53 +71,88 @@ QRectF UI::Connection::boundingRect() const
 	return commonRect;
 }
 
-
+/**
+ * @brief Draws spline using an appropriate style and calculated pivot points
+ *
+ * @param painter used for drawing on the canvas
+ * @param option not used (only for interface compatibility)
+ * @param widget not used (only for interface compatibility)
+ */
 void Connection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	painter->setBrush(Qt::NoBrush);
+	// Selects style based on connection status (connected, selected or currently being dragged)
 	if (isSelected())
+		// TODO: Rename
 		painter->setPen(ConnectionStyle::Grayscale.hovered);
 	else if (bFinished)
 		painter->setPen(ConnectionStyle::Grayscale.connected);
 	else
 		painter->setPen(ConnectionStyle::Grayscale.sketch);
 
-
 	auto c1c2 = PointsC1C2();
+	// Draws a cubic spline using the calculated pivot points
 	QPainterPath cubic(source);
 	cubic.cubicTo(c1c2.first, c1c2.second, sink);
 	painter->drawPath(cubic);
 }
 
+/**
+ * @brief Callback for mouse move event
+ *
+ * @param event Captured event
+ */
 void UI::Connection::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
 	prepareGeometryChange();
 
+	// Endpoint only moved if the position has changed
 	if (auto x = Requires(); any(x))
 		MoveEndpoint(x, event->pos() - event->lastPos());
 
 	update();
 	event->accept();
 }
+
+/**
+ * @brief Handles mouse release event (performs connection if mouse released on target)
+ *
+ * @param event Captured mouse release event
+ */
 void UI::Connection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	ungrabMouse();
 	event->accept();
 
+	// TODO: cleanup
 	auto& xscene = static_cast<UI::FlowScene&>(*scene());
 	auto* node = xscene.LocateNode(event->scenePos());
+
+	// Finishes connection if mouse was released on a target
 	if (node && node != StartNode())
 		if (auto p = node->PortHitScene(event->scenePos()); p)
 			return PlaceConnection(p, node);
 
-
 	if (any(Requires()))ConnMapper::ClearTemporary();
 }
+
+/**
+ * @brief Finishes a connection between two nodes
+ *
+ * @param port Target port
+ * @param node Target Node
+ */
 void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> port, Node* node)
 {
 	auto re = Requires();
-	if (port->first != re) { ConnMapper::ClearTemporary(); return; };
+	// If connecting Sink to Sink (or Source to Source)
+	if (port->first != re) {
+		ConnMapper::ClearTemporary();
+		return;
+	};
 	prepareGeometryChange();
+
+	// Extrapolates missing Sink or Source
 	switch (re)
 	{
 	case Port::Sink:
@@ -125,7 +160,6 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 		sinkN = port->second;
 		connector.second = node;
 		node->SetConnection(ConnMapper::DetachTemporary(), sinkN);
-		ConnMapper::Map(connector.first, this);
 		sink = node->GetPortPos(Port::Sink, sinkN);
 		break;
 	}
@@ -133,17 +167,29 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 		connector.first = node;
 		sourceN = port->second;
 		connector.second->SetConnection(ConnMapper::DetachTemporary(), sinkN);
-		ConnMapper::Map(connector.first, this);
 		source = node->GetPortPos(Port::Source, sourceN);
 		break;
 	}
+	ConnMapper::Map(connector.first, this);
 	connector.second->OnConnect(sinkN, *connector.first, sourceN);
+
+	// Set connection as properly terminated (for cleanup)
 	bFinished = true;
 }
+
+/**
+ * @brief Propagates changes to nodes following current Node
+ *
+ */
 void UI::Connection::Update()
 {
 	connector.second->OnConnect(sinkN, *connector.first, sourceN);
 }
+
+/**
+ * @brief Propagates information about disconnection
+ *
+ */
 void UI::Connection::UpdateDisconnect()
 {
 	connector.second->OnDisconnect(sinkN);
@@ -178,50 +224,83 @@ std::pair<QPointF, QPointF> Connection::PointsC1C2() const
 	};
 }
 
+/**
+ * @brief Generates a JSON representation of the connection
+ *
+ * @return QJsonObject
+ */
 QJsonObject Connection::Serialize()
 {
+	/*
+	The returned JSON has the following structure:
+
+	{
+		"Source": ["Node_name", source_index],
+		"Sink": ["Node_name", sink_index]
+	}
+	*/
 	QJsonObject top;
+
 	QJsonArray source;
 	source.append(connector.first->GetName().data());
 	source.append(sourceN);
 	top.insert("Source", source);
+
 	QJsonArray sink;
+
 	sink.append(connector.second->GetName().data());
 	sink.append(sinkN);
 	top.insert("Sink", sink);
+
 	return top;
 }
 
+/**
+ * @brief Checks what Port type is requred to properly finish the connection
+ *
+ * @return Port
+ */
 Port Connection::Requires()const
 {
-	if (!connector.first)
-		return Port::Source;
-	if (!connector.second)
-		return Port::Sink;
+	if (!connector.first) return Port::Source;
+	if (!connector.second) return Port::Sink;
 	return Port::None;
 }
+
+/**
+ * @brief Updates coordinates of the spline endpoint
+ *
+ * @param port Source port
+ * @param offset Offset from last position
+ */
 void Connection::MoveEndpoint(Port port, QPointF offset)
 {
-	switch (port)
-	{
-	case Port::Sink:
-		sink += offset;
-		break;
-	case Port::Source:
-		source += offset;
-		break;
-	default:
-		break;
-	}
+	// TODO: is this even needed?
+	Move(offset, port);
 }
-PortType Connection::GetType()const noexcept
+
+/**
+ * @brief Returns Source and Sink type (based on which end of the connection is currently connected)
+ *
+ * @return PortType
+ */
+PortType Connection::GetType() const noexcept
 {
 	if (connector.first)
 		return connector.first->GetSourceType(sourceN);
+
 	if (connector.second)
 		return connector.first->GetSinkType(sinkN);
+
 	return PortType::None;
 }
+
+/**
+ * @brief Updates coordinates of a spline point
+ *
+ * @param deltapos Target offset
+ * @param ty Port to change position of
+ */
 void Connection::Move(QPointF deltapos, Port ty)
 {
 	prepareGeometryChange();
@@ -237,7 +316,12 @@ void Connection::Move(QPointF deltapos, Port ty)
 		break;
 	}
 }
-void Connection::RemoveForce()noexcept
+
+/**
+ * @brief Destroys the connection
+ *
+ */
+void Connection::RemoveForce() noexcept
 {
 	if (bFinished)
 	{
@@ -248,28 +332,58 @@ void Connection::RemoveForce()noexcept
 
 /////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Singleton for connection mapper
+ *
+ * @return ConnMapper&
+ */
 ConnMapper& UI::ConnMapper::Instance()
 {
 	static ConnMapper mapper;
 	return mapper;
 }
 
+/**
+ * @brief Creates a new Node mapping in the connection mapper
+ *
+ * @param n Node that is being connected
+ * @param c New connection of the Node
+ */
 void ConnMapper::Map(Node* n, Connection* c)
 {
 	auto& i = Instance();
 	i.map[n].push_back(c);
 }
 
+/**
+ * @brief Returns all connections associated with the Node
+ *
+ * @param n Target Node
+ * @return std::span<Connection*> all asociated connection
+ */
 std::span<Connection*> UI::ConnMapper::Get(Node* n)
 {
 	return Instance().map[n];
 }
 
+/**
+ * @brief Creates a new temporary connection (the one being currently dragged)
+ *
+ * @param node Source node
+ * @param port Source port
+ * @param portidx Source port index
+ */
 void UI::ConnMapper::MakeTemporary(Node& node, Port port, uint8_t portidx)
 {
 	Instance().tmp.reset(new Connection{ node, port, portidx });
 	Instance().tmp->grabMouse();
 }
+
+/**
+ * @brief Moves a connection to the temporary connection (when it is being reattached to a different node)
+ *
+ * @param in Target connection
+ */
 void UI::ConnMapper::AttachTemporary(std::unique_ptr<Connection>&& in)
 {
 	auto& x = Instance().tmp;
@@ -280,12 +394,10 @@ void UI::ConnMapper::AttachTemporary(std::unique_ptr<Connection>&& in)
 	x->grabMouse();
 }
 
-void UI::ConnMapper::ConnectApply()
-{
-	auto& i = Instance();
-	i.map[i.tmp->GetSink()].emplace_back(i.tmp.get());
-}
-
+/**
+ * @brief Destroyes the temporary connection
+ *
+ */
 void UI::ConnMapper::ClearTemporary()
 {
 	Instance().tmp.reset();
