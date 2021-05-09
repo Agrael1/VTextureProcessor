@@ -2,7 +2,7 @@
 #include <QMainWindow>
 #include <QToolButton>
 #include <QLabel>
-#include <UI/Frameless_e.h>
+#include <UI/Frameless.h>
 #include <Logic/ProjectsData.h>
 #include <qpushbutton.h>
 
@@ -219,7 +219,7 @@ public:
 			move(e->globalPos() / 2);
 			return;
 		}
-		f.mouseMove(e);
+		f.MouseMove(e);
 	}
 protected:
 	void OnCreateClicked(bool checked) {
