@@ -5,13 +5,14 @@
 #include <UI/ProjectsWindow.h>
 #include <optional>
 
-class App
+class App : public QObject
 {
 public:
 	App(int argc, char** argv);
 public:
 	int Start();
 private:
+	bool ProjectChosenEvent(QEvent* e);
 	std::optional<Window> window;
 	std::optional<ProjectsWindow> projects;
 	QApplication app;

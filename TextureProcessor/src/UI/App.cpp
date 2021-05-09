@@ -50,3 +50,8 @@ int App::Start()
 {
 	return app.exec();
 }
+
+bool App::ProjectChosenEvent(QEvent* e)
+{
+    return true;
+}
