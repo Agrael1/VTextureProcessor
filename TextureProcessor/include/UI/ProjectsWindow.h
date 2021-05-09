@@ -5,6 +5,7 @@
 #include <UI/Frameless.h>
 #include <Logic/ProjectsData.h>
 #include <qpushbutton.h>
+#include <QFileDialog>
 
 
 class ProjectsCW : public QWidget
@@ -224,6 +225,17 @@ public:
 protected:
 	void OnCreateClicked(bool checked) {
 		qDebug() << "Create clicked";
+		auto projName = QFileDialog::getSaveFileName(
+			nullptr,
+			"Create new project",
+			"",
+			"(*.vtproj);;"
+		);
+		if (!pdata.InCache(projName.toStdString())) {
+			pdata.AppendCache(projName.toStdString());
+		}
+		FillTree();
+
 	}
 	void OnOpenClicked(bool checked) {
 		qDebug() << "Open clicked";

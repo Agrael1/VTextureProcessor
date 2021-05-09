@@ -17,6 +17,29 @@ public:
 	{
 		return { projects.data(), nreal };
 	}
+	bool InCache(std::string projName) {
+		for (int i = 0; i < 20; i++) {
+			qDebug() << projects[i].filename().string().c_str();
+			if (projects[i].filename().string().c_str() == projName)
+				return true;
+		}
+		return false;
+	}
+	void AppendCache(std::string projName) {
+		namespace fs = std::filesystem;
+
+		if (nreal < 20) {
+			projects[nreal++] = fs::path{projName};
+		}
+
+		fs::path cache{ "cache.vtxc" };
+		std::fstream f;
+		f.open(cache, std::ios::out);
+		for (int i = 0; i < nreal; i++) {
+			f << fs::absolute(projects[i]).string().c_str() << std::endl;
+		}
+		f.close();
+	}
 private:
 	void MakeCache()
 	{
