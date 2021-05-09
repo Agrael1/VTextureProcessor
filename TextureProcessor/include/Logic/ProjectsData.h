@@ -34,6 +34,7 @@ private:
 		f.open(cache, std::ios::in);
 		for (; nreal < 20 && !f.eof(); nreal++){
 			std::getline(f, s);
+			if (s.empty()) return;
 			projects[nreal] = s;
 		}
 	}
