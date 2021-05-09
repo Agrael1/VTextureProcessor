@@ -94,6 +94,7 @@ private:
 	})";
 };
 
+
 class ProjectsWindow : public QMainWindow
 {
 	struct Project : public QWidget
@@ -205,10 +206,11 @@ public:
 		buttonLay.addWidget(&create);
 		buttonLay.addWidget(&open);
 
+		connect(&create, &QToolButton::clicked, this, &ProjectsWindow::OnCreateClicked);
+		connect(&open, &QToolButton::clicked, this, &ProjectsWindow::OnOpenClicked);
+
 		lay.addLayout(&hlay);
 	}
-
-
 	void mouseMoveEvent(QMouseEvent* e)override
 	{
 		if (isMaximized())
@@ -218,6 +220,13 @@ public:
 			return;
 		}
 		f.mouseMove(e);
+	}
+protected:
+	void OnCreateClicked(bool checked) {
+		qDebug() << "Create clicked";
+	}
+	void OnOpenClicked(bool checked) {
+		qDebug() << "Open clicked";
 	}
 private:
 	void FillTree()
