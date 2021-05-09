@@ -224,25 +224,39 @@ public:
 	}
 protected:
 	void OnCreateClicked(bool checked) {
-		qDebug() << "Create clicked";
 		auto projName = QFileDialog::getSaveFileName(
 			nullptr,
 			"Create new project",
 			"",
 			"(*.vtproj);;"
 		);
+		if (projName.toStdString().empty()) return;
+
 		if (!pdata.InCache(projName.toStdString())) {
 			pdata.AppendCache(projName.toStdString());
 		}
+		// TODO: Serialize to file
 		FillTree();
-
 	}
 	void OnOpenClicked(bool checked) {
-		qDebug() << "Open clicked";
+		auto projName = QFileDialog::getOpenFileName(
+			nullptr,
+			"Open existing project",
+			"",
+			"(*.vtproj);;"
+		);
+		if (projName.toStdString().empty()) return;
+
+		if (!pdata.InCache(projName.toStdString())) {
+			pdata.AppendCache(projName.toStdString());
+		}
+
+		FillTree();
 	}
 private:
 	void FillTree()
 	{
+		selection.clear();
 		for (auto& x : pdata.GetRecent())
 		{
 			auto& xitem = *new QTreeWidgetItem(&selection);

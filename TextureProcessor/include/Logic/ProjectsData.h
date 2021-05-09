@@ -18,10 +18,12 @@ public:
 		return { projects.data(), nreal };
 	}
 	bool InCache(std::string projName) {
+		namespace fs = std::filesystem;
+
 		for (int i = 0; i < 20; i++) {
-			qDebug() << projects[i].filename().string().c_str();
-			if (projects[i].filename().string().c_str() == projName)
+			if (fs::absolute(fs::path{projName}) == fs::absolute(projects[i])) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -29,7 +31,7 @@ public:
 		namespace fs = std::filesystem;
 
 		if (nreal < 20) {
-			projects[nreal++] = fs::path{projName};
+			projects[nreal++] = fs::absolute(fs::path{projName});
 		}
 
 		fs::path cache{ "cache.vtxc" };
