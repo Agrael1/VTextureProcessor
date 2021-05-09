@@ -124,7 +124,7 @@ void FlowView::OnItemSelected(QTreeWidgetItem* item, int)
 	if (modelName == skipper) return;
 
 	auto& type = scene.CreateNode(modelName);
-	type.setPos(mapToScene(last_view));
+	type.setPos(mapToScene(last_event));
 
 	menu.close();
 }

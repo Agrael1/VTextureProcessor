@@ -35,10 +35,10 @@ App::App(int argc, char** argv)
     app.setPalette(darkPalette);
 
     // Set window size
-	window.emplace(1280, 720);
-    //projects.emplace(1280, 720);
-    //projects->show();
-	window->ShowMaximized();
+	//window.emplace(1280, 720);
+    projects.emplace(1280, 720);
+    projects->show();
+	//window->ShowMaximized();
 }
 
 /**
