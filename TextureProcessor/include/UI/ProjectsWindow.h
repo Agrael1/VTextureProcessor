@@ -234,12 +234,13 @@ protected:
 			"",
 			"(*.vtproj);;"
 		).toStdString();
+
 		if (projName.empty()) return;
 
 		std::filesystem::path projPath{projName};
 
-		if (!pdata.InCache(projName)) {
-			pdata.AppendCache(projName);
+		if (!pdata.InCache(projPath)) {
+			pdata.AppendCache(projPath);
 		}
 
 		OpenApp(projPath);
@@ -251,12 +252,13 @@ protected:
 			"",
 			"(*.vtproj);;"
 		).toStdString();
+
 		if (projName.empty()) return;
 
 		std::filesystem::path projPath{projName};
 
 		if (!pdata.InCache(projPath)) {
-			pdata.AppendCache(projName);
+			pdata.AppendCache(projPath);
 		}
 
 		OpenApp(projPath);

@@ -27,11 +27,11 @@ public:
 		}
 		return false;
 	}
-	void AppendCache(std::string projName) {
+	void AppendCache(std::filesystem::path projName) {
 		namespace fs = std::filesystem;
 
 		if (nreal < 20) {
-			projects[nreal++] = fs::absolute(fs::path{projName});
+			projects[nreal++] = fs::absolute(projName);
 		}
 
 		fs::path cache{ "cache.vtxc" };
