@@ -34,9 +34,10 @@ App::App(int argc, char** argv)
 
     app.setPalette(darkPalette);
 
+    QEvent::registerEventType(QEvent::User+1);
+
     // Set window size
-	//window.emplace(1280, 720);
-    projects.emplace(1280, 720);
+    projects.emplace(1280, 720, *this);
     projects->show();
 	//window->ShowMaximized();
 }
@@ -51,7 +52,12 @@ int App::Start()
 	return app.exec();
 }
 
-bool App::ProjectChosenEvent(QEvent* e)
+bool App::event(QEvent* e)
 {
+    if (e->type() == QEvent::User+1) {
+        qDebug() << "Event reached";
+        projects.reset();
+    }
+
     return true;
 }

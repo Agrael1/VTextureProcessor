@@ -12,7 +12,7 @@ public:
 public:
 	int Start();
 private:
-	bool ProjectChosenEvent(QEvent* e);
+	bool event(QEvent* e);
 	std::optional<Window> window;
 	std::optional<ProjectsWindow> projects;
 	QApplication app;

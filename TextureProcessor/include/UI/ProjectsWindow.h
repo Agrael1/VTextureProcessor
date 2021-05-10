@@ -6,6 +6,7 @@
 #include <Logic/ProjectsData.h>
 #include <qpushbutton.h>
 #include <QFileDialog>
+#include <QApplication>
 
 
 class ProjectsCW : public QWidget
@@ -166,14 +167,15 @@ class ProjectsWindow : public QMainWindow
 			})";
 	};
 public:
-	ProjectsWindow(int32_t width, int32_t height)
+	ProjectsWindow(int32_t width, int32_t height, QObject &app)
 		:QMainWindow(nullptr, Qt::FramelessWindowHint),
 		window(this), f(this)
 		, name("Veritas Texture Flow")
 		, recent("Open Recent")
 		, begin("Start now")
 		, create("Create New Project", "Create a new project file with specified\nresolution of the output texture", ":/icons8-add-file.png")
-		, open("Open Existing Project", "Open existing project from any location", ":/icons8-opened-folder.png")
+		, open("Open Existing Project", "Open existing project from any location", ":/icons8-opened-folder.png"),
+		app(app)
 	{
 		resize(width, height);
 		setCentralWidget(&window);
@@ -235,8 +237,8 @@ protected:
 		if (!pdata.InCache(projName.toStdString())) {
 			pdata.AppendCache(projName.toStdString());
 		}
-		// TODO: Serialize to file
-		FillTree();
+
+		qApp->postEvent(&app, new QEvent((QEvent::Type)(QEvent::User+1)));
 	}
 	void OnOpenClicked(bool checked) {
 		auto projName = QFileDialog::getOpenFileName(
@@ -281,6 +283,7 @@ private:
 	}
 
 private:
+	QObject &app;
 	ProjectsCW window;
 	FrameLess f;
 
