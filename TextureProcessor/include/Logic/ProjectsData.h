@@ -17,11 +17,11 @@ public:
 	{
 		return { projects.data(), nreal };
 	}
-	bool InCache(std::string projName) {
+	bool InCache(std::filesystem::path projName) {
 		namespace fs = std::filesystem;
 
 		for (int i = 0; i < 20; i++) {
-			if (fs::absolute(fs::path{projName}) == fs::absolute(projects[i])) {
+			if (fs::absolute(projName) == fs::absolute(projects[i])) {
 				return true;
 			}
 		}

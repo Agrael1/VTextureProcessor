@@ -233,14 +233,16 @@ protected:
 			"Create new project",
 			"",
 			"(*.vtproj);;"
-		);
-		if (projName.toStdString().empty()) return;
+		).toStdString();
+		if (projName.empty()) return;
 
-		if (!pdata.InCache(projName.toStdString())) {
-			pdata.AppendCache(projName.toStdString());
+		std::filesystem::path projPath{projName};
+
+		if (!pdata.InCache(projName)) {
+			pdata.AppendCache(projName);
 		}
 
-		OpenApp(std::filesystem::path{projName.toStdString()});
+		OpenApp(projPath);
 	}
 	void OnOpenClicked(bool checked) {
 		auto projName = QFileDialog::getOpenFileName(
@@ -248,14 +250,16 @@ protected:
 			"Open existing project",
 			"",
 			"(*.vtproj);;"
-		);
-		if (projName.toStdString().empty()) return;
+		).toStdString();
+		if (projName.empty()) return;
 
-		if (!pdata.InCache(projName.toStdString())) {
-			pdata.AppendCache(projName.toStdString());
+		std::filesystem::path projPath{projName};
+
+		if (!pdata.InCache(projPath)) {
+			pdata.AppendCache(projName);
 		}
 
-		OpenApp(std::filesystem::path{projName.toStdString()});
+		OpenApp(projPath);
 	}
 	void OpenApp(std::filesystem::path projPath) {
 		qApp->postEvent(&app, new ProjectEvent(projPath));
