@@ -2,7 +2,7 @@
 #include <filesystem>
 
 
-Window::Window(int32_t width, int32_t height, std::filesystem::path projPath)
+Window::Window(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
 	:file("File")
 	, Aclear("Clear")
 	, windows("Windows")
@@ -10,7 +10,7 @@ Window::Window(int32_t width, int32_t height, std::filesystem::path projPath)
 	, Aexport("Export All")
 	, Asave("Save")
 	, Aload("Load"),
-	projPath(projPath)
+	projPath(std::move(xprojPath))
 {
 	a.emplace(this);
 
@@ -60,11 +60,15 @@ void Window::OnLoad()
 
 	std::string str;
 	t.seekg(0, std::ios::end);
-	str.reserve(t.tellg());
+
+	int x = t.tellg();
+	str.reserve(x);
 	t.seekg(0, std::ios::beg);
 
 	str.assign((std::istreambuf_iterator<char>(t)),
 		std::istreambuf_iterator<char>());
+
+	if (str.empty())return;
 
 	QJsonParseError e;
 

@@ -15,7 +15,7 @@ class Window : public QMainWindow
 		FlowView view;
 	};
 public:
-	Window(int32_t width, int32_t height, std::filesystem::path projPath);
+	Window(int32_t width, int32_t height, std::filesystem::path&& projPath);
 public:
 	void OnClearTriggered();
 	void OnProps();

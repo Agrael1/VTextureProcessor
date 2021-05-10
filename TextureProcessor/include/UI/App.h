@@ -14,7 +14,7 @@ public:
 private:
 	bool event(QEvent* e);
 	std::optional<Window> window;
-	std::optional<ProjectsWindow> projects;
+	std::optional<UI::ProjectsWindow> projects;
 	QApplication app;
 private:
 	static constexpr std::string_view AppName = "VTexEditor";

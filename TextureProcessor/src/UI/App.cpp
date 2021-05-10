@@ -54,12 +54,12 @@ int App::Start()
 
 bool App::event(QEvent* e)
 {
-    ProjectEvent *proj = static_cast<ProjectEvent *>(e);
 
-    if (proj->type() == QEvent::User+1) {
-        qDebug() << "Event reached: " << std::filesystem::absolute(proj->projPath).string().c_str();
+    if (e->type() == QEvent::User+1) {
+        ProjectEvent& proj = static_cast<ProjectEvent&>(*e);
+        qDebug() << "Event reached: " << std::filesystem::absolute(proj.projPath).string().c_str();
         projects.reset();
-        window.emplace(1280, 720, proj->projPath);
+        window.emplace(1280, 720, std::move(proj.projPath));
         window->ShowMaximized();
     }
 

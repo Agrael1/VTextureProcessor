@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt: проект CMake для TextureProcessor; включите исходный код и определения,
 # укажите здесь логику для конкретного проекта.
 #
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.16)
 
 project(TextureProcessor CXX)
 
@@ -9,7 +9,7 @@ set(CXX_STANDARD 20)
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
 else(MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -g")
 endif()
 
 #set(CMAKE_AUTOMOC ON)
@@ -46,6 +46,7 @@ add_compile_definitions(_HAS_DEPRECATED_RESULT_OF=1)
 # Добавьте источник в исполняемый файл этого проекта.
 add_executable (TextureProcessor
 	"src/EntryMain.cpp"
+    "src/UI/ProjectsWindow.cpp"
     "resources/resources.qrc"
 	"include/Logic/Sink.h"
 	"include/Logic/Source.h"

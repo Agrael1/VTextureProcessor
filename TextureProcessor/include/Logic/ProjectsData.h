@@ -18,14 +18,7 @@ public:
 		return { projects.data(), nreal };
 	}
 	bool InCache(std::filesystem::path projName) {
-		namespace fs = std::filesystem;
-
-		for (int i = 0; i < 20; i++) {
-			if (fs::absolute(projName) == fs::absolute(projects[i])) {
-				return true;
-			}
-		}
-		return false;
+		return std::find(projects.rbegin(), projects.rend(), std::filesystem::absolute(projName))!= projects.rend();
 	}
 	void AppendCache(std::filesystem::path projName) {
 		namespace fs = std::filesystem;
@@ -43,25 +36,12 @@ public:
 		f.close();
 	}
 private:
-	void MakeCache()
+	void MakeCache();
+	void Trim()
 	{
-		namespace fs = std::filesystem;
-		fs::path cache{ "cache.vtxc" };
-		std::fstream f;
-		std::string s;
-
-		if (!fs::exists(cache) || !fs::is_regular_file(cache))
-		{
-			f.open(cache, std::ios::out);
-			f.close();
-		}
-
-		f.open(cache, std::ios::in);
-		for (; nreal < 20 && !f.eof(); nreal++){
-			std::getline(f, s);
-			if (s.empty()) return;
-			projects[nreal] = s;
-		}
+		if (nreal != 20)return;
+		for (size_t i = 1; auto& x : projects)
+			if (i > 0)x = std::move(projects[i++]);
 	}
 private:
 	std::array<std::filesystem::path, 20> projects;

@@ -50,9 +50,9 @@ FlowCodex::FlowCodex()
 
 		if (p.path().extension() == ".json")
 		{
-			std::ifstream t{ p };
+			std::ifstream t( p.path() );
 			std::string str;
-
+			
 			t.seekg(0, std::ios::end);
 			str.reserve(t.tellg());
 			t.seekg(0, std::ios::beg);
