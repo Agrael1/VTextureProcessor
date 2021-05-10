@@ -35,6 +35,7 @@ namespace UI
 				x.second.refcount = 0;
 		}
 		const pv::polymorphic_value<UI::Node>& GetNode(std::string_view nodety)const;
+		const pv::polymorphic_value<UI::Node>* TryGetNode(std::string_view nodety)const;
 		void SetMaxRef(std::string_view nodety, size_t cnt);
 		size_t AddRef(std::string_view nodety);
 	private:

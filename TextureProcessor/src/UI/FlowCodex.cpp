@@ -117,6 +117,12 @@ const pv::polymorphic_value<UI::Node>& FlowCodex::GetNode(std::string_view nodet
 {
 	return codex.at(nodety.data());
 }
+const pv::polymorphic_value<UI::Node>* FlowCodex::TryGetNode(std::string_view nodety)const
+{
+	if (!codex.contains(nodety.data()))return nullptr;
+	return &GetNode(nodety);
+}
+
 
 /**
  * @brief Changes reference cout to target Node type (can only be increased)

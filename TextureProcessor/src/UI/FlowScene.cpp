@@ -2,6 +2,7 @@
 #include <fmt/printf.h>
 #include <UI/Properties.h>
 #include <UI/Connection.h>
+#include <QMessageBox>
 
 /**
  * @brief Generates file name with incremented count if name already exists
@@ -174,6 +175,18 @@ UI::Node& FlowScene::InsertNode(std::string_view name, std::string&& unique_name
 	x.first->second->SetUniqueName(x.first->first);
 	return *x.first->second;
 }
+UI::Node* FlowScene::TryInsertNode(std::string_view name, std::string&& unique_name)
+{
+	const auto* r = codex.TryGetNode(name);
+	if (!r)return nullptr;
+	auto x = nodes.emplace(std::piecewise_construct,
+		std::forward_as_tuple(std::move(unique_name)),
+		std::forward_as_tuple(*r)
+	);
+	x.first->second->SetUniqueName(x.first->first);
+	return &*x.first->second;
+}
+
 
 /**
  * @brief Deletes the object in focus
@@ -279,6 +292,8 @@ void FlowScene::Deserialize(QJsonObject obj)
 	// Nothing to draw if no Nodes
 	if (!obj.contains("Nodes")) return;
 
+	bool missing = false;
+
 	QJsonArray arr{ obj["Nodes"].toArray() };
 	for (auto ref : arr)
 	{
@@ -292,16 +307,18 @@ void FlowScene::Deserialize(QJsonObject obj)
 		auto xref = node["Ref"].toInt();
 
 		// Create unique name from Ref and Type
-		auto& xnode = InsertNode(type, fmt::sprintf("%s_%zu", type, xref));
+		auto* xnode = TryInsertNode(type, fmt::sprintf("%s_%zu", type, xref));
+		if (!xnode) { missing = true; continue; }
+
 		codex.SetMaxRef(type, xref + 1);
-		addItem(&xnode);
+		addItem(xnode);
 
 		// Register output
 		if (type == "Output")
-			outputs.push_back(&xnode);
+			outputs.push_back(xnode);
 
 		// Load config from JSON into the new Node
-		xnode.Deserialize(node);
+		xnode->Deserialize(node);
 	}
 
 	if (!obj.contains("Connections")) return;
@@ -353,4 +370,8 @@ void FlowScene::Deserialize(QJsonObject obj)
 		if (!node) { ConnMapper::ClearTemporary(); continue; }
 		ConnMapper::ConnectTemporary(*node, Port::Sink, sinkN);
 	}
+
+	if (missing)
+		QMessageBox{ QMessageBox::Warning, "Warning", "Some nodes were missing, because their type was not loaded properly",
+		QMessageBox::Ok}.exec();
 }

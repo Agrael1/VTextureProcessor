@@ -17,7 +17,6 @@ private:
 	std::optional<UI::ProjectsWindow> projects;
 	QApplication app;
 private:
-	static constexpr std::string_view AppName = "VTexEditor";
 	static constexpr std::string_view AppVer = "0.1.1";
 	static constexpr std::string_view AppTheme = "Fusion";
 };

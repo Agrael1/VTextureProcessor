@@ -12,7 +12,7 @@ App::App(int argc, char** argv)
 {
     // TODO: Calling AppName and AppVer causes a segfault on Linux
     // Basic setup of the application
-	QCoreApplication::setApplicationName(AppName.data());
+	QCoreApplication::setApplicationName(Window::AppName.data());
 	QCoreApplication::setApplicationVersion(AppVer.data());
 	app.setStyle(QStyleFactory::create(AppTheme.data()));
     app.setWindowIcon(QIcon{ ":/tlr.ico" });
@@ -54,7 +54,6 @@ int App::Start()
 
 bool App::event(QEvent* e)
 {
-
     if (e->type() == QEvent::User+1) {
         ProjectEvent& proj = static_cast<ProjectEvent&>(*e);
         qDebug() << "Event reached: " << std::filesystem::absolute(proj.projPath).string().c_str();

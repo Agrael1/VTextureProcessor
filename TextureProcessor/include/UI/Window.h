@@ -15,13 +15,17 @@ class Window : public QMainWindow
 		FlowView view;
 	};
 public:
+	static constexpr std::string_view AppName = "VTexEditor";
+public:
 	Window(int32_t width, int32_t height, std::filesystem::path&& projPath);
 public:
 	void OnClearTriggered();
 	void OnProps();
 	void OnExport();
 	void OnSave();
+	void OnSaveAs();
 	void OnLoad();
+	void LoadFile();
 	void ShowMaximized()
 	{
 		showMaximized();
@@ -41,6 +45,7 @@ private:
 	QAction Aclear;
 	QAction Aexport;
 	QAction Asave;
+	QAction Asaveas;
 	QAction Aload;
 	QAction Aprops;
 	std::filesystem::path projPath;

@@ -1,7 +1,14 @@
 #include <UI/Window.h>
-#include <filesystem>
+#include <QFileDialog>
 
+namespace fs = std::filesystem;
 
+/**
+ * @brief Creates a main application window
+ * @param width of a window
+ * @param height of a window
+ * @param xprojPath file project that is being worked upon
+*/
 Window::Window(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
 	:file("File")
 	, Aclear("Clear")
@@ -9,6 +16,7 @@ Window::Window(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
 	, Aprops("Properties")
 	, Aexport("Export All")
 	, Asave("Save")
+	, Asaveas("Save As")
 	, Aload("Load"),
 	projPath(std::move(xprojPath))
 {
@@ -24,17 +32,24 @@ Window::Window(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
 	connect(&Aprops, &QAction::triggered, this, &Window::OnProps);
 	connect(&Aexport, &QAction::triggered, this, &Window::OnExport);
 	connect(&Asave, &QAction::triggered, this, &Window::OnSave);
+	connect(&Asaveas, &QAction::triggered, this, &Window::OnSaveAs);
 	connect(&Aload, &QAction::triggered, this, &Window::OnLoad);
 	file.addAction(&Aclear);
 	file.addAction(&Aload);
 	file.addAction(&Asave);
+	file.addAction(&Asaveas);
+	file.addSeparator();
 	file.addAction(&Aexport);
 	windows.addAction(&Aprops);
+
+	Asave.setShortcut(QKeySequence{ QKeySequence::StandardKey::Save });
+	Asaveas.setShortcut(QKeySequence{ tr("Ctrl+Shift+S") });
+	Aload.setShortcut(QKeySequence{ QKeySequence::StandardKey::Open });
 
 	a->scene.setSceneRect(-32000, -32000, 64000, 64000);
 
 	if (!projPath.empty())
-		OnLoad();
+		LoadFile();
 
 	setCentralWidget(&a->view);
 	addDockWidget(Qt::RightDockWidgetArea, &a->props);
@@ -54,9 +69,25 @@ void Window::OnExport()
 }
 void Window::OnLoad()
 {
+	fs::path proj_path{ QFileDialog::getOpenFileName(
+		nullptr,
+		"Open existing project",
+		"",
+		"(*.vtproj);;"
+		).toStdString() };
+
+	if (proj_path.empty()) return;
+	projPath = std::move(proj_path);
+	LoadFile();
+}
+void Window::LoadFile()
+{
+	using namespace std::string_literals;
 	a->scene.Clear();
 	std::fstream t;
 	t.open(projPath, std::ios::in);
+
+	setWindowTitle((AppName.data() + " - "s + projPath.filename().string()).c_str());
 
 	std::string str;
 	t.seekg(0, std::ios::end);
@@ -75,6 +106,23 @@ void Window::OnLoad()
 	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e);
 	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return; }
 	a->scene.Deserialize(json.object());
+}
+void Window::OnSaveAs()
+{
+	fs::path proj_path{ QFileDialog::getSaveFileName(
+		nullptr,
+		"Create new project",
+		"",
+		"(*.vtproj);;"
+	).toStdString() };
+
+	if (proj_path.empty()) return;
+
+	std::fstream f;
+	f.open(proj_path, std::ios::out);
+	if (!f.is_open()) return;
+	QJsonDocument doc{ a->scene.Serialize() };
+	f << doc.toJson().constData();
 }
 void Window::OnSave()
 {

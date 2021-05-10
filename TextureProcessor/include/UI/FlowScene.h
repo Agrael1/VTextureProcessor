@@ -21,6 +21,7 @@ namespace UI
 		virtual void Deserialize(QJsonObject)override;
 	protected:
 		UI::Node& InsertNode(std::string_view name, std::string&& unique_name);
+		UI::Node* TryInsertNode(std::string_view name, std::string&& unique_name);
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
 		void OnSelectionChanged();
 	private:
