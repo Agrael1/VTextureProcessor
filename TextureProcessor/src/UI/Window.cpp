@@ -33,6 +33,9 @@ Window::Window(int32_t width, int32_t height, std::filesystem::path projPath)
 
 	a->scene.setSceneRect(-32000, -32000, 64000, 64000);
 
+	if (!projPath.empty())
+		OnLoad();
+
 	setCentralWidget(&a->view);
 	addDockWidget(Qt::RightDockWidgetArea, &a->props);
 }
@@ -51,6 +54,7 @@ void Window::OnExport()
 }
 void Window::OnLoad()
 {
+	a->scene.Clear();
 	std::fstream t;
 	t.open(projPath, std::ios::in);
 

@@ -148,4 +148,5 @@ void UI::TextureNode::Deserialize(QJsonObject in)
 			buf[sk].SetIfExists(v[k].toVariant());
 		}
 	}
+	Update();
 }
