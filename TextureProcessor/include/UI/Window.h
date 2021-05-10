@@ -3,6 +3,7 @@
 #include <UI/FlowView.h>
 #include <UI/Properties.h>
 #include <fstream>
+#include <filesystem>
 
 class Window : public QMainWindow
 {
@@ -14,7 +15,7 @@ class Window : public QMainWindow
 		FlowView view;
 	};
 public:
-	Window(int32_t width, int32_t height/*, std::fstream&& project*/);
+	Window(int32_t width, int32_t height, std::filesystem::path projPath);
 public:
 	void OnClearTriggered();
 	void OnProps();
@@ -42,5 +43,6 @@ private:
 	QAction Asave;
 	QAction Aload;
 	QAction Aprops;
+	std::filesystem::path projPath;
 	std::optional<Internal> a;
 };

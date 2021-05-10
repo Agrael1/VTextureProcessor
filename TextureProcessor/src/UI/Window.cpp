@@ -1,14 +1,16 @@
 #include <UI/Window.h>
+#include <filesystem>
 
 
-Window::Window(int32_t width, int32_t height/*, std::fstream&& project*/)
+Window::Window(int32_t width, int32_t height, std::filesystem::path projPath)
 	:file("File")
 	, Aclear("Clear")
 	, windows("Windows")
 	, Aprops("Properties")
 	, Aexport("Export All")
 	, Asave("Save")
-	, Aload("Load")
+	, Aload("Load"),
+	projPath(projPath)
 {
 	a.emplace(this);
 
@@ -50,7 +52,7 @@ void Window::OnExport()
 void Window::OnLoad()
 {
 	std::fstream t;
-	t.open("s.json", std::ios::in);
+	t.open(projPath, std::ios::in);
 
 	std::string str;
 	t.seekg(0, std::ios::end);
@@ -69,7 +71,7 @@ void Window::OnLoad()
 void Window::OnSave()
 {
 	std::fstream f;
-	f.open("s.json", std::ios::out);
+	f.open(projPath, std::ios::out);
 	QJsonDocument doc{ a->scene.Serialize() };
 	f << doc.toJson().constData();
 }

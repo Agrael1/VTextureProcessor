@@ -59,7 +59,7 @@ bool App::event(QEvent* e)
     if (proj->type() == QEvent::User+1) {
         qDebug() << "Event reached: " << std::filesystem::absolute(proj->projPath).string().c_str();
         projects.reset();
-        window.emplace(1280, 720);
+        window.emplace(1280, 720, proj->projPath);
         window->ShowMaximized();
     }
 

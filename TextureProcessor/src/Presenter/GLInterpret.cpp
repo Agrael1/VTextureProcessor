@@ -3,7 +3,7 @@
 Engine::Context::Context()
 {
 	QSurfaceFormat surfaceFormat;
-	surfaceFormat.setMajorVersion(4);
+	surfaceFormat.setMajorVersion(3);
 	surfaceFormat.setMinorVersion(3);
 
 	context.setFormat(surfaceFormat);
