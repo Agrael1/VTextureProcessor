@@ -212,6 +212,7 @@ public:
 
 		connect(&create, &QToolButton::clicked, this, &ProjectsWindow::OnCreateClicked);
 		connect(&open, &QToolButton::clicked, this, &ProjectsWindow::OnOpenClicked);
+		connect(&selection, &QTreeWidget::itemDoubleClicked, this, &ProjectsWindow::OnItemDoubleClicked);
 
 		lay.addLayout(&hlay);
 	}
@@ -284,6 +285,9 @@ private:
 			const bool match = (modelName.contains(text, Qt::CaseInsensitive));
 			topLvlItem->setHidden(!match);
 		}
+	}
+	void OnItemDoubleClicked(QTreeWidgetItem*item, int column) {
+		OpenApp(std::filesystem::path{item->data(1, Qt::UserRole).toString().toStdString()});
 	}
 
 private:
