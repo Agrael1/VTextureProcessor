@@ -1,4 +1,5 @@
 #include <UI/App.h>
+#include <UI/ProjectEvent.h>
 
 /**
  * @brief Construct a new App:: App object
@@ -39,7 +40,6 @@ App::App(int argc, char** argv)
     // Set window size
     projects.emplace(1280, 720, *this);
     projects->show();
-	//window->ShowMaximized();
 }
 
 /**
@@ -54,9 +54,13 @@ int App::Start()
 
 bool App::event(QEvent* e)
 {
-    if (e->type() == QEvent::User+1) {
-        qDebug() << "Event reached";
+    ProjectEvent *proj = static_cast<ProjectEvent *>(e);
+
+    if (proj->type() == QEvent::User+1) {
+        qDebug() << "Event reached: " << std::filesystem::absolute(proj->projPath).string().c_str();
         projects.reset();
+        window.emplace(1280, 720);
+        window->ShowMaximized();
     }
 
     return true;

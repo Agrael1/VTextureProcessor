@@ -7,6 +7,7 @@
 #include <qpushbutton.h>
 #include <QFileDialog>
 #include <QApplication>
+#include <UI/ProjectEvent.h>
 
 
 class ProjectsCW : public QWidget
@@ -238,7 +239,7 @@ protected:
 			pdata.AppendCache(projName.toStdString());
 		}
 
-		qApp->postEvent(&app, new QEvent((QEvent::Type)(QEvent::User+1)));
+		OpenApp(std::filesystem::path{projName.toStdString()});
 	}
 	void OnOpenClicked(bool checked) {
 		auto projName = QFileDialog::getOpenFileName(
@@ -253,7 +254,10 @@ protected:
 			pdata.AppendCache(projName.toStdString());
 		}
 
-		FillTree();
+		OpenApp(std::filesystem::path{projName.toStdString()});
+	}
+	void OpenApp(std::filesystem::path projPath) {
+		qApp->postEvent(&app, new ProjectEvent(projPath));
 	}
 private:
 	void FillTree()
