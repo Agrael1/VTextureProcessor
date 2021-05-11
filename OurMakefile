@@ -6,11 +6,12 @@ LOGIN2 = xdoros01
 VARIANT = 2
 SRC = ./src
 
-build:
-	qmake -o MakefileQt Project.pro
-	make -f MakefileQt
+.PHONY: clean pack doxygen run build
 
-.PHONY: clean pack doxygen run
+build:
+	mkdir -p build
+	cd build && cmake ..
+
 clean:
 	rm -rf latex html
 	# TODO
