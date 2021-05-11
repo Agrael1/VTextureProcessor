@@ -1,4 +1,7 @@
-﻿cmake_minimum_required (VERSION 3.16)
+﻿# CMakeLists.txt
+# author: Ilya Doroshenko (xdoros01)
+
+cmake_minimum_required (VERSION 3.16)
 
 project(TextureProcessor CXX)
 
@@ -60,6 +63,8 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                        ${CMAKE_CURRENT_SOURCE_DIR}/nodes $<TARGET_FILE_DIR:${PROJECT_NAME}>/nodes)
 
+# This part is adapted from StackOverflow:
+# https://stackoverflow.com/questions/40564443/copying-qt-dlls-to-executable-directory-on-windows-using-cmake
 if(WIN32)
     if($<CONFIG:Debug>)
         get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)

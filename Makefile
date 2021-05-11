@@ -1,3 +1,5 @@
+# Makefile
+# author: David Černý (xcerny74)
 LOGIN1 = xcerny74
 LOGIN2 = xdoros01
 VARIANT = 2
@@ -10,7 +12,7 @@ build:
 	cp -r src/TextureProcessor/nodes build/TextureProcessor/nodes
 
 run: build
-	cd build/TextureProcessor && ./TextureProcessor
+	cd ./build/TextureProcessor && ./TextureProcessor
 
 clean:
 	rm -rf build
