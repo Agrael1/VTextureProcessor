@@ -16,6 +16,7 @@ run: build
 
 clean:
 	rm -rf build
+	rm -rf doc/*
 
 pack: clean
 	rm -rf doc

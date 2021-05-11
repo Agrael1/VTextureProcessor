@@ -24,6 +24,7 @@ editors in 3D modeling software.
   - **Output nodes** - can be exported as images (although any individual node can also be exported)
 - Projects can be saved to **.vtproj** files
 - Node library stored in JSON format
+- The "Edit" option when right clicking on a Node does not work
 
 ## Limitations
 - Nodes can not be renamed within the program
