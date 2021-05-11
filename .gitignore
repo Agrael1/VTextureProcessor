@@ -1,4 +1,5 @@
 TextureProcessor/TextureProcessor
+TextureProcessor_autogen
 Findfmt.cmake
 qrc_resources.cpp
 *.zip
@@ -13,7 +14,6 @@ conan*
 graph_info*
 cmake_install.cmake
 CMakeCache*
-conan.cmake
 Makefile
 xout/
 

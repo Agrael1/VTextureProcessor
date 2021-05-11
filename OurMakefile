@@ -10,7 +10,7 @@ SRC = ./src
 
 build:
 	mkdir -p build
-	cd build && cmake ..
+	cd build && cmake ../src && make
 
 clean:
 	rm -rf latex html
