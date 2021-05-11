@@ -17,11 +17,13 @@ run: build
 	cd build/TextureProcessor && ./TextureProcessor
 
 clean:
-	rm -rf latex html
+	rm -rf build
 	# TODO
 
-pack:
-	zip -r $(VARIANT)-$(LOGIN1)-$(LOGIN2).zip Doxyfile Makefile README.txt src
+pack: clean
+	rm -rf doc
+	mkdir -p doc
+	zip -r $(VARIANT)-$(LOGIN1)-$(LOGIN2).zip Doxyfile Makefile README.txt src doc
 
 doxygen:
 	doxygen Doxyfile
