@@ -15,7 +15,7 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	: e(e)
 {
 	auto node = document["Node"].toObject();
-	QString xshader{ "#version 330 \n" };
+	QString xshader{ "#version 420 \n" };
 
 	if (node.contains("Properties"))
 		SetProperties(node["Properties"].toArray(), xshader);
@@ -102,20 +102,7 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 
 QImage ShaderNode::Update()
 {
-	for (uint32_t s = 0; auto & i: inputs)
-	{
-		if (i)
-		{
-			if (tiling)
-				i->setWrapMode(QOpenGLTexture::ClampToEdge);
-			i->bind(s++);
-		}
-		else e.Empty().bind(s++);
-	}
-	auto im = e.Render(shader->shader, outputs, buf);
-	for (auto& i : inputs)
-		if (i)i->setWrapMode(QOpenGLTexture::Repeat);
-	return im;
+	return e.Render(shader->shader, inputs, tiling, outputs, buf);
 }
 
 

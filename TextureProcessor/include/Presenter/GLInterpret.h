@@ -21,7 +21,7 @@ public:
 	Engine(QSize size);
 	~Engine() { Empty().destroy(); }
 public:
-	QImage Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> outputs, ver::dc::Buffer& buffer);
+	QImage Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> inputs, bool tile, std::span<std::shared_ptr<QOpenGLTexture>> outputs, ver::dc::Buffer& buffer);
 	QOpenGLFunctions& Functions() { return con.funcs; }
 	static QOpenGLTexture& Empty();
 private:

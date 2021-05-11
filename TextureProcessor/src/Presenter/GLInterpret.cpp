@@ -43,11 +43,22 @@ QOpenGLTexture& Engine::Empty()
 	return empty;
 }
 
-QImage Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> outputs, ver::dc::Buffer& buffer)
+QImage Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> inputs, bool tile, std::span<std::shared_ptr<QOpenGLTexture>> outputs, ver::dc::Buffer& buffer)
 {
 	shaders.addShader(&ps);
 	shaders.link();
 	shaders.bind();
+
+	for (uint32_t s = 0; auto & i: inputs)
+	{
+		if (i)
+		{
+			if (tile)
+				i->setWrapMode(QOpenGLTexture::ClampToEdge);
+			i->bind(s++);
+		}
+		else Empty().bind(s++);
+	}
 
 	if (buffer)BindBuffer(buffer);
 
@@ -55,6 +66,10 @@ QImage Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTextur
 	con.funcs.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	con.funcs.glDrawArrays(GL_TRIANGLES, 0, 3);
 	shaders.removeShader(&ps);
+
+	if(tile)
+		for (auto& i : inputs)
+			if (i)i->setWrapMode(QOpenGLTexture::Repeat);
 
 	for (int i = 0; auto & o : outputs)
 		o = std::make_shared<QOpenGLTexture>(frame.toImage(true, i++));
