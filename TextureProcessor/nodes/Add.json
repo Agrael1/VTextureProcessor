@@ -1,0 +1,39 @@
+{
+  "Add": {
+    "Node": {
+      "Class": "Texture",
+      "Group": "Operations",
+      "Sinks": [
+        {
+          "Name": "In1",
+          "Type": "Grayscale"
+        },
+        {
+          "Name": "In2",
+          "Type": "Grayscale"
+        }
+      ],
+      "Sources": [
+        {
+          "Name": "Out",
+          "Type": "Grayscale"
+        }
+      ]
+    },
+    "NodeStyle": {
+      "TitleColor": [ 0, 128, 0 ],
+      "FontColor": "white"
+    },
+    "Value": [
+      "uniform sampler2D u_tex1;\n",
+      "uniform sampler2D u_tex2;\n",
+      "in vec2 texcoords;\n",
+      "out vec4 color;\n",
+      "void main() {\n",
+      " vec4 t1 = texture2D(u_tex1, texcoords);\n",
+      " vec4 t2 = texture2D(u_tex2, texcoords);\n",
+      " color = t2;\n",
+      "}"
+    ]
+  }
+}
