@@ -1,5 +1,5 @@
 /**
- * @file Utils.h
+ * @file Window.h
  * @author Ilya Doroshenko (xdoros01)
  * @brief Node model logic
  * Gathered from Veritas engine WinD3D project
