@@ -11,6 +11,10 @@ SRC = ./src
 build:
 	mkdir -p build
 	cd build && cmake ../src && make
+	cp -r src/TextureProcessor/nodes build/TextureProcessor/nodes
+
+run: build
+	cd build/TextureProcessor && ./TextureProcessor
 
 clean:
 	rm -rf latex html
@@ -21,6 +25,3 @@ pack:
 
 doxygen:
 	doxygen Doxyfile
-
-run:
-	# TODO

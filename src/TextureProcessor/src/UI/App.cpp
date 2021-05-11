@@ -12,8 +12,8 @@
  * @param argc argument count
  * @param argv argument list
  */
-App::App(int xargc, char** xargv)
-	:argc(xargc), argv(xargv), app(argc, argv)
+App::App(int &xargc, char** xargv)
+	:app(xargc, xargv)
 {
     // Basic setup of the application
 	QCoreApplication::setApplicationName(Window::AppName.data());

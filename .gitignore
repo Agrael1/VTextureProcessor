@@ -14,8 +14,8 @@ conan*
 graph_info*
 cmake_install.cmake
 CMakeCache*
-Makefile
 xout/
+build
 
 # Prerequisites
 *.d
