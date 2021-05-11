@@ -1,3 +1,8 @@
+/**
+ * @file FlowCodex.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for loading Node definitions from files
+ */
 #include <UI/FlowCodex.h>
 #include <fmt/printf.h>
 #include <fstream>
@@ -52,7 +57,7 @@ FlowCodex::FlowCodex()
 		{
 			std::ifstream t( p.path() );
 			std::string str;
-			
+
 			t.seekg(0, std::ios::end);
 			str.reserve(t.tellg());
 			t.seekg(0, std::ios::beg);

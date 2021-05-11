@@ -1,3 +1,7 @@
+html
+latex
+qrc_resources
+*.vtxc
 .DS_Store
 .vscode
 CMakeFiles

@@ -1,3 +1,9 @@
+/**
+ * @file TextureNode.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for drawing and exporting generated textures
+ */
+
 #include <UI/TextureNode.h>
 #include <UI/Connection.h>
 #include <UI/Properties.h>
@@ -63,7 +69,7 @@ void UI::TextureNode::UpdateProperties(Properties& props)
 	auto& buf = model.GetBuffer();
 	if (!buf)return props.AppendProperty(std::move(prop));
 
-	
+
 	for (auto ref : buf)
 	{
 		auto t = ref.GetType();

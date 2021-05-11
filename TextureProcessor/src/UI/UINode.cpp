@@ -1,3 +1,9 @@
+/**
+ * @file UINode.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class specifying Node behavior
+ */
+
 #include <UI/UINode.h>
 #include <UI/Connection.h>
 #include <fstream>

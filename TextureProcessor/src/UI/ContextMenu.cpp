@@ -1,3 +1,8 @@
+/**
+ * @file ContextMenu.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for managing context menu contents and callbacks
+ */
 #include <UI/ContextMenu.h>
 
 

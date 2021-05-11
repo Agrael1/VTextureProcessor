@@ -1,3 +1,9 @@
+/**
+ * @file NodeStyle.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Node header color specification
+ */
+
 #include <UI/NodeStyle.h>
 #include <array>
 

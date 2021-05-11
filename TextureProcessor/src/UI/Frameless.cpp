@@ -1,3 +1,9 @@
+/**
+ * @file Frameless.cpp
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Class for frameless window style
+ */
+
 #include <UI/Frameless.h>
 
 /**
@@ -18,7 +24,7 @@ FrameLess::FrameLess(QWidget* target) :
  * @brief overrides event filter for parent object
  * @param o object to hook onto
  * @param e incoming event
- * @return  true if event is accepted 
+ * @return  true if event is accepted
 */
 bool FrameLess::eventFilter(QObject* o, QEvent* e)
 {

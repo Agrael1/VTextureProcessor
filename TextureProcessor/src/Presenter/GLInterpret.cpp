@@ -1,3 +1,9 @@
+/**
+ * @file GLInterpret.cpp
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Handler for HLSL textures
+ */
+
 #include <Presenter/GLInterpret.h>
 
 Engine::Context::Context()

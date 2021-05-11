@@ -1,4 +1,9 @@
-﻿#include <UI/App.h>
+﻿/**
+ * @file EntryMain.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Program entrypoint
+ */
+#include <UI/App.h>
 
 /**
  * @brief Entrypoint to the application
@@ -11,3 +16,10 @@ int main(int argc, char *argv[])
 {
 	return App{ argc, argv }.Start();
 }
+
+/**
+ * @mainpage ICP project documentation
+ * @tableofcontents
+ *
+ * @section about About
+*/

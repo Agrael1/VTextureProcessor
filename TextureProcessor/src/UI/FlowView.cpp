@@ -1,3 +1,8 @@
+/**
+ * @file FlowView.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Flow view for handling the Node editor canvas view
+ */
 #include <UI/FlowView.h>
 
 /**

@@ -1,3 +1,8 @@
+/**
+ * @file FlowScene.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Logic behind Node editor canvas
+ */
 #include <UI/FlowScene.h>
 #include <fmt/printf.h>
 #include <UI/Properties.h>

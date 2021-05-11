@@ -1,3 +1,9 @@
+/**
+ * @file Window.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Handles menubar actions
+ */
+
 #include <UI/Window.h>
 #include <QFileDialog>
 

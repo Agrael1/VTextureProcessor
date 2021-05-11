@@ -1,3 +1,8 @@
+/**
+ * @file Connection.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for managing connections between Nodes
+ */
 #include <UI/Connection.h>
 #include <UI/FlowScene.h>
 

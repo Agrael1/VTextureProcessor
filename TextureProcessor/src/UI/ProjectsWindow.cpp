@@ -1,3 +1,9 @@
+/**
+ * @file ProjectsWindow.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Node header color specification
+ */
+
 #include <UI/ProjectsWindow.h>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -114,7 +120,7 @@ ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app)
 
 /**
  * @brief reaction on mouse movement
- * @param e incoming event 
+ * @param e incoming event
 */
 void ProjectsWindow::mouseMoveEvent(QMouseEvent* e)
 {
@@ -131,7 +137,7 @@ void ProjectsWindow::mouseMoveEvent(QMouseEvent* e)
  * @brief On create new project button clicked callback
  * @param checked [unused]
 */
-void ProjectsWindow::OnCreateClicked(bool checked) 
+void ProjectsWindow::OnCreateClicked(bool checked)
 {
 	fs::path proj_path { QFileDialog::getSaveFileName(
 		nullptr,
@@ -142,7 +148,7 @@ void ProjectsWindow::OnCreateClicked(bool checked)
 
 	if (proj_path.empty()) return;
 
-	if (!pdata.contains(proj_path)) 
+	if (!pdata.contains(proj_path))
 		pdata.AppendCache(proj_path);
 
 	//create ifnot exists
@@ -156,7 +162,7 @@ void ProjectsWindow::OnCreateClicked(bool checked)
  * @brief On open existing project button clicked callback
  * @param checked [unused]
 */
-void ProjectsWindow::OnOpenClicked(bool checked) 
+void ProjectsWindow::OnOpenClicked(bool checked)
 {
 	fs::path proj_path{ QFileDialog::getOpenFileName(
 		nullptr,

@@ -1,3 +1,8 @@
+/**
+ * @file App.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for loading project view initialization
+ */
 #include <UI/App.h>
 #include <UI/ProjectEvent.h>
 
