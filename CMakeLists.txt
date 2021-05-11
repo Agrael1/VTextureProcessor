@@ -2,4 +2,4 @@
 
 project ("vut_fit_icp_proj")
 
-add_subdirectory ("src")
+add_subdirectory ("TextureProcessor")

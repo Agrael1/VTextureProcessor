@@ -1,3 +1,5 @@
+TextureProcessor/TextureProcessor
+Findfmt.cmake
 qrc_resources.cpp
 *.zip
 html
