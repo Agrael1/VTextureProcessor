@@ -11,20 +11,8 @@ namespace UI
 	class PropertyElement : public QGroupBox
 	{
 	public:
-		PropertyElement(INode& parent, std::string_view title)
-			:QGroupBox(title.data()), parent(parent)
-		{
-			lay.setAlignment(Qt::AlignTop);
-			setLayout(&lay);
-		}
-		PropertyElement(PropertyElement&& o)
-			:QGroupBox(o.title()), widgets(std::move(o.widgets)), parent(o.parent)
-		{
-			lay.setAlignment(Qt::AlignTop);
-			setLayout(&lay);
-			for (auto& w : widgets)
-				lay.addWidget(w.get());
-		};
+		PropertyElement(INode& parent, std::string_view title);
+		PropertyElement(PropertyElement&& o);
 	public:
 		template <typename W, typename ...Args> requires std::derived_from<W, QWidget>
 		W& AppendWidget(Args&&... args)
@@ -47,43 +35,18 @@ namespace UI
 		class Dummy :public QWidget
 		{
 		public:
-			Dummy() { 
-				lay.setAlignment(Qt::AlignTop); setLayout(&lay); 
-				setSizePolicy(QSizePolicy{ QSizePolicy::Ignored, QSizePolicy::Preferred });
-			}
+			Dummy();
 		public:
 			QVBoxLayout lay;
 		};
 	public:
-		Properties(QWidget* parent = nullptr)
-			:QDockWidget("Properties", parent)
-		{
-			setMinimumWidth(150);
-			setWidget(&dum);
-		}
+		Properties(QWidget* parent = nullptr);
 
 	public:
-		PropertyElement& AppendProperty(INode& node, std::string_view name)
-		{
-			return props.emplace_back(node, name);
-		}
-		void AppendProperty(PropertyElement&& prop)
-		{
-			props.emplace_back(std::move(prop));
-		}
-		void Set()
-		{
-			auto s = size();
-			for (auto& w : props)
-				dum.lay.addWidget(&w);
-			resize(s);
-		}
-		void Clear()
-		{
-			for (auto& w : props)
-				dum.lay.removeWidget(&w);
-			props.clear();
-		}
+		PropertyElement& AppendProperty(INode& node, std::string_view name);
+		void AppendProperty(PropertyElement&& prop);
+		void Set();
+		void Clear();
 	private:
 		Dummy dum;
 		std::vector<PropertyElement> props;
