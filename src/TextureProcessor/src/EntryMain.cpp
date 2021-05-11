@@ -26,4 +26,5 @@ int main(int argc, char *argv[])
  * input nodes (that generate constant shapes), operation nodes (that
  * are used to modify the textures) and output nodes that can be used to export
  * textures to files.
+ * @image html screenshot.png width=750px
 */
