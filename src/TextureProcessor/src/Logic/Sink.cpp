@@ -1,3 +1,10 @@
+/**
+ * @file Sink.cpp
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Sink model logic
+ * Gathered from Veritas engine WinD3D project
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #include <Logic/Sink.h>
 #include <utils/Exception.h>
 

@@ -1,3 +1,8 @@
+﻿/**
+ * @file UINode.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class specifying Node behavior
+ */
 #pragma once
 #include <UI/NodeStyle.h>
 #include <optional>

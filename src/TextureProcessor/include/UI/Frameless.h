@@ -1,3 +1,8 @@
+/**
+ * @file Frameless.cpp
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Class for frameless window style
+ */
 #pragma once
 
 class FrameLess : public QObject

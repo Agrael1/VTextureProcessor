@@ -1,3 +1,8 @@
+﻿/**
+ * @file Connection.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for managing connections between Nodes
+ */
 #pragma once
 #include <unordered_map>
 #include <span>

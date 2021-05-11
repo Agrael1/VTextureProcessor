@@ -1,3 +1,8 @@
+/**
+ * @file GLInterpret.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Engine base model for shader compilation
+ */
 #pragma once
 #include <Logic/DynamicConstant.h>
 

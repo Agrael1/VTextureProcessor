@@ -1,3 +1,8 @@
+/**
+ * @file ProjectsData.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Logic for projects window and persistant data writer for cache.vtxc
+ */
 #pragma once
 #include <array>
 #include <filesystem>

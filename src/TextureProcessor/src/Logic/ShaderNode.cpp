@@ -1,3 +1,10 @@
+/**
+ * @file ShaderNode.cpp
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief ShaderNode model logic
+ * Modified from Veritas engine WinD3D project (file Pass.*)
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #include <Logic/ShaderNode.h>
 #include <Logic/SourcesT.h>
 #include <Logic/SinksT.h>

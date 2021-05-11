@@ -1,3 +1,8 @@
+﻿/**
+ * @file Sliders.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Controls for properties and constant buffers
+ */
 #pragma once
 #include <UI/Updater.h>
 #include <QCheckBox>

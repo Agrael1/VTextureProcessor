@@ -1,3 +1,10 @@
+/**
+ * @file SinksT.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Templated sinks with custom logic 
+ * Modified from Veritas engine WinD3D project (file SinksT.h)
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #pragma once
 #include <Logic/Sink.h>
 #include <memory>

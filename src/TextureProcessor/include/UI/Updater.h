@@ -1,3 +1,8 @@
+/**
+ * @file Updater.cpp
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief A simple interface for callback
+ */
 #pragma once
 
 namespace UI

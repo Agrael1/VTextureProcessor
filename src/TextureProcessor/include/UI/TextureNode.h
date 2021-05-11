@@ -1,3 +1,8 @@
+﻿/**
+ * @file TextureNode.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for drawing and exporting generated textures
+ */
 #include <UI/UINode.h>
 #include <Logic/ShaderNode.h>
 

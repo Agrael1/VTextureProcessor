@@ -1,3 +1,8 @@
+﻿/**
+ * @file App.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for loading project view initialization
+ */
 #pragma once
 #include <QApplication>
 #include <QStyleFactory>

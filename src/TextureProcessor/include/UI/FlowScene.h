@@ -1,3 +1,8 @@
+﻿/**
+ * @file FlowScene.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Logic behind Node editor canvas
+ */
 #pragma once
 #include <UI/FlowCodex.h>
 

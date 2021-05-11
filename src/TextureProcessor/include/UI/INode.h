@@ -1,3 +1,8 @@
+/**
+ * @file Frameless.cpp
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Interfaces for class management
+ */
 #pragma once
 #ifdef _WIN32
 #define NOVTABLE __declspec(novtable)

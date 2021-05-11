@@ -36,11 +36,11 @@ UI::TextureNode::TextureNode(QJsonObject document, std::string_view name, Engine
 }
 
 /**
- * @brief
+ * @brief Paint event override
  *
- * @param painter
- * @param option
- * @param widget
+ * @param painter Paint device (similar to HDC)
+ * @param option [unused]
+ * @param widget [unused]
  */
 void UI::TextureNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
@@ -48,6 +48,10 @@ void UI::TextureNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 	DrawTexture(painter);
 }
 
+/**
+ * @brief Draws texture upon node
+ * @param painter Handle to device context
+*/
 void UI::TextureNode::DrawTexture(QPainter* painter)
 {
 	QPointF point{ body_size.width() / 2 - 64, EffectiveHeight() / 2 - 64 + NodeStyle::title_height + NodeStyle::item_padding };
@@ -55,12 +59,20 @@ void UI::TextureNode::DrawTexture(QPainter* painter)
 	painter->drawImage(point, texture);
 }
 
+/**
+ * @brief Updates the whole node
+*/
 void UI::TextureNode::Update()
 {
 	model.Update();
 	Node::Update();
 	update();
 }
+
+/**
+ * @brief Creates properties for dock window
+ * @param props reference to properties window (visitor)
+*/
 void UI::TextureNode::UpdateProperties(Properties& props)
 {
 	PropertyElement prop{ *this, model.GetName() };
@@ -101,6 +113,10 @@ void UI::TextureNode::UpdateProperties(Properties& props)
 	props.AppendProperty(std::move(prop));
 }
 
+/**
+ * @brief Exports all output pins as images
+ * @return filename chosen
+*/
 std::string UI::TextureNode::Export()
 {
 	auto str = QFileDialog::getSaveFileName(nullptr,
@@ -112,12 +128,21 @@ std::string UI::TextureNode::Export()
 	model.Update().save(str);
 	return str.toStdString();
 }
+
+/**
+ * @brief With specified filename creates images from nodes
+ * @param hint  filename hint (will be generated with)
+*/
 void UI::TextureNode::ExportSilent(std::string_view hint)
 {
 	if (hint.empty())return;
 	model.Update().save(hint.data());
 }
 
+/**
+ * @brief Overrides ISerializable interface
+ * @return JsonObject to save
+*/
 QJsonObject UI::TextureNode::Serialize()
 {
 	QJsonObject j;
@@ -141,6 +166,11 @@ QJsonObject UI::TextureNode::Serialize()
 	j.insert(GetStyleName().data(), node);
 	return j;
 }
+
+/**
+ * @brief Unpacks data from json
+ * @param in data to unpack
+*/
 void UI::TextureNode::Deserialize(QJsonObject in)
 {
 	if (in.contains("Position"))

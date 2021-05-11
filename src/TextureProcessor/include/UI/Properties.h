@@ -1,3 +1,8 @@
+﻿/**
+ * @file Properties.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Controls for properties dock window
+ */
 #pragma once
 #include <QDockWidget>
 #include <QGroupBox>
