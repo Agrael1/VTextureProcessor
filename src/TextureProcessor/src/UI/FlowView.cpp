@@ -16,7 +16,6 @@ FlowView::FlowView(UI::FlowScene& scene)
 {
 	setRenderHints(QPainter::Antialiasing |
 		QPainter::TextAntialiasing |
-		QPainter::HighQualityAntialiasing |
 		QPainter::SmoothPixmapTransform);
 
 	setDragMode(QGraphicsView::ScrollHandDrag);

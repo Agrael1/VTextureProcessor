@@ -21,7 +21,7 @@ clean:
 	# TODO
 
 pack:
-	zip -r $(VARIANT)-$(LOGIN1)-$(LOGIN2).zip Doxyfile Makefile README.txt
+	zip -r $(VARIANT)-$(LOGIN1)-$(LOGIN2).zip Doxyfile Makefile README.txt src
 
 doxygen:
 	doxygen Doxyfile
