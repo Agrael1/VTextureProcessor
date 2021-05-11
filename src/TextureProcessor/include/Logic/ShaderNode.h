@@ -1,3 +1,8 @@
+/**
+ * @file ShaderNode.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief ShaderNode model logic
+ */
 #pragma once
 #include <Logic/Node.h>
 #include <Logic/DynamicConstant.h>
@@ -8,6 +13,7 @@ namespace ver
 {
 	class ShaderNode : public Node
 	{
+		//Shared value between same type of nodes
 		struct NodePrivate
 		{
 			NodePrivate(QString&& code);

@@ -1,3 +1,8 @@
+﻿/**
+ * @file ContextMenu.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for managing context menu contents and callbacks
+ */
 #pragma once
 
 class ContextMenu : public QMenu

@@ -1,3 +1,8 @@
+﻿/**
+ * @file ProjectsWindow.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Node header color specification
+ */
 #pragma once
 #include <QMainWindow>
 #include <QToolButton>

@@ -1,3 +1,8 @@
+﻿/**
+ * @file FlowCodex.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Class for loading Node definitions from files
+ */
 #pragma once
 #include <UI/TextureNode.h> 
 #include <unordered_map>

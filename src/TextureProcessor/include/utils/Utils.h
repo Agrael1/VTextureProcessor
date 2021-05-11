@@ -1,3 +1,10 @@
+/**
+ * @file Utils.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Useful functions for symbolic linking [UNUSED]
+ * Gathered from Veritas engine WinD3D project
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #pragma once
 #include <vector>
 #include <string>

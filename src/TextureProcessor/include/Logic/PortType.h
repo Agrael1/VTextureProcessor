@@ -1,3 +1,9 @@
+/**
+ * @file PortType.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Basic Enumerators for node logic
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #pragma once 
 
 enum class PortType :uint8_t

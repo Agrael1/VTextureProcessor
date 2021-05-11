@@ -1,3 +1,8 @@
+﻿/**
+ * @file NodeStyle.h
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Node, Port and Connection style specification
+ */
 #pragma once
 
 namespace UI

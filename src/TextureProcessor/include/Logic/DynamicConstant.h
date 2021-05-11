@@ -1,3 +1,10 @@
+/**
+ * @file DynamicConstant.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Dynamic constant buffer for heterogenous data to bind on a gpu side
+ * Gathered from Veritas engine WinD3D project
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #pragma once
 #include <cassert>
 #include <memory>

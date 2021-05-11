@@ -1,3 +1,10 @@
+/**
+ * @file Sink.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Sink connector logic
+ * Modified from Veritas engine WinD3D project (file Sink.*)
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #pragma once
 #include <Logic/PortType.h>
 #include <string>

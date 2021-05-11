@@ -1,3 +1,10 @@
+/**
+ * @file Exception.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Exception class for render graph model
+ * Gathered from Veritas engine WinD3D project
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #pragma once
 #include <exception>
 #include <fmt/printf.h>

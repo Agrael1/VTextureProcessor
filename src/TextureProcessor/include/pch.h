@@ -1,3 +1,8 @@
+/**
+ * @file pch.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Precompiled header
+ */
 #include <QtGui>
 #include <QGraphicsItem>
 #include <QMenuBar>

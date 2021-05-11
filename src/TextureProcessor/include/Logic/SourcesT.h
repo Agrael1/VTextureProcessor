@@ -1,3 +1,10 @@
+/**
+ * @file SourcesT.h
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Templates for custom sources
+ * Modified from Veritas engine WinD3D project (file Pass.*)
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #pragma once
 #include <Logic/Source.h>
 

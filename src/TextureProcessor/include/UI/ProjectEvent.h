@@ -1,3 +1,8 @@
+﻿/**
+ * @file ProjectEvent.h
+ * @author David Černý (xcerny74)
+ * @brief Custom event for application
+ */
 #pragma once
 #include <filesystem>
 
