@@ -64,16 +64,12 @@ int App::Start()
  */
 bool App::event(QEvent* e)
 {
-    switch (e->type()) {
-        // Handling of opening projects
-        case QEvent::User+1:
-            ProjectEvent& proj = static_cast<ProjectEvent&>(*e);
-            projects.reset();  // Destroys project selection window
-            window.emplace(1280, 720, std::move(proj.projPath));
-            window->ShowMaximized();
-            break;
-        default:
-            break;
+    // Handling of opening projects
+    if (e->type() == QEvent::User+1) {
+        ProjectEvent& proj = static_cast<ProjectEvent&>(*e);
+        projects.reset();  // Destroys project selection window
+        window.emplace(1280, 720, std::move(proj.projPath));
+        window->ShowMaximized();
     }
     return true;
 }
