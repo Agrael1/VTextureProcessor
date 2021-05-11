@@ -15,7 +15,6 @@
 App::App(int argc, char** argv)
 	:app(argc, argv)
 {
-    // TODO: Calling AppName and AppVer causes a segfault on Linux
     // Basic setup of the application
 	QCoreApplication::setApplicationName(Window::AppName.data());
 	QCoreApplication::setApplicationVersion(AppVer.data());
@@ -40,6 +39,7 @@ App::App(int argc, char** argv)
 
     app.setPalette(darkPalette);
 
+    // Event type for opening projects
     QEvent::registerEventType(QEvent::User+1);
 
     // Set window size
@@ -57,15 +57,23 @@ int App::Start()
 	return app.exec();
 }
 
+/**
+ * @brief QEvent handler, mainly used for handling 'open project' events
+ *
+ * @param e Captured event
+ */
 bool App::event(QEvent* e)
 {
-    if (e->type() == QEvent::User+1) {
-        ProjectEvent& proj = static_cast<ProjectEvent&>(*e);
-        qDebug() << "Event reached: " << std::filesystem::absolute(proj.projPath).string().c_str();
-        projects.reset();
-        window.emplace(1280, 720, std::move(proj.projPath));
-        window->ShowMaximized();
+    switch (e->type()) {
+        // Handling of opening projects
+        case QEvent::User+1:
+            ProjectEvent& proj = static_cast<ProjectEvent&>(*e);
+            projects.reset();  // Destroys project selection window
+            window.emplace(1280, 720, std::move(proj.projPath));
+            window->ShowMaximized();
+            break;
+        default:
+            break;
     }
-
     return true;
 }
