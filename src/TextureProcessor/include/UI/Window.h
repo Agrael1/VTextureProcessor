@@ -1,9 +1,7 @@
 /**
  * @file Window.h
  * @author Ilya Doroshenko (xdoros01)
- * @brief Node model logic
- * Gathered from Veritas engine WinD3D project
- * https://github.com/Agrael1/VeritasD3D
+ * @brief Main window event handling
  */
 #pragma once
 #include <QMainWindow>

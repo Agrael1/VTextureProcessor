@@ -14,26 +14,32 @@ editors in 3D modeling software.
 - *conan* package manager
     - Install using `pip3 install conan`
 - *fmt* library version **7.1.3**+ (will be installed automatically by conan during cmake build)
-- *OpenGL* version **4.2**
+- *OpenGL* version **4.2**+
 
 ## Features
 - Project window for choosing recent projects, creating new projects and opening existing projects
 - Canvas for manipulating texture nodes
   - **Input nodes** - emit a constant texture (like a geometric shape)
   - **Operation nodes** - modify input textures and output modified textures
-  - **Output nodes** - can be exported as images
+  - **Output nodes** - can be exported as images (although any individual node can also be exported)
 - Projects can be saved to **.vtproj** files
 - Node library stored in JSON format
 
 ## Limitations
-- Nodes can not be renamed
+- Nodes can not be renamed within the program
 - Composite nodes were not implemented
-- The node library can't be edited from the program itself (only in the library file)
+- The node library can't be edited from the program itself (only in the library files)
 
 ## Examples
 The example folder contains following:
 - `/examples/node_examples` - example definitions of nodes (for the node library)
 - `/examples/project_files` - example saved project file
 
-## Used sources
-- TODO
+## Files adapted from other projects
+- `src/TextureProcessor/include/Logic` - files adapted from the VeritasD3D library (https://github.com/Agrael1/VeritasD3D) written by Illya Doroshenko
+- `src/TextureProcessor/utils/Exception.h` - file adapted from the VeritasD3D library
+- `src/TextureProcessor/utils/Utils.h` - file adapted from the VeritasD3D library
+- `src/TextureProcessor/utils/polymorphic_value.h` - file adapted from https://github.com/jbcoe/polymorphic_value
+- `src/TextureProcessor/src/Logic/Node.cpp` - file adapted from the VeritasD3D library
+- `src/TextureProcessor/src/Logic/Sink.cpp` - file adapted from the VeritasD3D library
+- `src/TextureProcessor/src/Logic/Source.cpp` - file adapted from the VeritasD3D library
