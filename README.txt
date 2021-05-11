@@ -30,5 +30,10 @@ editors in 3D modeling software.
 - Composite nodes were not implemented
 - The node library can't be edited from the program itself (only in the library file)
 
+## Examples
+The example folder contains following:
+- `/examples/node_examples` - example definitions of nodes (for the node library)
+- `/examples/project_files` - example saved project file
+
 ## Used sources
 - TODO

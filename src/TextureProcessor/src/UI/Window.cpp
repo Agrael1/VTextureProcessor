@@ -124,6 +124,10 @@ void Window::OnSaveAs()
 
 	if (proj_path.empty()) return;
 
+	if (!proj_path.has_extension()) {
+		proj_path.replace_extension(".vtproj");
+	}
+
 	std::fstream f;
 	f.open(proj_path, std::ios::out);
 	if (!f.is_open()) return;

@@ -23,7 +23,7 @@ clean:
 pack: clean
 	rm -rf doc
 	mkdir -p doc
-	zip -r $(VARIANT)-$(LOGIN1)-$(LOGIN2).zip Doxyfile Makefile README.txt src doc
+	zip -r $(VARIANT)-$(LOGIN1)-$(LOGIN2).zip Doxyfile Makefile README.txt src doc examples
 
 doxygen:
 	doxygen Doxyfile
