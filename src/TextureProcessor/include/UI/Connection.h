@@ -46,7 +46,6 @@ namespace UI
 
 		std::pair<QPointF, QPointF> PointsC1C2()const;
 		Port Requires()const;
-		void MoveEndpoint(Port port, QPointF offset);
 		PortType GetType()const noexcept;
 		Node* StartNode()const noexcept { return connector.first ? connector.first : (connector.second ? connector.second : nullptr); }
 	private:
