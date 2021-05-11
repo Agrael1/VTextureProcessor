@@ -1,10 +1,6 @@
-CXX = g++-10
-CXXFLAGS = -std=c++20 -I./src
-LDFLAGS = -LQt5Core
 LOGIN1 = xcerny74
 LOGIN2 = xdoros01
 VARIANT = 2
-SRC = ./src
 
 .PHONY: clean pack doxygen run build
 
@@ -18,7 +14,6 @@ run: build
 
 clean:
 	rm -rf build
-	# TODO
 
 pack: clean
 	rm -rf doc

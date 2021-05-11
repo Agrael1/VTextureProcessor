@@ -9,9 +9,7 @@ else(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -g")
 endif()
 
-#set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-#set(CMAKE_AUTOUIC ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
@@ -52,7 +50,6 @@ add_executable (TextureProcessor
 	"include/utils/Exception.h"
 	"src/Logic/Node.cpp" "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp" "src/UI/FlowScene.cpp" "include/UI/FlowScene.h" "include/UI/FlowView.h" "src/UI/FlowView.cpp" "src/UI/UINode.cpp"   "include/UI/NodeStyle.h" "src/UI/NodeStyle.cpp" "include/UI/ContextMenu.h" "include/pch.h" "src/UI/ContextMenu.cpp" "include/UI/FlowCodex.h" "src/UI/FlowCodex.cpp"  "include/Logic/SinksT.h" "include/Logic/SourcesT.h" "include/Presenter/GLInterpret.h" "src/Presenter/GLInterpret.cpp" "include/Logic/ShaderNode.h" "src/Logic/ShaderNode.cpp" "include/UI/TextureNode.h" "src/UI/TextureNode.cpp" "include/Logic/PortType.h" "include/UI/Connection.h" "src/UI/Connection.cpp" "include/UI/Properties.h" "src/UI/Properties.cpp" "include/Logic/DynamicConstant.h"  "src/UI/Sliders.cpp" "include/UI/INode.h"  "include/UI/Updater.h"  "include/UI/ProjectsWindow.h" "include/UI/Frameless.h" "src/UI/Frameless.cpp"  "include/Logic/ProjectsData.h" "src/Logic/ProjectsData.cpp")
 
-# TODO: Добавьте тесты и целевые объекты, если это необходимо.
 target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt5Widgets_INCLUDE_DIRS}")
 target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_precompile_headers("${PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/pch.h")
@@ -80,4 +77,3 @@ if(WIN32)
 endif(WIN32)
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/nodes" DESTINATION ${INSTALL_PATH}/nodes FILES_MATCHING PATTERN "*.json")
-
