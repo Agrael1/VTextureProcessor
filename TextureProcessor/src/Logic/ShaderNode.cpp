@@ -97,9 +97,19 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 QImage ShaderNode::Update()
 {
 	for (uint32_t s = 0; auto & i: inputs)
-		if (i)i->bind(s++);
+	{
+		if (i)
+		{
+			if (tiling)
+				i->setWrapMode(QOpenGLTexture::ClampToEdge);
+			i->bind(s++);
+		}
 		else e.Empty().bind(s++);
-	return e.Render(shader->shader, outputs, buf);
+	}
+	auto im = e.Render(shader->shader, outputs, buf);
+	for (auto& i : inputs)
+		if (i)i->setWrapMode(QOpenGLTexture::Repeat);
+	return im;
 }
 
 

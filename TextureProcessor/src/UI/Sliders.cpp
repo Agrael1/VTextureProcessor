@@ -111,3 +111,20 @@ void Vec2Slider::SetChangedCallback(INode* to)
 	upper.SetChangedCallback(to);
 	lower.SetChangedCallback(to);
 }
+
+
+CheckBox::CheckBox(bool& value, const QString& name)
+	:value(value), box(name)
+{
+	box.setChecked(value);
+	lay.addWidget(&box);
+	setLayout(&lay);
+}
+void CheckBox::SetChangedCallback(INode* to)
+{
+	connect(&box, &QCheckBox::stateChanged, [this, to](int v)
+		{
+			value = bool(v);
+			to->Update();
+		});
+}

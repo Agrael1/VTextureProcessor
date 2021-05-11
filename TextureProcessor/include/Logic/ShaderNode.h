@@ -20,6 +20,7 @@ namespace ver
 	public:
 		QImage Update();
 		dc::Buffer& GetBuffer() { return buf; }
+		bool& Tiling() { return tiling; }
 	private:
 		void SetProperties(const QJsonArray& props, QString& scode);
 	private:
@@ -28,6 +29,7 @@ namespace ver
 		std::shared_ptr<NodePrivate> shader;
 		dc::Buffer buf;
 		Engine& e;
+		bool tiling = false;
 	};
 }
 

@@ -4,6 +4,7 @@
 #include <UI/Sliders.h>
 #include <QLabel>
 #include <QFileDialog>
+#include <QCheckBox>
 #include <charconv>
 
 /**
@@ -56,10 +57,13 @@ void UI::TextureNode::Update()
 }
 void UI::TextureNode::UpdateProperties(Properties& props)
 {
-	auto& buf = model.GetBuffer();
-	if (!buf)return;
+	PropertyElement prop{ *this, model.GetName() };
+	prop.AppendWidget<CheckBox>(model.Tiling(), "Disable Tiling");
 
-	PropertyElement prop{*this, model.GetName()};
+	auto& buf = model.GetBuffer();
+	if (!buf)return props.AppendProperty(std::move(prop));
+
+	
 	for (auto ref : buf)
 	{
 		auto t = ref.GetType();
@@ -80,6 +84,7 @@ void UI::TextureNode::UpdateProperties(Properties& props)
 		case ver::dc::Type::Matrix:
 			break;
 		case ver::dc::Type::Bool:
+			prop.AppendWidget<CheckBox>((bool&)ref, ref.GetName().data());
 			break;
 		case ver::dc::Type::Integer:
 			break;

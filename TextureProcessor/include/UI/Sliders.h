@@ -1,5 +1,6 @@
 #pragma once
 #include <UI/Updater.h>
+#include <QCheckBox>
 
 namespace UI
 {
@@ -33,5 +34,17 @@ namespace UI
 		FloatSlider upper;
 		FloatSlider lower;
 		QVector2D& value;
+	};
+
+	class CheckBox : public Updater
+	{
+	public:
+		CheckBox(bool& value, const QString& name);
+	public:
+		void SetChangedCallback(INode* to)override;
+	private:
+		bool& value;
+		QVBoxLayout lay;
+		QCheckBox box;
 	};
 }
