@@ -287,18 +287,20 @@ QJsonObject FlowScene::Serialize()
  *
  * @param obj
  */
-void FlowScene::Deserialize(QJsonObject obj)
+void FlowScene::Deserialize(QJsonObject xobj)
 {
 	// Nothing to draw if no Nodes
-	if (!obj.contains("Nodes")) return;
+	if (!xobj.contains("Nodes")) return;
 
 	bool missing = false;
 
-	QJsonArray arr{ obj["Nodes"].toArray() };
+	QJsonArray arr = xobj["Nodes"].toArray();
 	for (auto ref : arr)
 	{
-		QJsonObject obj{ ref.toObject() };
-		auto stype = obj.keys()[0];
+		QJsonObject obj = ref.toObject();
+
+		if(obj.isEmpty())continue;
+		auto stype = obj.keys().first();
 		auto type = stype.toStdString();
 		auto node = obj[stype].toObject();
 
@@ -321,9 +323,9 @@ void FlowScene::Deserialize(QJsonObject obj)
 		xnode->Deserialize(node);
 	}
 
-	if (!obj.contains("Connections")) return;
+	if (!xobj.contains("Connections")) return;
 
-	QJsonArray conns{ obj["Connections"].toArray() };
+	QJsonArray conns = xobj["Connections"].toArray();
 	for (auto c : conns)
 	{
 		auto o = c.toObject();
