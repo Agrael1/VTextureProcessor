@@ -1,3 +1,8 @@
+﻿/**
+ * @file Sliders.cpp
+ * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @brief Controls for properties and constant buffers
+ */
 #include <UI/Sliders.h>
 #include <fmt/printf.h>
 #include <UI/INode.h>
@@ -112,7 +117,11 @@ void Vec2Slider::SetChangedCallback(INode* to)
 	lower.SetChangedCallback(to);
 }
 
-
+/**
+ * @brief Creates value dependent check box
+ * @param value ref to changed value
+ * @param name Label to go with
+*/
 CheckBox::CheckBox(bool& value, const QString& name)
 	:value(value), box(name)
 {
@@ -120,6 +129,11 @@ CheckBox::CheckBox(bool& value, const QString& name)
 	lay.addWidget(&box);
 	setLayout(&lay);
 }
+
+/**
+ * @brief Sets check box callback
+ * @param to calls update upon
+*/
 void CheckBox::SetChangedCallback(INode* to)
 {
 	connect(&box, &QCheckBox::stateChanged, [this, to](int v)

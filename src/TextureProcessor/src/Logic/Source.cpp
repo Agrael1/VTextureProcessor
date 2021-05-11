@@ -1,3 +1,10 @@
+/**
+ * @file Source.cpp
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Source connector logic
+ * Gathered from Veritas engine WinD3D project
+ * https://github.com/Agrael1/VeritasD3D
+ */
 #include <Logic/Source.h>
 #include <utils/Exception.h>
 

@@ -1,11 +1,14 @@
 /**
  * @file GLInterpret.cpp
  * @author Ilya Doroshenko (xdoros01)
- * @brief Handler for HLSL textures
+ * @brief Handler for GLSL Shaders
  */
 
 #include <Presenter/GLInterpret.h>
 
+/**
+ * @brief Creates GL context
+*/
 Engine::Context::Context()
 {
 	QSurfaceFormat surfaceFormat;
@@ -23,6 +26,10 @@ Engine::Context::Context()
 	funcs.initializeOpenGLFunctions();
 }
 
+/**
+ * @brief Creates Engine with specified texture size
+ * @param size size of the input and output textures
+*/
 Engine::Engine(QSize size)
 	:vs(QOpenGLShader::Vertex), frame(size, con.Format()), vlay(QOpenGLBuffer::VertexBuffer)
 {
@@ -36,7 +43,10 @@ Engine::Engine(QSize size)
 	vbuf.bind();
 }
 
-
+/**
+ * @brief Creates static empty texture
+ * @return ref to global empty texture
+*/
 QOpenGLTexture& Engine::Empty()
 {
 	static QOpenGLTexture empty{ QOpenGLTexture::Target2D };
@@ -49,6 +59,15 @@ QOpenGLTexture& Engine::Empty()
 	return empty;
 }
 
+/**
+ * @brief Renders specified node with input and output textures
+ * @param ps Node shader
+ * @param inputs input textures to be bound
+ * @param tile enable tiling on textures
+ * @param outputs retrieved textures
+ * @param buffer constant buffer
+ * @return Image to be drawn to the node
+*/
 QImage Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> inputs, bool tile, std::span<std::shared_ptr<QOpenGLTexture>> outputs, ver::dc::Buffer& buffer)
 {
 	shaders.addShader(&ps);
@@ -83,6 +102,10 @@ QImage Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTextur
 	return frame.toImage(true, 0);
 }
 
+/**
+ * @brief Constant buffer binding
+ * @param buffer buffer with data to be bound
+*/
 void Engine::BindBuffer(ver::dc::Buffer& buffer)
 {
 	for (auto r : buffer)

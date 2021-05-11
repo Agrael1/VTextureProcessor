@@ -61,18 +61,33 @@ Window::Window(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
 	addDockWidget(Qt::RightDockWidgetArea, &a->props);
 }
 
+/**
+ * @brief clear menu button
+*/
 void Window::OnClearTriggered()
 {
 	a->scene.Clear();
 }
+
+/**
+ * @brief Windows->Properties
+*/
 void Window::OnProps()
 {
 	a->props.show();
 }
+
+/**
+ * @brief File->Export
+*/
 void Window::OnExport()
 {
 	a->scene.ExportAll();
 }
+
+/**
+ * @brief File->Load
+*/
 void Window::OnLoad()
 {
 	fs::path proj_path{ QFileDialog::getOpenFileName(
@@ -86,6 +101,10 @@ void Window::OnLoad()
 	projPath = std::move(proj_path);
 	LoadFile();
 }
+
+/**
+ * @brief Loads specified file
+*/
 void Window::LoadFile()
 {
 	using namespace std::string_literals;
@@ -98,6 +117,7 @@ void Window::LoadFile()
 	std::string str;
 	t.seekg(0, std::ios::end);
 
+	//preallocation
 	int x = t.tellg();
 	str.reserve(x);
 	t.seekg(0, std::ios::beg);
@@ -113,6 +133,10 @@ void Window::LoadFile()
 	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return; }
 	a->scene.Deserialize(json.object());
 }
+
+/**
+ * @brief file->Save as
+*/
 void Window::OnSaveAs()
 {
 	fs::path proj_path{ QFileDialog::getSaveFileName(
@@ -130,6 +154,10 @@ void Window::OnSaveAs()
 	QJsonDocument doc{ a->scene.Serialize() };
 	f << doc.toJson().constData();
 }
+
+/**
+ * @brief File->save
+*/
 void Window::OnSave()
 {
 	std::fstream f;

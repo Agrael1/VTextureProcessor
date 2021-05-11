@@ -1,3 +1,8 @@
+/**
+ * @file ProjectsData.cpp
+ * @author Ilya Doroshenko (xdoros01)
+ * @brief Logic for projects window
+ */
 #include <Logic/ProjectsData.h>
 #include <fstream>
 
