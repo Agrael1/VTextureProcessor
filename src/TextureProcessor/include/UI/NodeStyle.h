@@ -60,4 +60,3 @@ namespace UI
 		static const ConnectionStyle Grayscale;
 	};
 }
-

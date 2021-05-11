@@ -22,4 +22,8 @@ int main(int argc, char *argv[])
  * @tableofcontents
  *
  * @section about About
+ * This program implements a node editor for blending textures using
+ * input nodes (that generate constant shapes), operation nodes (that
+ * are used to modify the textures) and output nodes that can be used to export
+ * textures to files.
 */

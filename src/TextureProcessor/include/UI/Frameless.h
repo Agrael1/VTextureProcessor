@@ -1,5 +1,5 @@
 /**
- * @file Frameless.cpp
+ * @file Frameless.h
  * @author Ilya Doroshenko (xdoros01)
  * @brief Class for frameless window style
  */
@@ -42,5 +42,3 @@ private:
 
 	static constexpr int border_width = 5;
 };
-
-
