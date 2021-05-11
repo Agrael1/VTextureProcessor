@@ -105,6 +105,8 @@ void UI::TextureNode::UpdateProperties(Properties& props)
 			prop.AppendWidget<CheckBox>((bool&)ref, ref.GetName().data());
 			break;
 		case ver::dc::Type::Integer:
+			prop.AppendWidget<QLabel>(ref.GetName().data());
+			prop.AppendWidget<IntSlider>((int&)ref);
 			break;
 		default:
 			break;

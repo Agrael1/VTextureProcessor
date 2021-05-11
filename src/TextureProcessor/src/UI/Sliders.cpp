@@ -117,6 +117,81 @@ void Vec2Slider::SetChangedCallback(INode* to)
 	lower.SetChangedCallback(to);
 }
 
+
+
+/**
+ * @brief Construct a new Float Slider:: Float Slider object
+ *
+ * @param value Value changed by the slider
+ * @param min Minimum value
+ * @param max Maximum value
+ */
+IntSlider::IntSlider(int& value)
+	:slider(Qt::Horizontal), value(value), valid(0, 20)
+{
+	setLayout(&lay);
+	text.setValidator(&valid);
+	text.connect(&text, &QLineEdit::textEdited, this, &IntSlider::TextEdited);
+
+	// Display with 2 floating point precision
+	slider.setRange(0, 20);
+	slider.setValue(value);
+	text.setText(fmt::sprintf("%d", value).c_str());
+
+	// Set text size policy
+	QSizePolicy spText(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	spText.setHorizontalStretch(1);
+	text.setSizePolicy(spText);
+
+	// Set slider size policy
+	QSizePolicy spSlider(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	spSlider.setHorizontalStretch(3);
+	slider.setSizePolicy(spSlider);
+
+	lay.addWidget(&slider);
+	lay.addWidget(&text);
+}
+
+
+
+/**
+ * @brief Updates slider on value change
+ *
+ * @param xvalue New value
+ */
+void IntSlider::ValueChanged(int xvalue)
+{
+	value = xvalue;
+	text.setText(fmt::sprintf("%d", value).c_str());
+	slider.setValue(value);
+}
+
+/**
+ * @brief If value is set manually trough the text field
+ *
+ * @param text
+ */
+void IntSlider::TextEdited(const QString& text)
+{
+	slider.setValue(text.toInt());
+}
+
+/**
+ * @brief Callback to node on slider value change
+ *
+ * @param to
+ */
+void IntSlider::SetChangedCallback(INode* to)
+{
+	connect(&slider, &QSlider::valueChanged, [this, to](int v)
+		{
+			ValueChanged(v);
+			to->Update();
+		});
+}
+
+
+
 /**
  * @brief Creates value dependent check box
  * @param value ref to changed value
