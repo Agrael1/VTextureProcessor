@@ -79,6 +79,7 @@ ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app)
 	, open("Open Existing Project", "Open existing project from any location", ":/icons8-opened-folder.png"),
 	app(app)
 {
+	// Header
 	resize(width, height);
 	setCentralWidget(&window);
 	window.Layout().addLayout(&lay);
@@ -93,6 +94,7 @@ ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app)
 	hlay.addLayout(&innerLay, 2);
 	hlay.addLayout(&buttonLay, 1);
 
+	// Filtering
 	recent.setFont({ "Arial", 16 });
 	innerLay.addWidget(&recent);
 	search.setPlaceholderText("Search...");
@@ -100,6 +102,7 @@ ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app)
 	search.setClearButtonEnabled(true);
 	innerLay.addWidget(&search);
 
+	// Show all recent projects from project cache
 	FillTree();
 	selection.setHeaderHidden(true);
 	search.connect(&search, &QLineEdit::textEdited, this, &ProjectsWindow::OnFilterChanged);
@@ -220,6 +223,8 @@ void ProjectsWindow::OnFilterChanged(const QString& text)
 void ProjectsWindow::OnItemDoubleClicked(QTreeWidgetItem* item, int column)
 {
 	std::filesystem::path file{ item->data(1, Qt::UserRole).toString().toStdString() };
+
+	// Non-existing file warning
 	if (!fs::exists(file) || !fs::is_regular_file(file))
 	{
 		QMessageBox m(QMessageBox::Icon::Warning, "Warning", "Specified file does not exist\nDo you want to delete the entry?",
