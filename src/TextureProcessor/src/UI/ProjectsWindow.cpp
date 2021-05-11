@@ -151,6 +151,10 @@ void ProjectsWindow::OnCreateClicked(bool checked)
 
 	if (proj_path.empty()) return;
 
+	if (!proj_path.has_extension()) {
+		proj_path.replace_extension(".vtproj");
+	}
+
 	if (!pdata.contains(proj_path))
 		pdata.AppendCache(proj_path);
 
@@ -175,6 +179,7 @@ void ProjectsWindow::OnOpenClicked(bool checked)
 	).toStdString() };
 
 	if (proj_path.empty()) return;
+
 	if (!pdata.contains(proj_path))
 		pdata.AppendCache(proj_path);
 
