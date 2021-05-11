@@ -8,7 +8,7 @@
 class App : public QObject
 {
 public:
-	App(int argc, char** argv);
+	App(int xargc, char** xargv);
 public:
 	int Start();
 private:
@@ -17,6 +17,8 @@ private:
 	std::optional<UI::ProjectsWindow> projects;
 	QApplication app;
 private:
+	int argc;
+	char** argv;
 	static constexpr std::string_view AppVer = "0.1.1";
 	static constexpr std::string_view AppTheme = "Fusion";
 };

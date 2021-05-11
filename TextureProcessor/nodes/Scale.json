@@ -2,7 +2,7 @@
 	"Scale": {
 		"Node": {
 			"Class": "Texture",
-			"Group": "Transform",
+			"Group": "Operations",
 			"Properties": [{"Tag": "Scale", "Type":"vec2", "Val":[1.5, 1.0]}],
 			"Sinks": [{"Name": "In", "Type": "Grayscale"}],
 			"Sources": [{"Name": "Out", "Type": "Grayscale"}]

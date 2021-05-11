@@ -15,7 +15,7 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	: e(e)
 {
 	auto node = document["Node"].toObject();
-	QString xshader{ "#version 330 \n" };
+	QString xshader{ "#version 420 \n" };
 
 	if (node.contains("Properties"))
 		SetProperties(node["Properties"].toArray(), xshader);
@@ -34,6 +34,8 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	shader = std::make_shared<NodePrivate>(std::move(xshader));
 
 	auto sources = node["Sources"].toArray();
+	outputs.reserve(sources.size());
+
 	for (auto it : sources)
 	{
 		auto source = it.toObject();
@@ -47,6 +49,7 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	}
 
 	auto sinks = node["Sinks"].toArray();
+	inputs.reserve(sinks.size());
 	for (auto it : sinks)
 	{
 		auto sink = it.toObject();
@@ -63,6 +66,9 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 {
 	sinks.reserve(other.SinksCount());
 	sources.reserve(other.SourcesCount());
+	outputs.reserve(other.SourcesCount());
+	inputs.reserve(other.SinksCount());
+
 	for (auto& s : other.sources)
 	{
 		switch (s->GetType())
@@ -96,20 +102,7 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 
 QImage ShaderNode::Update()
 {
-	for (uint32_t s = 0; auto & i: inputs)
-	{
-		if (i)
-		{
-			if (tiling)
-				i->setWrapMode(QOpenGLTexture::ClampToEdge);
-			i->bind(s++);
-		}
-		else e.Empty().bind(s++);
-	}
-	auto im = e.Render(shader->shader, outputs, buf);
-	for (auto& i : inputs)
-		if (i)i->setWrapMode(QOpenGLTexture::Repeat);
-	return im;
+	return e.Render(shader->shader, inputs, tiling, outputs, buf);
 }
 
 
