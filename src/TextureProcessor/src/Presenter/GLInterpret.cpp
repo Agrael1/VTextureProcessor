@@ -97,7 +97,7 @@ QImage Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTextur
 			if (i)i->setWrapMode(QOpenGLTexture::Repeat);
 
 	for (int i = 0; auto & o : outputs)
-		o = std::make_shared<QOpenGLTexture>(frame.toImage(true, i++));
+		o = std::make_shared<QOpenGLTexture>(frame.toImage(false, i++));
 
 	return frame.toImage(true, 0);
 }

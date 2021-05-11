@@ -41,6 +41,23 @@ namespace UI
 		QVector2D& value;
 	};
 
+	class IntSlider : public Updater
+	{
+	public:
+		IntSlider(int& value);
+	public:
+		void SetChangedCallback(INode* to)override;
+	private:
+		void ValueChanged(int value);
+		void TextEdited(const QString& text);
+	private:
+		QHBoxLayout lay;
+		QSlider slider;
+		QLineEdit text;
+		QIntValidator valid;
+		int& value;
+	};
+
 	class CheckBox : public Updater
 	{
 	public:
