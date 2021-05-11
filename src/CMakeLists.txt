@@ -1,7 +1,4 @@
-﻿# CMakeList.txt: проект CMake для TextureProcessor; включите исходный код и определения,
-# укажите здесь логику для конкретного проекта.
-#
-cmake_minimum_required (VERSION 3.16)
+﻿cmake_minimum_required (VERSION 3.16)
 
 project(TextureProcessor CXX)
 
@@ -43,7 +40,6 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 add_compile_definitions(_HAS_DEPRECATED_RESULT_OF=1)
 
-# Добавьте источник в исполняемый файл этого проекта.
 add_executable (TextureProcessor
 	"src/EntryMain.cpp"
     "src/UI/ProjectsWindow.cpp"
