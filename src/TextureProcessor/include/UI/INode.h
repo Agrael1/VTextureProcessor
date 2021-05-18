@@ -1,5 +1,5 @@
 /**
- * @file Frameless.cpp
+ * @file INode.h
  * @author Ilya Doroshenko (xdoros01)
  * @brief Interfaces for class management
  */

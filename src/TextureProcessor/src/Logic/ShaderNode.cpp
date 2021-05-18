@@ -2,8 +2,6 @@
  * @file ShaderNode.cpp
  * @author Ilya Doroshenko (xdoros01)
  * @brief ShaderNode model logic
- * Modified from Veritas engine WinD3D project (file Pass.*)
- * https://github.com/Agrael1/VeritasD3D
  */
 #include <Logic/ShaderNode.h>
 #include <Logic/SourcesT.h>
@@ -12,12 +10,23 @@
 
 using namespace ver;
 
+/**
+ * @brief Construct a new Shader Node:: Node Private:: Node Private object
+ *
+ * @param code GLSL source code
+ */
 ShaderNode::NodePrivate::NodePrivate(QString&& code)
 	:shader(QOpenGLShader::Fragment), shadercode(code.toStdString())
 {
 	shader.compileSourceCode(code);
 }
 
+/**
+ * @brief Construct a new Shader Node:: Shader Node object
+ *
+ * @param document JSON specification of the shader node
+ * @param e Engine for compiling textures
+ */
 ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	: e(e)
 {
@@ -27,11 +36,10 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	if (node.contains("Properties"))
 		SetProperties(node["Properties"].toArray(), xshader);
 
-
 	auto val = document["Value"];
 	if (!val.isArray())
 	{
-		return;//TODO: file
+		return;
 	}
 	for (auto x : val.toArray())
 	{
@@ -43,6 +51,7 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	auto sources = node["Sources"].toArray();
 	outputs.reserve(sources.size());
 
+	// Register all sources
 	for (auto it : sources)
 	{
 		auto source = it.toObject();
@@ -57,6 +66,7 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 
 	auto sinks = node["Sinks"].toArray();
 	inputs.reserve(sinks.size());
+	// Register all sinks
 	for (auto it : sinks)
 	{
 		auto sink = it.toObject();
@@ -68,6 +78,12 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 		}
 	}
 }
+
+/**
+ * @brief Construct a new Shader Node:: Shader Node object
+ *
+ * @param other Shader node to be duplicated (without recompiling shader)
+ */
 ShaderNode::ShaderNode(const ShaderNode& other)
 	:shader(other.shader), e(other.e), buf(other.buf)
 {
@@ -76,6 +92,7 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 	outputs.reserve(other.SourcesCount());
 	inputs.reserve(other.SinksCount());
 
+	// Copies and registers sources
 	for (auto& s : other.sources)
 	{
 		switch (s->GetType())
@@ -94,6 +111,8 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 			break;
 		}
 	}
+
+	// Copies and registers sinks
 	for (auto& s : other.sinks)
 	{
 		switch (s->GetType())
@@ -107,12 +126,22 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 	}
 }
 
+/**
+ * @brief Called on input change
+ *
+ * @return QImage Generated texture preview
+ */
 QImage ShaderNode::Update()
 {
 	return e.Render(shader->shader, inputs, tiling, outputs, buf);
 }
 
-
+/**
+ * @brief Sets properties of the shader node
+ *
+ * @param props List of properties to be added
+ * @param scode Source code for dynamic replacement
+ */
 void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 {
 	if (props.isEmpty())return;
@@ -130,7 +159,6 @@ void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 		scode += qtag + ";\n";
 		lay += { tags.emplace_back(qtag.toStdString()), dc::LayoutElement{ qtype.toStdString() }};
 	}
-
 
 	buf.Replace(std::move(lay));
 	for (size_t i = 0; auto it : props)

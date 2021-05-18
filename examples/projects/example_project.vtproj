@@ -1,0 +1,168 @@
+{
+    "Connections": [
+        {
+            "Sink": [
+                "Output_1",
+                0
+            ],
+            "Source": [
+                "Scale_1",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Add_0",
+                1
+            ],
+            "Source": [
+                "Circle_2",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Add_0",
+                0
+            ],
+            "Source": [
+                "Circle_1",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Scale_0",
+                0
+            ],
+            "Source": [
+                "Circle_0",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Output_0",
+                0
+            ],
+            "Source": [
+                "Scale_0",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Scale_1",
+                0
+            ],
+            "Source": [
+                "Add_0",
+                0
+            ]
+        }
+    ],
+    "Nodes": [
+        {
+            "Output": {
+                "Buffer": {
+                },
+                "Position": [
+                    593,
+                    -300
+                ],
+                "Ref": 1
+            }
+        },
+        {
+            "Scale": {
+                "Buffer": {
+                    "Scale": [
+                        1.5,
+                        1
+                    ]
+                },
+                "Position": [
+                    303,
+                    -306
+                ],
+                "Ref": 1
+            }
+        },
+        {
+            "Circle": {
+                "Buffer": {
+                    "Radius": 1,
+                    "Shade": 1
+                },
+                "Position": [
+                    -377,
+                    -94
+                ],
+                "Ref": 2
+            }
+        },
+        {
+            "Circle": {
+                "Buffer": {
+                    "Radius": 1,
+                    "Shade": 1
+                },
+                "Position": [
+                    -375,
+                    -342
+                ],
+                "Ref": 1
+            }
+        },
+        {
+            "Circle": {
+                "Buffer": {
+                    "Radius": 1,
+                    "Shade": 1
+                },
+                "Position": [
+                    -327,
+                    140
+                ],
+                "Ref": 0
+            }
+        },
+        {
+            "Scale": {
+                "Buffer": {
+                    "Scale": [
+                        1.5,
+                        1
+                    ]
+                },
+                "Position": [
+                    47,
+                    100
+                ],
+                "Ref": 0
+            }
+        },
+        {
+            "Add": {
+                "Buffer": {
+                },
+                "Position": [
+                    37,
+                    -306
+                ],
+                "Ref": 0
+            }
+        },
+        {
+            "Output": {
+                "Buffer": {
+                },
+                "Position": [
+                    407,
+                    142
+                ],
+                "Ref": 0
+            }
+        }
+    ]
+}

@@ -1,10 +1,8 @@
-CXX = g++-10
-CXXFLAGS = -std=c++20 -I./src
-LDFLAGS = -LQt5Core
+# Makefile
+# author: David Černý (xcerny74)
 LOGIN1 = xcerny74
 LOGIN2 = xdoros01
 VARIANT = 2
-SRC = ./src
 
 .PHONY: clean pack doxygen run build
 
@@ -14,16 +12,16 @@ build:
 	cp -r src/TextureProcessor/nodes build/TextureProcessor/nodes
 
 run: build
-	cd build/TextureProcessor && ./TextureProcessor
+	cd ./build/TextureProcessor && ./TextureProcessor
 
 clean:
 	rm -rf build
-	# TODO
+	rm -rf doc/*
 
 pack: clean
 	rm -rf doc
 	mkdir -p doc
-	zip -r $(VARIANT)-$(LOGIN1)-$(LOGIN2).zip Doxyfile Makefile README.txt src doc
+	zip -r $(VARIANT)-$(LOGIN1)-$(LOGIN2).zip Doxyfile Makefile README.txt src doc examples images
 
 doxygen:
 	doxygen Doxyfile

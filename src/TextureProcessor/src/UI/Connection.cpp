@@ -64,7 +64,6 @@ void Connection::Init()
  */
 QRectF UI::Connection::boundingRect() const
 {
-	// TODO: Validate
 	auto points = PointsC1C2();
 	QRectF c1c2Rect = QRectF(points.first, points.second).normalized();
 	QRectF commonRect = QRectF(source, sink).normalized().united(c1c2Rect);
@@ -88,8 +87,7 @@ void Connection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 	painter->setBrush(Qt::NoBrush);
 	// Selects style based on connection status (connected, selected or currently being dragged)
 	if (isSelected())
-		// TODO: Rename
-		painter->setPen(ConnectionStyle::Grayscale.hovered);
+		painter->setPen(ConnectionStyle::Grayscale.selected);
 	else if (bFinished)
 		painter->setPen(ConnectionStyle::Grayscale.connected);
 	else
@@ -113,7 +111,7 @@ void UI::Connection::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 	// Endpoint only moved if the position has changed
 	if (auto x = Requires(); any(x))
-		MoveEndpoint(x, event->pos() - event->lastPos());
+		Move(event->pos() - event->lastPos(), x);
 
 	update();
 	event->accept();
@@ -129,7 +127,6 @@ void UI::Connection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	ungrabMouse();
 	event->accept();
 
-	// TODO: cleanup
 	auto& xscene = static_cast<UI::FlowScene&>(*scene());
 	auto* node = xscene.LocateNode(event->scenePos());
 
@@ -270,18 +267,6 @@ Port Connection::Requires()const
 	if (!connector.first) return Port::Source;
 	if (!connector.second) return Port::Sink;
 	return Port::None;
-}
-
-/**
- * @brief Updates coordinates of the spline endpoint
- *
- * @param port Source port
- * @param offset Offset from last position
- */
-void Connection::MoveEndpoint(Port port, QPointF offset)
-{
-	// TODO: is this even needed?
-	Move(offset, port);
 }
 
 /**

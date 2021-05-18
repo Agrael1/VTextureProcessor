@@ -1,5 +1,5 @@
 /**
- * @file Updater.cpp
+ * @file Updater.h
  * @author Ilya Doroshenko (xdoros01)
  * @brief A simple interface for callback
  */
@@ -13,4 +13,3 @@ namespace UI
 		virtual void SetChangedCallback(INode* to) = 0;
 	};
 }
-

@@ -55,9 +55,8 @@ namespace UI
 	public:
 		QPen sketch{ {"#FF878787"}, line_width, Qt::DashLine };
 		QPen connected{ {"#FFD9DDDC"}, line_width };
-		QPen hovered{ Qt::white, line_width*2 };
+		QPen selected{ Qt::white, line_width*2 };
 	public:
 		static const ConnectionStyle Grayscale;
 	};
 }
-
