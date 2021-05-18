@@ -1,0 +1,11 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>tlr.ico</file>
+	  <file>icon_window_close.png</file>
+  <file>icon_window_maximize.png</file>
+  <file>icon_window_minimize.png</file>
+  <file>icon_window_restore.png</file>
+  <file>icons8-add-file.png</file>
+  <file>icons8-opened-folder.png</file>
+</qresource>
+</RCC>
