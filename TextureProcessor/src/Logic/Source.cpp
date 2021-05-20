@@ -21,6 +21,10 @@ Source::Source(std::string_view name, PortType ty) :name(name), type(ty)
 	{
 		throw RGC_EXCEPTION(std::format("Invalid source name: {}", name));
 	}
+	if (!any(ty))
+	{
+		throw RGC_EXCEPTION(std::format("Invalid type: {}", uint8_t(ty)));
+	}
 }
 
 std::string_view Source::GetName() const noexcept

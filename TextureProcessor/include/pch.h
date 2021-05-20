@@ -14,3 +14,8 @@
 #include <QGraphicsScene>
 #include <QOpenGLContext>
 #include <QGraphicsSceneMouseEvent>
+
+//std
+#include <memory>
+#include <span>
+#include <string>

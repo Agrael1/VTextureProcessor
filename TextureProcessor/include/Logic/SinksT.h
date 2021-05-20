@@ -7,7 +7,6 @@
  */
 #pragma once
 #include <Logic/Sink.h>
-#include <memory>
 #include <utils/Exception.h>
 
 
@@ -19,26 +18,29 @@ public:
 	{
 		return std::make_unique<DirectTextureSink>(registeredName, target);
 	}
-	void PostLinkValidate() const override
-	{
-		
-	}
-	virtual void Unlink()override
+	void Unlink()override
 	{
 		target = nullptr;
 	}
-	void Bind(Source& source) override
+	bool Link(Source& source) override
 	{
 		auto p = source.YieldTexture();
 		if (!p)
 		{
-			auto msg = std::format("Binding input[{}] to output [{}.{}]. Source has no texture in it",
+			auto msg = std::format("Binding input[{}] to output [{}.{}]. Source has no texture in it.\n",
 				GetRegisteredName(),
 				GetOutputNodeName(),
 				GetSourceName());
-			throw RGC_EXCEPTION(msg);
+			printf(msg.c_str());
+			return false;
+		}
+		if (source.GetType() != ty)
+		{
+			printf("Types do not match\n");
+			return false;
 		}
 		target = std::move(p);
+		return true;
 	}
 	DirectTextureSink(std::string_view registeredName, std::shared_ptr<QOpenGLTexture>& target)
 		:

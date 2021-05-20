@@ -7,8 +7,6 @@
  */
 #pragma once
 #include <Logic/PortType.h>
-#include <memory>
-#include <string>
 
 class QOpenGLTexture;
 
@@ -16,7 +14,7 @@ class Source
 {
 public:
 	std::string_view GetName()const noexcept;
-	auto GetType()const noexcept { return type; }
+	PortType GetType()const noexcept { return type; }
 
 	virtual ~Source() = default;
 	virtual std::string_view YieldShader();

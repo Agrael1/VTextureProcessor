@@ -1,5 +1,5 @@
 /**
- * @file GLInterpret.h
+ * @file Engine.h
  * @author Ilya Doroshenko (xdoros01)
  * @brief Engine base model for shader compilation
  */
@@ -43,10 +43,10 @@ private:
 
 	static constexpr const char* vertexShaderSource =
 		R"(#version 330 core
-		out vec2 texcoords;
+		out vec2 sv_texc;
 		void main() {
 			vec2 vertices[3] = vec2[3](vec2(-1, -1), vec2(3, -1), vec2(-1, 3));
 			gl_Position = vec4(vertices[gl_VertexID], 0, 1);
-			texcoords = 0.5 * gl_Position.xy + vec2(0.5);
+			sv_texc = 0.5 * gl_Position.xy + vec2(0.5);
 		})";
 };

@@ -11,9 +11,6 @@ editors in 3D modeling software.
 ## Requirements
 - *Qt* version **5.12**+
 - *cmake* version **3.16**+
-- *conan* package manager
-    - Install using `pip3 install conan`
-- *fmt* library version **7.1.3**+ (will be installed automatically by conan during cmake build)
 - *OpenGL* version **4.2**+
 
 ## Features

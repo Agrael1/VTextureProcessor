@@ -6,7 +6,6 @@
 #pragma once
 #include <array>
 #include <filesystem>
-#include <span>
 
 class ProjectsData
 {

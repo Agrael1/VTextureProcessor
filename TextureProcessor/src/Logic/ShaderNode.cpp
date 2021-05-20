@@ -6,7 +6,7 @@
 #include <Logic/ShaderNode.h>
 #include <Logic/SourcesT.h>
 #include <Logic/SinksT.h>
-#include <Presenter/GLInterpret.h>
+#include <Presenter/Engine.h>
 
 using namespace ver;
 
@@ -18,7 +18,7 @@ using namespace ver;
 ShaderNode::NodePrivate::NodePrivate(QString&& code)
 	:shader(QOpenGLShader::Fragment), shadercode(code.toStdString())
 {
-	shader.compileSourceCode(code);
+	if (!shader.compileSourceCode(code))throw RGC_EXCEPTION("Failed to compile shader code");
 }
 
 /**
@@ -36,17 +36,33 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	if (node.contains("Properties"))
 		SetProperties(node["Properties"].toArray(), xshader);
 
-	auto val = document["Value"];
-	if (!val.isArray())
+	auto sinks = node["Sinks"].toArray();
+	inputs.reserve(sinks.size());
+	// Register all sinks
+	for (auto it : sinks)
 	{
-		return;
-	}
-	for (auto x : val.toArray())
-	{
-		xshader += x.toString();
-	}
+		auto sink = it.toObject();
+		auto type = from_str(sink["Type"].toString().toStdString());
 
-	shader = std::make_shared<NodePrivate>(std::move(xshader));
+		switch (type)
+		{
+		case PortType::None:
+			break;
+		case PortType::Grayscale:
+		{
+			auto sname = sink["Name"].toString().toStdString();
+			xshader += std::format("layout(binding = {})uniform sampler2D {};\n", inputs.size(), sname).c_str();
+			RegisterSink(GrayscaleSink::Make(sname, inputs.emplace_back()));
+		}
+		break;
+		case PortType::Color:
+			break;
+		case PortType::Normal:
+			break;
+		default:
+			break;
+		}
+	}
 
 	auto sources = node["Sources"].toArray();
 	outputs.reserve(sources.size());
@@ -55,28 +71,35 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 	for (auto it : sources)
 	{
 		auto source = it.toObject();
-		auto type = source["Type"].toString();
-		if (type == "Grayscale")
+		auto type = from_str(source["Type"].toString().toStdString()); //TODO: switch
+
+		switch (type)
+		{
+		case PortType::None:
+			break;
+		case PortType::Grayscale:
 		{
 			auto sname = source["Name"].toString().toStdString();
+			xshader += std::format("layout(location={})out vec4 {};\n", outputs.size(), sname).c_str();
 			RegisterSource(GrayscaleSource::Make(sname,
-				shader->shadercode, outputs.emplace_back(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D))));
+				"", outputs.emplace_back(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D))));
+			break;
+		}
+		case PortType::Color:
+			break;
+		case PortType::Normal:
+			break;
+		default:
+			break;
 		}
 	}
+	xshader += "in vec2 sv_texc;\n"; //load texture coordinates
 
-	auto sinks = node["Sinks"].toArray();
-	inputs.reserve(sinks.size());
-	// Register all sinks
-	for (auto it : sinks)
-	{
-		auto sink = it.toObject();
-		auto type = sink["Type"].toString();
-		if (type == "Grayscale")
-		{
-			auto sname = sink["Name"].toString().toStdString();
-			RegisterSink(GrayscaleSink::Make(sname, inputs.emplace_back()));
-		}
-	}
+	auto val = document["Value"];
+	for (auto x : val.toArray())
+		xshader += x.toString();
+
+	shader = std::make_shared<NodePrivate>(std::move(xshader));
 }
 
 /**
@@ -165,7 +188,7 @@ void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 	{
 		auto p = it.toObject();
 		if (p.contains("Val"))
-			buf[tags[i]]= p["Val"].toVariant();
+			buf[tags[i]] = p["Val"].toVariant();
 		i++;
 	}
 }

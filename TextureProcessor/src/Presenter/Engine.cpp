@@ -1,10 +1,10 @@
 /**
- * @file GLInterpret.cpp
+ * @file Engine.cpp
  * @author Ilya Doroshenko (xdoros01)
  * @brief Handler for GLSL Shaders
  */
 
-#include <Presenter/GLInterpret.h>
+#include <Presenter/Engine.h>
 
 /**
  * @brief Creates GL context

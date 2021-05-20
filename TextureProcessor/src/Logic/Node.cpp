@@ -12,13 +12,6 @@
 
 using namespace ver;
 
-inline Node::Node(std::string_view name)
-	:name(name)
-{}
-inline Node::Node(std::string&& name)
-	: name(std::move(name))
-{}
-
 std::string_view Node::GetName() const noexcept
 {
 	return name;
@@ -47,7 +40,7 @@ Sink& Node::GetSink(size_t index)
 	return *sinks.at(index);
 }
 
-void Node::RegisterSink(std::unique_ptr<Sink> in)
+void Node::RegisterSink(std::unique_ptr<Sink>&& in)
 {
 	// check for overlap of input names
 	for (auto& si : sinks)
@@ -56,7 +49,7 @@ void Node::RegisterSink(std::unique_ptr<Sink> in)
 
 	sinks.push_back(std::move(in));
 }
-void Node::RegisterSource(std::unique_ptr<Source> in)
+void Node::RegisterSource(std::unique_ptr<Source>&& in)
 {
 	// check for overlap of output names
 	using namespace std::string_literals;
@@ -70,13 +63,12 @@ void Node::RegisterSource(std::unique_ptr<Source> in)
 	sources.push_back(std::move(in));
 }
 
-void Node::SetSinkLinkage(std::string_view registeredName, const std::string& target)
+void Node::SetSinkLinkage(std::string_view registeredName, std::string_view to_node, std::string_view source)
 {
-	auto& sink = GetSink(registeredName);
-	auto targetSplit = SplitString(target, ".");
-	if (targetSplit.size() != 2u)
-	{
-		throw RGC_EXCEPTION("Input target has incorrect format");
-	}
-	sink.SetTarget(std::move(targetSplit[0]), std::move(targetSplit[1]));
+	GetSink(registeredName).SetTarget(to_node, source);
+}
+
+void ver::Node::SetSinkLinkage(size_t index, std::string_view to_node, std::string_view source)
+{
+	GetSink(index).SetTarget(to_node, source);
 }

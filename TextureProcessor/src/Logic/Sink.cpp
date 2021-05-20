@@ -66,4 +66,8 @@ Sink::Sink(std::string_view registeredName, PortType type):registeredName(regist
 	{
 		throw RGC_EXCEPTION(std::format("Invalid output name: {}", registeredName));
 	}
+	if (!any(type))
+	{
+		throw RGC_EXCEPTION(std::format("Invalid type: {}", uint8_t(type)));
+	}
 }

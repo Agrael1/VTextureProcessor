@@ -7,11 +7,8 @@
  */
 #pragma once
 #include <cassert>
-#include <memory>
-#include <string>
 #include <optional>
 #include <vector>
-#include <span>
 
 #define LEAF_ELEMENT_TYPES \
 	X(Float)\

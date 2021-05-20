@@ -24,7 +24,7 @@ namespace UI
 	private:
 		virtual void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN)override
 		{
-			model.GetSink(sinkN).Bind(source.Model().GetSource(sourceN));
+			model.GetSink(sinkN).Link(source.Model().GetSource(sourceN));
 			Update();
 		}
 		virtual void OnDisconnect(uint8_t sinkN)override
