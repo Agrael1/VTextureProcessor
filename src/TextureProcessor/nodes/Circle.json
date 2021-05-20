@@ -1,0 +1,27 @@
+{
+"Circle": {
+		"Node": {
+			"Class": "Texture",
+			"Group": "Shapes",
+			"Properties": [{"Tag": "Shade", "Type":"float", "Val":1.0}, {"Tag": "Radius", "Type":"float", "Val":1.0}],
+			"Sources": [{"Name": "Shape", "Type": "Grayscale"}]
+		},
+		"NodeStyle": {
+			"TitleColor": [128,0,0],
+			"FontColor" : "white"
+		},
+		"Value":["float circle(in vec2 _st){\n",
+				"	vec2 dist = _st-vec2(0.5);					  \n",
+				"	return Shade -smoothstep(Radius-(Radius*0.01),  \n",
+				"		 Radius+(Radius*0.01),				  \n",
+				"		 dot(dist,dist)*4.0);					  \n",
+				"}												  \n",
+				"in vec2 texcoords;\n",
+				"out vec4 color;								  \n",
+				"void main() {									  \n",
+				"	vec2 st = texcoords;	  \n",
+				"	vec3 xcolor = vec3(circle(st));		  \n",
+				"	color = vec4(xcolor, 1.0);					  \n",
+			"}"]
+	}
+}

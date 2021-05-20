@@ -1,3 +1,23 @@
+TextureProcessor/TextureProcessor
+TextureProcessor_autogen
+TextureProcessor
+Findfmt.cmake
+qrc_resources.cpp
+*.zip
+html
+latex
+qrc_resources
+*.vtxc
+.DS_Store
+.vscode
+CMakeFiles
+conan*
+graph_info*
+cmake_install.cmake
+CMakeCache*
+xout/
+build
+
 # Prerequisites
 *.d
 
@@ -94,3 +114,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+#settings
+CMakeSettings.json
