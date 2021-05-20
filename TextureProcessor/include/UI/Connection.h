@@ -64,6 +64,7 @@ namespace UI
 		static void MakeTemporary(Node& node, Port port, uint8_t portidx);
 		static void ConnectTemporary(Node& node, Port port, uint8_t portidx)
 		{
+			Instance().tmp->ungrabMouse();
 			Instance().tmp->PlaceConnection({ {port, portidx} }, &node);
 		}
 		static void AttachTemporary(std::unique_ptr<Connection>&& in);
@@ -72,7 +73,6 @@ namespace UI
 		{
 			return std::move(Instance().tmp);
 		}
-		static void ConnectApply();
 		static void UpdateGraph(Node* from)
 		{
 			for (auto* c : Get(from))

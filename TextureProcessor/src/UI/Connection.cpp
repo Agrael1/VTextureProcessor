@@ -390,5 +390,6 @@ void UI::ConnMapper::AttachTemporary(std::unique_ptr<Connection>&& in)
  */
 void UI::ConnMapper::ClearTemporary()
 {
+	Instance().tmp->ungrabMouse();
 	Instance().tmp.reset();
 }
