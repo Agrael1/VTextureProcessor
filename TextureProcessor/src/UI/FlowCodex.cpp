@@ -4,7 +4,6 @@
  * @brief Class for loading Node definitions from files
  */
 #include <UI/FlowCodex.h>
-#include <fmt/printf.h>
 #include <fstream>
 #include <streambuf>
 

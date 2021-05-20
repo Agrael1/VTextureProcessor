@@ -64,6 +64,6 @@ Sink::Sink(std::string_view registeredName, PortType type):registeredName(regist
 		});
 	if (!nameCharsValid || std::isdigit(registeredName.front()))
 	{
-		throw RGC_EXCEPTION(fmt::sprintf("Invalid output name: %s", registeredName));
+		throw RGC_EXCEPTION(std::format("Invalid output name: {}", registeredName));
 	}
 }

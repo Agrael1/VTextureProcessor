@@ -1,9 +1,61 @@
-﻿# CMakeList.txt: проект CMake для TextureProcessor; включите исходный код и определения,
-# укажите здесь логику для конкретного проекта.
-#
-cmake_minimum_required (VERSION 3.8)
+﻿# CMakeLists.txt
+# author: Ilya Doroshenko (xdoros01)
 
-# Добавьте источник в исполняемый файл этого проекта.
-add_executable (TextureProcessor "TextureProcessor.cpp" "TextureProcessor.h")
+cmake_minimum_required (VERSION 3.16)
 
-# TODO: Добавьте тесты и целевые объекты, если это необходимо.
+project(TextureProcessor CXX)
+
+set(CXX_STANDARD 20)
+if(MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
+else(MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -g")
+endif()
+
+set(CMAKE_AUTORCC ON)
+
+
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
+add_compile_definitions(_HAS_DEPRECATED_RESULT_OF=1)
+
+add_executable (TextureProcessor
+	"src/EntryMain.cpp"
+    "src/UI/ProjectsWindow.cpp"
+    "resources/resources.qrc"
+	"include/Logic/Sink.h"
+	"include/Logic/Source.h"
+	"src/Logic/Source.cpp"
+	"src/Logic/Sink.cpp"
+	"include/UI/UINode.h"
+	"include/utils/Exception.h"
+	"src/Logic/Node.cpp" "include/utils/Utils.h" "include/UI/UINode.h" "include/UI/App.h" "src/UI/App.cpp" "include/UI/Window.h" "src/UI/Window.cpp" "src/UI/FlowScene.cpp" "include/UI/FlowScene.h" "include/UI/FlowView.h" "src/UI/FlowView.cpp" "src/UI/UINode.cpp"   "include/UI/NodeStyle.h" "src/UI/NodeStyle.cpp" "include/UI/ContextMenu.h" "include/pch.h" "src/UI/ContextMenu.cpp" "include/UI/FlowCodex.h" "src/UI/FlowCodex.cpp"  "include/Logic/SinksT.h" "include/Logic/SourcesT.h" "include/Presenter/GLInterpret.h" "src/Presenter/GLInterpret.cpp" "include/Logic/ShaderNode.h" "src/Logic/ShaderNode.cpp" "include/UI/TextureNode.h" "src/UI/TextureNode.cpp" "include/Logic/PortType.h" "include/UI/Connection.h" "src/UI/Connection.cpp" "include/UI/Properties.h" "src/UI/Properties.cpp" "include/Logic/DynamicConstant.h"  "src/UI/Sliders.cpp" "include/UI/INode.h"  "include/UI/Updater.h"  "include/UI/ProjectsWindow.h" "include/UI/Frameless.h" "src/UI/Frameless.cpp"  "include/Logic/ProjectsData.h" "src/Logic/ProjectsData.cpp")
+
+target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt5Widgets_INCLUDE_DIRS}")
+target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_precompile_headers("${PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/pch.h")
+target_link_libraries("${PROJECT_NAME}" Qt5::Widgets)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_CURRENT_SOURCE_DIR}/nodes $<TARGET_FILE_DIR:${PROJECT_NAME}>/nodes)
+
+# This part is adapted from StackOverflow:
+# https://stackoverflow.com/questions/40564443/copying-qt-dlls-to-executable-directory-on-windows-using-cmake
+if(WIN32)
+    if($<CONFIG:Debug>)
+        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
+    else($<CONFIG:Debug>)
+        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_RELEASE)
+    endif($<CONFIG:Debug>)
+    add_custom_command(
+        TARGET "${PROJECT_NAME}" POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:Qt5::Widgets>
+        $<TARGET_FILE:Qt5::Core>
+        $<TARGET_FILE:Qt5::Gui>
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    )
+endif(WIN32)
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/nodes" DESTINATION ${INSTALL_PATH}/nodes FILES_MATCHING PATTERN "*.json")

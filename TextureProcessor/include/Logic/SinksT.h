@@ -8,7 +8,6 @@
 #pragma once
 #include <Logic/Sink.h>
 #include <memory>
-#include <fmt/printf.h>
 #include <utils/Exception.h>
 
 
@@ -33,7 +32,7 @@ public:
 		auto p = source.YieldTexture();
 		if (!p)
 		{
-			auto msg = fmt::sprintf("Binding input[%s] to output [%s.%s]. Source has no texture in it",
+			auto msg = std::format("Binding input[{}] to output [{}.{}]. Source has no texture in it",
 				GetRegisteredName(),
 				GetOutputNodeName(),
 				GetSourceName());

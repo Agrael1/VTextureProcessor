@@ -37,7 +37,7 @@ The example folder contains following:
 - `/examples/project_files` - example saved project file
 
 ## Files adapted from other projects and generated files
-- `src/TextureProcessor/include/Logic` - files adapted from the VeritasD3D library (https://github.com/Agrael1/VeritasD3D) written by Illya Doroshenko
+- `src/TextureProcessor/include/Logic` - files adapted from the VeritasD3D library (https://github.com/Agrael1/VeritasD3D) written by Ilya Doroshenko
 - `src/TextureProcessor/utils/Exception.h` - file adapted from the VeritasD3D library
 - `src/TextureProcessor/utils/Utils.h` - file adapted from the VeritasD3D library
 - `src/TextureProcessor/utils/polymorphic_value.h` - file adapted from https://github.com/jbcoe/polymorphic_value

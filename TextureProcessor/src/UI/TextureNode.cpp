@@ -153,6 +153,8 @@ QJsonObject UI::TextureNode::Serialize()
 	xpos.append(scenePos().x());
 	xpos.append(scenePos().y());
 	node.insert("Position", xpos);
+	bool t = model.Tiling();
+	if(t)node.insert("NoTiling", t);
 
 	auto name = model.GetName();
 	auto unders = name.find_last_of('_');
@@ -190,6 +192,10 @@ void UI::TextureNode::Deserialize(QJsonObject in)
 			auto sk = k.toStdString();
 			buf[sk].SetIfExists(v[k].toVariant());
 		}
+	}
+	if (in.contains("NoTiling"))
+	{
+		model.Tiling() = in["NoTiling"].toBool();
 	}
 	Update();
 }

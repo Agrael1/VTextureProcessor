@@ -195,16 +195,16 @@ void FrameLess::UpdateCursor(const QPoint& pos)
 */
 FrameLess::Edge FrameLess::LocateCursor(const QPoint& pos, const QRect& framerect)
 {
-	bool onLeft = pos.x() >= framerect.x() - border_width && pos.x() <= framerect.x() + border_width &&
+	uint8_t onLeft = pos.x() >= framerect.x() - border_width && pos.x() <= framerect.x() + border_width &&
 		pos.y() <= framerect.y() + framerect.height() - border_width && pos.y() >= framerect.y() + border_width;
 
-	bool onRight = pos.x() >= framerect.x() + framerect.width() - border_width && pos.x() <= framerect.x() + framerect.width() &&
+	uint8_t onRight = pos.x() >= framerect.x() + framerect.width() - border_width && pos.x() <= framerect.x() + framerect.width() &&
 		pos.y() >= framerect.y() + border_width && pos.y() <= framerect.y() + framerect.height() - border_width;
 
-	bool onBottom = pos.x() >= framerect.x() + border_width && pos.x() <= framerect.x() + framerect.width() - border_width &&
+	uint8_t onBottom = pos.x() >= framerect.x() + border_width && pos.x() <= framerect.x() + framerect.width() - border_width &&
 		pos.y() >= framerect.y() + framerect.height() - border_width && pos.y() <= framerect.y() + framerect.height();
 
-	bool onTop = pos.x() >= framerect.x() + border_width && pos.x() <= framerect.x() + framerect.width() - border_width &&
+	uint8_t onTop = pos.x() >= framerect.x() + border_width && pos.x() <= framerect.x() + framerect.width() - border_width &&
 		pos.y() >= framerect.y() && pos.y() <= framerect.y() + border_width;
 
 	return Edge(onLeft | onRight << 2 | onBottom << 3 | onTop << 1);

@@ -1,6 +1,3 @@
-TextureProcessor/TextureProcessor
-TextureProcessor_autogen
-TextureProcessor
 Findfmt.cmake
 qrc_resources.cpp
 *.zip

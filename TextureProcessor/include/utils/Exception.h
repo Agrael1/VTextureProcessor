@@ -7,7 +7,7 @@
  */
 #pragma once
 #include <exception>
-#include <fmt/printf.h>
+#include <format>
 
 class Exception :std::exception
 {
@@ -31,7 +31,7 @@ public:
 	}
 	std::string GetOriginString()const noexcept
 	{
-		return fmt::sprintf("[File]: %s\n[Line]: %d", file, line);
+		return std::format("[File]: {}\n[Line]: {}", file, line);
 	}
 private:
 	int line;
@@ -49,7 +49,7 @@ public:
 	const char* what() const noexcept override
 	{
 		if (whatBuffer.empty())
-			whatBuffer = fmt::sprintf("%s\n[message]:\n%s", Exception::what(), message);
+			whatBuffer = std::format("{}\n[message]:\n{}", Exception::what(), message);
 		return whatBuffer.c_str();
 	}
 	const char* GetType() const noexcept override

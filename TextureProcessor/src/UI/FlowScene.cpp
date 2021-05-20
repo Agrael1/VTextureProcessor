@@ -4,7 +4,6 @@
  * @brief Logic behind Node editor canvas
  */
 #include <UI/FlowScene.h>
-#include <fmt/printf.h>
 #include <UI/Properties.h>
 #include <UI/Connection.h>
 #include <QMessageBox>
@@ -130,7 +129,7 @@ void FlowScene::OnSelectionChanged()
  */
 UI::Node& FlowScene::CreateNode(std::string_view name)
 {
-	auto &node = InsertNode(name, fmt::sprintf("%s_%zu", name, codex.AddRef(name)));
+	auto &node = InsertNode(name, std::format("{}_{}", name, codex.AddRef(name)));
 	addItem(&node);
 
 	// Add to Output nodes if output
@@ -314,7 +313,7 @@ void FlowScene::Deserialize(QJsonObject xobj)
 		auto xref = node["Ref"].toInt();
 
 		// Create unique name from Ref and Type
-		auto* xnode = TryInsertNode(type, fmt::sprintf("%s_%zu", type, xref));
+		auto* xnode = TryInsertNode(type, std::format("{}_{}", type, xref));
 		if (!xnode) { missing = true; continue; }
 
 		codex.SetMaxRef(type, xref + 1);

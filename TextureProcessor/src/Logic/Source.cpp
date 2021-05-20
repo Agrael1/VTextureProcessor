@@ -19,7 +19,7 @@ Source::Source(std::string_view name, PortType ty) :name(name), type(ty)
 		});
 	if (!nameCharsValid || std::isdigit(name.front()))
 	{
-		throw RGC_EXCEPTION(fmt::sprintf("Invalid source name: %s", name));
+		throw RGC_EXCEPTION(std::format("Invalid source name: {}", name));
 	}
 }
 

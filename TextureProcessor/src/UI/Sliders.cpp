@@ -4,7 +4,6 @@
  * @brief Controls for properties and constant buffers
  */
 #include <UI/Sliders.h>
-#include <fmt/printf.h>
 #include <UI/INode.h>
 
 
@@ -29,7 +28,7 @@ FloatSlider::FloatSlider(float& value, float min, float max)
 	// Display with 2 floating point precision
 	slider.setRange(0, 100);
 	slider.setValue(int(value / dpi));
-	text.setText(fmt::sprintf("%.2g", value).c_str());
+	text.setText(std::format("{:.2f}", value).c_str());
 
 	// Set text size policy
 	QSizePolicy spText(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -53,7 +52,7 @@ FloatSlider::FloatSlider(float& value, float min, float max)
 void FloatSlider::ValueChanged(int xvalue)
 {
 	value = xvalue * dpi;
-	text.setText(fmt::sprintf("%.2g", value).c_str());
+	text.setText(std::format("{:.2f}", value).c_str());
 
 	// Rescale according to DPI
 	if (xvalue == 100 && value < 20)
@@ -136,7 +135,7 @@ IntSlider::IntSlider(int& value)
 	// Display with 2 floating point precision
 	slider.setRange(0, 20);
 	slider.setValue(value);
-	text.setText(fmt::sprintf("%d", value).c_str());
+	text.setText(std::format("{}", value).c_str());
 
 	// Set text size policy
 	QSizePolicy spText(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -162,7 +161,7 @@ IntSlider::IntSlider(int& value)
 void IntSlider::ValueChanged(int xvalue)
 {
 	value = xvalue;
-	text.setText(fmt::sprintf("%d", value).c_str());
+	text.setText(std::format("{}", value).c_str());
 	slider.setValue(value);
 }
 
