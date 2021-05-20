@@ -22,6 +22,7 @@ Window::Window(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
 	, Aprops("Properties")
 	, Aexport("Export All")
 	, Asave("Save")
+	, Aedit("Editor")
 	, Asaveas("Save As")
 	, Aload("Load"),
 	projPath(std::move(xprojPath))
@@ -40,7 +41,9 @@ Window::Window(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
 	connect(&Asave, &QAction::triggered, this, &Window::OnSave);
 	connect(&Asaveas, &QAction::triggered, this, &Window::OnSaveAs);
 	connect(&Aload, &QAction::triggered, this, &Window::OnLoad);
+	connect(&Aedit, &QAction::triggered, this, &Window::OnEdit);
 	file.addAction(&Aclear);
+	file.addAction(&Aedit);
 	file.addAction(&Aload);
 	file.addAction(&Asave);
 	file.addAction(&Asaveas);
@@ -57,7 +60,7 @@ Window::Window(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
 	if (!projPath.empty())
 		LoadFile();
 
-	setCentralWidget(&a->view);
+	setCentralWidget(&a->tab);
 	addDockWidget(Qt::RightDockWidgetArea, &a->props);
 }
 
@@ -100,6 +103,12 @@ void Window::OnLoad()
 	if (proj_path.empty()) return;
 	projPath = std::move(proj_path);
 	LoadFile();
+}
+
+void Window::OnEdit()
+{
+	a->tab.addTab(&a->edits.emplace_back(), "New Node");
+	a->tab.setCurrentIndex(a->edits.size());
 }
 
 /**

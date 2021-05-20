@@ -57,6 +57,7 @@ int App::Start()
 	return app.exec();
 }
 
+
 /**
  * @brief QEvent handler, mainly used for handling 'open project' events
  *

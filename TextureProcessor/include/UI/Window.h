@@ -9,15 +9,21 @@
 #include <UI/Properties.h>
 #include <fstream>
 #include <filesystem>
+#include <Editor/Editor.h>
+#include <QTabWidget>
+#include <list>
+
 
 class Window : public QMainWindow
 {
 	struct Internal
 	{
-		Internal(QWidget* x) :scene(x, props), view(scene) { }
+		Internal(QWidget* x) :scene(x, props), view(scene) { tab.addTab(&view, "Main Editor"); }
+		QTabWidget tab;
 		UI::Properties props;
 		UI::FlowScene scene;
 		FlowView view;
+		std::list<Editor> edits;
 	};
 public:
 	static constexpr std::string_view AppName = "VTexEditor";
@@ -30,6 +36,7 @@ public:
 	void OnSave();
 	void OnSaveAs();
 	void OnLoad();
+	void OnEdit();
 	void LoadFile();
 	void ShowMaximized()
 	{
@@ -53,6 +60,7 @@ private:
 	QAction Asaveas;
 	QAction Aload;
 	QAction Aprops;
+	QAction Aedit;
 	std::filesystem::path projPath;
 	std::optional<Internal> a;
 };

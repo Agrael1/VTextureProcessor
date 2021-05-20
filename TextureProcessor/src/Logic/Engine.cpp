@@ -4,7 +4,7 @@
  * @brief Handler for GLSL Shaders
  */
 
-#include <Presenter/Engine.h>
+#include <Logic/Engine.h>
 
 /**
  * @brief Creates GL context

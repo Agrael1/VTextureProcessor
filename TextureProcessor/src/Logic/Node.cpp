@@ -66,7 +66,6 @@ void Node::SetSinkLinkage(std::string_view registeredName, std::string_view to_n
 {
 	GetSink(registeredName).SetTarget(to_node, source);
 }
-
 void ver::Node::SetSinkLinkage(size_t index, std::string_view to_node, std::string_view source)
 {
 	GetSink(index).SetTarget(to_node, source);
