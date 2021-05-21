@@ -14,6 +14,7 @@
 #include <QGraphicsScene>
 #include <QOpenGLContext>
 #include <QGraphicsSceneMouseEvent>
+#include <QFileDialog>
 
 //std
 #include <memory>

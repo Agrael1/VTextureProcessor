@@ -5,39 +5,78 @@
  */
 #pragma once
 #include <QMainWindow>
-#include <UI/FlowView.h>
 #include <UI/Properties.h>
-#include <fstream>
-#include <filesystem>
-#include <Editor/Editor.h>
-#include <QTabWidget>
-#include <list>
+#include <UI/TabRelay.h>
 
 
 class Window : public QMainWindow
 {
-	struct Internal
+	class Internal
 	{
-		Internal(QWidget* x) :scene(x, props), view(scene) { tab.addTab(&view, "Main Editor"); }
-		QTabWidget tab;
+	public:
+		Internal(QMainWindow* x, std::filesystem::path&& projPath);
+	public:
+		void OnClearTriggered()
+		{
+			if (cur_scene)
+				cur_scene->Clear();
+		}
+		void OnProps()
+		{
+			props.show();
+		}
+		void OnExport()
+		{
+			cur_scene->Export();
+		}
+		void OnSave()
+		{
+			tab.OnSave();
+		}
+		void OnSaveAs()
+		{
+			tab.OnSaveAs();
+		}
+		void OnLoad();
+		void OnCreateNode();
+		void OnViewDelete()
+		{
+			if (cur_scene)
+				cur_scene->DeleteSelected();
+		}
+		void OnViewClrSel()
+		{
+			if (cur_scene)
+				cur_scene->ClearSelection();
+		}
+	private:
+		TabRelay tab;
+
 		UI::Properties props;
-		UI::FlowScene scene;
-		FlowView view;
-		std::list<Editor> edits;
+
+		QMenu file;
+		QMenu windows;
+		QAction Aclear;
+		QAction Aexport;
+		QAction Asave;
+		QAction Asaveas;
+		QAction Aload;
+		QAction Aprops;
+
+		QMenu nodes;
+		QAction Acreaten;
+		QAction Aloadn;
+
+		QMenu view;
+		QAction Adelet;
+		QAction Aclrselect;
+		SceneTab* cur_scene = nullptr;
 	};
 public:
 	static constexpr std::string_view AppName = "VTexEditor";
 public:
 	Window(int32_t width, int32_t height, std::filesystem::path&& projPath);
 public:
-	void OnClearTriggered();
-	void OnProps();
-	void OnExport();
-	void OnSave();
-	void OnSaveAs();
-	void OnLoad();
-	void OnEdit();
-	void LoadFile();
 	void ShowMaximized()
 	{
 		showMaximized();
@@ -50,17 +89,6 @@ public:
 	{
 		a.reset();
 	}
-
 private:
-	QMenu file;
-	QMenu windows;
-	QAction Aclear;
-	QAction Aexport;
-	QAction Asave;
-	QAction Asaveas;
-	QAction Aload;
-	QAction Aprops;
-	QAction Aedit;
-	std::filesystem::path projPath;
 	std::optional<Internal> a;
 };

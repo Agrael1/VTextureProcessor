@@ -4,11 +4,7 @@
  * @brief Interfaces for class management
  */
 #pragma once
-#ifdef _WIN32
-#define NOVTABLE __declspec(novtable)
-#else
-#define NOVTABLE
-#endif
+#include <Utils/Macros.h>
 
 namespace UI
 {
