@@ -24,13 +24,14 @@ class Engine
 	};
 public:
 	Engine(QSize size);
-	~Engine() { Empty().destroy(); }
+	~Engine() { Current(); Empty().destroy(); }
 public:
 	QImage Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> inputs, bool tile, std::span<std::shared_ptr<QOpenGLTexture>> outputs, ver::dc::Buffer& buffer);
 	QOpenGLFunctions& Functions() { return con.funcs; }
 	static QOpenGLTexture& Empty();
 private:
 	void BindBuffer(ver::dc::Buffer& buffer);
+	void Current();
 private:
 	Context con;
 	QOpenGLFramebufferObject frame;

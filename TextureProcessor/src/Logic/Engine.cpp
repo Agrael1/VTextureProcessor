@@ -70,6 +70,7 @@ QOpenGLTexture& Engine::Empty()
 */
 QImage Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> inputs, bool tile, std::span<std::shared_ptr<QOpenGLTexture>> outputs, ver::dc::Buffer& buffer)
 {
+	Current();
 	shaders.addShader(&ps);
 	shaders.link();
 	shaders.bind();
@@ -135,4 +136,9 @@ void Engine::BindBuffer(ver::dc::Buffer& buffer)
 			break;
 		}
 	}
+}
+
+void Engine::Current()
+{
+	con.context.makeCurrent(&con.surface);
 }

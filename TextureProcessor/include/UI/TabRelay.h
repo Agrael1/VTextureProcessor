@@ -33,6 +33,10 @@ public:
 		if (x == -1)return;
 		tabs[x]->SaveAs();
 	}
+	void OnTabClosed(int prev_i)
+	{
+		tabs.erase(tabs.begin() + prev_i);
+	}
 private:
 	std::vector<std::unique_ptr<IEditable>> tabs;
 	SceneTab*& cur_scene;

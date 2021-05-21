@@ -5,7 +5,6 @@
  */
 
 #include <UI/Window.h>
-#include <QFileDialog>
 #include <Windows/SceneTab.h>
 #include <Windows/EditorTab.h>
 
