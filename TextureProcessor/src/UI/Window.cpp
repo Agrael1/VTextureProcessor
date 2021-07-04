@@ -37,7 +37,7 @@ Window::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath)
 	, Acreaten("Create Node")
 	, Aloadn("Load Existing")
 {
-	auto& cs = tab.AddTab<SceneTab>(projPath.filename().string(), props, std::move(projPath));
+	auto& cs = tab.LoadTab<SceneTab>({ projPath }, projPath.filename().string(), props, std::move(projPath));
 	cs.Load();
 	auto& mb = *x->menuBar();
 
@@ -89,11 +89,11 @@ void Window::Internal::OnLoad()
 	).toStdString() };
 
 	if (proj_path.empty()) return;
-	auto& cs = tab.AddTab<SceneTab>(proj_path.filename().string(), props, std::move(proj_path));
-	cs.Load();
+	proj_path = proj_path.make_preferred();
+	auto& cs = tab.LoadTab<SceneTab>({ proj_path }, proj_path.filename().string(), props, std::move(proj_path));
 }
 
 void Window::Internal::OnCreateNode()
 {
-	tab.AddTab<EditorTab>("New Node");
+	tab.TempTab<EditorTab>("New Node");
 }

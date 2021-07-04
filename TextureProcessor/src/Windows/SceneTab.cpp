@@ -4,7 +4,7 @@
 namespace fs = std::filesystem;
 
 SceneTab::SceneTab(UI::Properties& props, std::filesystem::path&& xproj_path)
-	:proj_path(std::move(xproj_path)), scene(nullptr, props), view(scene)
+	:Tab(std::move(xproj_path)), scene(nullptr, props), view(scene)
 {
 	scene.setSceneRect(-32000, -32000, 64000, 64000);
 }
@@ -12,7 +12,7 @@ SceneTab::SceneTab(UI::Properties& props, std::filesystem::path&& xproj_path)
 void SceneTab::Save()
 {
 	std::fstream f;
-	f.open(proj_path, std::ios::out);
+	f.open(Path(), std::ios::out);
 	QJsonDocument doc{ scene.Serialize() };
 	f << doc.toJson().constData();
 }
@@ -47,7 +47,7 @@ void SceneTab::Load()
 {
 	using namespace std::string_literals;
 	std::fstream t;
-	t.open(proj_path, std::ios::in);
+	t.open(Path(), std::ios::in);
 
 	std::string str;
 	t.seekg(0, std::ios::end);
@@ -68,3 +68,4 @@ void SceneTab::Load()
 	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return; }
 	scene.Deserialize(json.object());
 }
+

@@ -1,8 +1,8 @@
 #pragma once
 #include <Editor/Editor.h>
-#include <UI/IEditable.h>
+#include <Windows/Tab.h>
 
-class EditorTab : public IEditable
+class EditorTab : public Tab
 {
 public:
 	EditorTab() {};

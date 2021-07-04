@@ -27,7 +27,8 @@ class Window : public QMainWindow
 		}
 		void OnExport()
 		{
-			cur_scene->Export();
+			if (cur_scene)
+				cur_scene->Export();
 		}
 		void OnSave()
 		{

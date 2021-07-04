@@ -1,9 +1,9 @@
 #pragma once
-#include <UI/IEditable.h>
+#include <Windows/Tab.h>
 #include <UI/FlowView.h>
 
 
-class SceneTab : public IEditable
+class SceneTab : public Tab
 {
 public:
 	SceneTab(UI::Properties& props, std::filesystem::path&& xproj_path);
@@ -30,7 +30,6 @@ public:
 		scene.ExportAll();
 	}
 private:
-	std::filesystem::path proj_path;
 	UI::FlowScene scene;
 	FlowView view;
 };
