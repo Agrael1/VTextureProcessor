@@ -40,7 +40,6 @@ Window::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath)
 	, Aclrselect("Clear Selection")
 {
 	auto& cs = tab.LoadTab<SceneTab>({ projPath }, projPath.filename().string(), props, std::move(projPath));
-	cs.Load();
 	auto& mb = *x->menuBar();
 
 	mb.addMenu(&file);
