@@ -76,10 +76,8 @@ void Properties::AppendProperty(PropertyElement&& prop)
 */
 void Properties::Set()
 {
-    auto s = size();
     for (auto& w : props)
         dum.lay.addWidget(&w);
-    resize(s);
 }
 
 /**

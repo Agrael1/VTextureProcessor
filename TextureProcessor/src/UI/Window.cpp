@@ -36,6 +36,8 @@ Window::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath)
 	, Aload("Open Project")
 	, Acreaten("Create Node")
 	, Aloadn("Load Existing")
+	, Adelet("Delete Selected")
+	, Aclrselect("Clear Selection")
 {
 	auto& cs = tab.LoadTab<SceneTab>({ projPath }, projPath.filename().string(), props, std::move(projPath));
 	cs.Load();
@@ -69,6 +71,8 @@ Window::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath)
 	nodes.addAction(&Acreaten);
 	nodes.addAction(&Aloadn);
 
+	view.addAction(&Adelet);
+	view.addAction(&Aclrselect);
 
 	Asave.setShortcut(QKeySequence{ QKeySequence::StandardKey::Save });
 	Asaveas.setShortcut(QKeySequence{ x->tr("Ctrl+Shift+S") });
