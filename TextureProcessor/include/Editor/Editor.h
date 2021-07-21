@@ -44,9 +44,13 @@ struct FontSizeController : public QComboBox
 
 class Editor : public QWidget
 {
+	static constexpr size_t font_defsz = 12ull;
+	static constexpr size_t font_defc = 146;
 public:
 	Editor();
-
+private:
+	void ParseFontSize();
+	void SelectFontSize(const QString&);
 private:
 	QVBoxLayout vl;
 	QTextEdit texter;

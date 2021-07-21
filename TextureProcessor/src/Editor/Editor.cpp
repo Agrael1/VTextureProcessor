@@ -1,6 +1,7 @@
 #include <Editor/Editor.h>
+#include <format>
 
-const QRegularExpression sz_re{ "^\\d{2,3} ?%?$" };
+const QRegularExpression sz_re{ "^\\d{0,3} ?%?$" };
 
 Editor::Editor()
 	:hl(code.document()), value_range(sz_re)
@@ -8,16 +9,48 @@ Editor::Editor()
 	QFont font;
 	font.setFamily("Consolas");
 	font.setFixedPitch(true);
-	font.setPointSize(30);
+	font.setPointSize(font_defsz * font_defc / 100);
 	code.setFont(font);
 
 	font_szbox.setEditable(true);
+	font_szbox.setInsertPolicy(QComboBox::NoInsert);
 	font_szbox.setValidator(&value_range);
 	font_szbox.addItems({ "20 %", "50 %","70 %", "100 %", "150 %", "200 %", "400 %" });
+	connect(font_szbox.lineEdit(), &QLineEdit::editingFinished, this, &Editor::ParseFontSize);
+	connect(&font_szbox, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &Editor::SelectFontSize);
+	font_szbox.setEditText(QString{ std::format("{} %", font_defc).data() });
 
 	vl.addWidget(&code);
 	vl.addWidget(&font_szbox);
 	setLayout(&vl);
+}
+
+void Editor::ParseFontSize()
+{
+	auto text = font_szbox.currentText();
+	const QRegularExpression sz{ "^\\d{0,3}" };
+	auto x = sz.match(text);
+	int i = x.captured().toInt();
+
+	QFont font = code.font();
+	font.setPointSize(font_defsz * i / 100);
+	code.setFont(font);
+
+	font_szbox.setEditText(QString{ std::format("{} %", i).data() });
+	font_szbox.clearFocus();
+}
+void Editor::SelectFontSize(const QString& text)
+{
+	const QRegularExpression sz{ "^\\d{0,3}" };
+	auto x = sz.match(text);
+	int i = x.captured().toInt();
+
+	QFont font = code.font();
+	font.setPointSize(font_defsz * i / 100);
+	code.setFont(font);
+
+	font_szbox.setEditText(QString{ std::format("{} %", i).data() });
+	font_szbox.clearFocus();
 }
 
 CodeEditor::CodeEditor(QWidget* parent) : QPlainTextEdit(parent), line_number_area(this)
