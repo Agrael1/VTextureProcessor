@@ -1,50 +1,46 @@
 #pragma once
 #include <Editor/Highlight.h>
-#include <QTextEdit>
 #include <QPlainTextEdit>
+#include <QComboBox>
+
 
 class CodeEditor : public QPlainTextEdit
 {
+	class LineNumberArea : public QWidget
+	{
+	public:
+		LineNumberArea(CodeEditor* editor) : QWidget(editor), code_editor(editor)
+		{}
+		QSize sizeHint() const override;
+	protected:
+		void paintEvent(QPaintEvent* event) override;
+	private:
+		CodeEditor* code_editor;
+	};
 public:
-    CodeEditor(QWidget* parent = nullptr);
-
-    void lineNumberAreaPaintEvent(QPaintEvent* event);
-    int lineNumberAreaWidth();
-
+	CodeEditor(QWidget* parent = nullptr);
+public:
+	void lineNumberAreaPaintEvent(QPaintEvent* event);
+	int lineNumberAreaWidth();
 protected:
-    void resizeEvent(QResizeEvent* event) override;
+	void resizeEvent(QResizeEvent* event) override;
+	void wheelEvent(QWheelEvent* e) override;
+private:
+	void updateLineNumberAreaWidth(int newBlockCount);
+	void highlightLine();
+	void updateLineNumberArea(const QRect& rect, int dy);
 
 private:
-    void updateLineNumberAreaWidth(int newBlockCount);
-    void highlightCurrentLine();
-    void updateLineNumberArea(const QRect& rect, int dy);
-
-private:
-    QWidget* lineNumberArea;
+	LineNumberArea line_number_area;
 };
 
-class LineNumberArea : public QWidget
+
+
+struct FontSizeController : public QComboBox
 {
-public:
-    LineNumberArea(CodeEditor* editor) : QWidget(editor), codeEditor(editor)
-    {}
-
-    QSize sizeHint() const override
-    {
-        return QSize(codeEditor->lineNumberAreaWidth(), 0);
-    }
-
-protected:
-    void paintEvent(QPaintEvent* event) override
-    {
-        codeEditor->lineNumberAreaPaintEvent(event);
-    }
-
-private:
-    CodeEditor* codeEditor;
+	uint16_t font_percent = 100;
+	QIntValidator value_range;
 };
-
-
 
 class Editor : public QWidget
 {
@@ -54,6 +50,9 @@ public:
 private:
 	QVBoxLayout vl;
 	QTextEdit texter;
-    CodeEditor code;
+	CodeEditor code;
 	Highlighter hl;
+	uint16_t font_percent = 100;
+	QComboBox font_szbox;
+	QRegularExpressionValidator value_range;
 };
