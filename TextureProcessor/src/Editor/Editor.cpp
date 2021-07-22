@@ -25,6 +25,24 @@ Editor::Editor()
 	setLayout(&vl);
 }
 
+void Editor::wheelEvent(QWheelEvent* event)
+{
+	auto text = font_szbox.currentText();
+	const QRegularExpression sz{ "^\\d{0,3}" };
+	auto x = sz.match(text);
+	int i = x.captured().toInt();
+	int n = event->delta() > 0 ? int(i * 1.1f) : int(i / 1.1f);
+	n = n > 400 ? 400 : n;
+	n = n < 20 ? 20 : n;
+
+	QFont font = code.font();
+	font.setPointSize(font_defsz * n / 100);
+	code.setFont(font);
+
+	font_szbox.setEditText(QString{ std::format("{} %", n).data() });
+	font_szbox.clearFocus();
+}
+
 void Editor::ParseFontSize()
 {
 	auto text = font_szbox.currentText();
