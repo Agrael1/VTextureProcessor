@@ -5,7 +5,8 @@
 class EditorTab : public Tab
 {
 public:
-	EditorTab() {};
+	EditorTab() {}
+	using Tab::Tab;
 public:
 	QWidget* Widget() noexcept override
 	{
@@ -14,7 +15,7 @@ public:
 	void Save() override {};
 	void SaveAs() override {};
 	void Clear() override {};
-	void Load() override {};
+	void Load() override;
 private:
 	Editor edit;
 };

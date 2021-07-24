@@ -40,6 +40,7 @@ class Window : public QMainWindow
 		}
 		void OnLoad();
 		void OnCreateNode();
+		void OnLoadNode();
 		void OnViewDelete()
 		{
 			if (cur_scene)

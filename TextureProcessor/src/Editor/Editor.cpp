@@ -173,3 +173,7 @@ void CodeEditor::LineNumberArea::paintEvent(QPaintEvent* event)
 {
 	code_editor->lineNumberAreaPaintEvent(event);
 }
+void Editor::LoadText(const QString& in)
+{
+	code.setPlainText(in);
+}

@@ -48,6 +48,8 @@ class Editor : public QWidget
 	static constexpr size_t font_defc = 146;
 public:
 	Editor();
+public:
+	void LoadText(const QString& in);
 protected:
 	void wheelEvent(QWheelEvent* event);
 private:

@@ -55,6 +55,7 @@ Window::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath)
 	x->connect(&Asaveas, &QAction::triggered, [this]() {OnSaveAs(); });
 	x->connect(&Aload, &QAction::triggered, [this]() {OnLoad(); });
 	x->connect(&Acreaten, &QAction::triggered, [this]() {OnCreateNode(); });
+	x->connect(&Aloadn, &QAction::triggered, [this]() {OnLoadNode(); });
 
 	x->connect(&Adelet, &QAction::triggered, [this]() {OnViewDelete(); });
 	x->connect(&Aclrselect, &QAction::triggered, [this]() {OnViewClrSel(); });
@@ -99,4 +100,18 @@ void Window::Internal::OnLoad()
 void Window::Internal::OnCreateNode()
 {
 	tab.TempTab<EditorTab>("New Node");
+}
+
+void Window::Internal::OnLoadNode()
+{
+	fs::path node_path{ QFileDialog::getOpenFileName(
+		nullptr,
+		"Open existing node",
+		"nodes",
+		"(*.json);;"
+	).toStdString() };
+
+	if (node_path.empty()) return;
+	node_path = node_path.make_preferred();
+	auto& cs = tab.LoadTab<EditorTab>({ node_path }, node_path.filename().string(), std::move(node_path));
 }
