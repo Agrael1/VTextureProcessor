@@ -2,31 +2,47 @@
 #include <format>
 
 const QRegularExpression sz_re{ "^\\d{0,3} ?%?$" };
+constexpr std::string_view szbox_ss{
+R"(QComboBox {
+	border-radius: 0px;
+	max-width: 6em;
+})"
+};
 
 Editor::Editor()
-	:hl(code.document()), value_range(sz_re)
+	:hl(code.document()), value_range(sz_re), scroll(Qt::Horizontal)
 {
 	QFont font;
 	font.setFamily("Consolas");
 	font.setFixedPitch(true);
 	font.setPointSize(font_defsz * font_defc / 100);
 	code.setFont(font);
+	code.setHorizontalScrollBar(&scroll);
+	code.setCenterOnScroll(true);
 
 	font_szbox.setEditable(true);
 	font_szbox.setInsertPolicy(QComboBox::NoInsert);
 	font_szbox.setValidator(&value_range);
+	font_szbox.setStyleSheet(szbox_ss.data());
 	font_szbox.addItems({ "20 %", "50 %","70 %", "100 %", "150 %", "200 %", "400 %" });
 	connect(font_szbox.lineEdit(), &QLineEdit::editingFinished, this, &Editor::ParseFontSize);
 	connect(&font_szbox, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &Editor::SelectFontSize);
 	font_szbox.setEditText(QString{ std::format("{} %", font_defc).data() });
 
+	sbar.addWidget(&font_szbox);
+	sbar.addWidget(&scroll);
+
 	vl.addWidget(&code);
-	vl.addWidget(&font_szbox);
+	vl.addLayout(&sbar);
+	vl.setSpacing(0);
 	setLayout(&vl);
 }
 
 void Editor::wheelEvent(QWheelEvent* event)
 {
+	if (!(qApp->keyboardModifiers() & Qt::ControlModifier))
+		return;
+
 	auto text = font_szbox.currentText();
 	const QRegularExpression sz{ "^\\d{0,3}" };
 	auto x = sz.match(text);
@@ -108,13 +124,6 @@ void CodeEditor::resizeEvent(QResizeEvent* e)
 	QPlainTextEdit::resizeEvent(e);
 	QRect cr = contentsRect();
 	line_number_area.setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
-}
-void CodeEditor::wheelEvent(QWheelEvent* e)
-{
-	if (!(qApp->keyboardModifiers() & Qt::ControlModifier))
-		return QPlainTextEdit::wheelEvent(e);
-
-
 }
 void CodeEditor::highlightLine()
 {

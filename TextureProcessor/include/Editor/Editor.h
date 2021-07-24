@@ -2,6 +2,7 @@
 #include <Editor/Highlight.h>
 #include <QPlainTextEdit>
 #include <QComboBox>
+#include <QScrollBar>
 
 
 class CodeEditor : public QPlainTextEdit
@@ -24,7 +25,6 @@ public:
 	int lineNumberAreaWidth();
 protected:
 	void resizeEvent(QResizeEvent* event) override;
-	void wheelEvent(QWheelEvent* e) override;
 private:
 	void updateLineNumberAreaWidth(int newBlockCount);
 	void highlightLine();
@@ -58,7 +58,10 @@ private:
 	QTextEdit texter;
 	CodeEditor code;
 	Highlighter hl;
+
+	QHBoxLayout sbar;
 	uint16_t font_percent = 100;
 	QComboBox font_szbox;
 	QRegularExpressionValidator value_range;
+	QScrollBar scroll;
 };
