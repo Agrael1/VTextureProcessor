@@ -45,7 +45,7 @@ App::App(int &xargc, char** xargv)
 
     // Set window size
     window.emplace<ProjectsWindow>(1280, 720, *this);
-    std::get<0>(window).show();
+    std::get<ProjectsWindow>(window).show();
 }
 
 /**
@@ -70,7 +70,7 @@ bool App::event(QEvent* e)
     if (e->type() == QEvent::User+1) {
         ProjectEvent& proj = static_cast<ProjectEvent&>(*e);
         window.emplace<MainWindow>(1280, 720, std::move(proj.projPath));
-        std::get<1>(window).showMaximized();
+        std::get<MainWindow>(window).showMaximized();
     }
     return true;
 }
