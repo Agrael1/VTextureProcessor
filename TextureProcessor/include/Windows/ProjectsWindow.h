@@ -83,9 +83,9 @@ private:
 };
 }
 
-
-
-class ProjectsWindow : public QMainWindow
+namespace UI
+{
+class MainPage : public QWidget
 {
 	class Project : public QWidget
 	{
@@ -123,9 +123,8 @@ class ProjectsWindow : public QMainWindow
 		QLabel desc;
 	};
 public:
-	ProjectsWindow(int32_t width, int32_t height, QObject& app);
+	MainPage(QObject& app);
 protected:
-	void mouseMoveEvent(QMouseEvent* e)override;
 	void OnCreateClicked(bool checked);
 	void OnOpenClicked(bool checked);
 	void OpenApp(std::filesystem::path&& projPath);
@@ -136,8 +135,6 @@ private:
 
 private:
 	QObject& app;
-	UI::Internal::ProjectsCW window;
-	UI::FrameLess f;
 
 	QVBoxLayout lay;
 	QHBoxLayout hlay;
@@ -155,3 +152,16 @@ private:
 	ProjectsData pdata;
 };
 
+}
+
+class ProjectsWindow : public QMainWindow
+{
+public:
+	ProjectsWindow(int32_t width, int32_t height, QObject& app);
+protected:
+	void mouseMoveEvent(QMouseEvent* e)override;
+private:
+	UI::Internal::ProjectsCW window;
+	UI::FrameLess f;
+	UI::MainPage pw;
+};

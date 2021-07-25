@@ -21,3 +21,9 @@
 #include <span>
 #include <string>
 #include <filesystem>
+
+//renewal
+#include <QFileDialog>
+#include <QApplication>
+#include <QMouseEvent>
+#include <fstream>

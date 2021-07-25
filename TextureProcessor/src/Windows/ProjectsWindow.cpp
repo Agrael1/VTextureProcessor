@@ -5,12 +5,13 @@
  */
 
 #include <Windows/ProjectsWindow.h>
+#include <UI/ProjectEvent.h>
+
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QApplication>
 #include <QMouseEvent>
 
-#include <UI/ProjectEvent.h>
 #include <fstream>
 
 using namespace UI;
@@ -20,7 +21,7 @@ namespace fs = std::filesystem;
  * @brief Creates a path subwidget for tree view
  * @param xpath path to suggest
 */
-ProjectsWindow::Project::Project(const std::filesystem::path& xpath)
+MainPage::Project::Project(const std::filesystem::path& xpath)
 	:filename(xpath.filename().string().c_str())
 	, path(xpath.parent_path().string().c_str())
 {
@@ -42,7 +43,7 @@ ProjectsWindow::Project::Project(const std::filesystem::path& xpath)
  * @param descr description
  * @param xicon path to icon
 */
-ProjectsWindow::XButton::XButton(std::string_view head, std::string_view descr, std::string_view xicon)
+MainPage::XButton::XButton(std::string_view head, std::string_view descr, std::string_view xicon)
 	:header(head.data()), desc(descr.data())
 {
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
@@ -73,20 +74,15 @@ ProjectsWindow::XButton::XButton(std::string_view head, std::string_view descr, 
  * @param height window height
  * @param app tied applicaion to call back to
 */
-ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app)
-	:QMainWindow(nullptr, Qt::FramelessWindowHint),
-	window(this), f(this)
-	, name("Veritas Texture Flow")
+MainPage::MainPage(QObject& app)
+	:name("Veritas Texture Flow")
 	, recent("Open Recent")
 	, begin("Start now")
 	, create("Create New Project", "Create a new project file with specified\nresolution of the output texture", ":/icons8-add-file.png")
 	, open("Open Existing Project", "Open existing project from any location", ":/icons8-opened-folder.png"),
 	app(app)
 {
-	// Header
-	resize(width, height);
-	setCentralWidget(&window);
-	window.Layout().addLayout(&lay);
+	setLayout(&lay);
 	lay.setAlignment(Qt::AlignTop | Qt::AlignLeft);
 	buttonLay.setAlignment(Qt::AlignTop | Qt::AlignLeft);
 	name.setSizePolicy({ QSizePolicy::Expanding ,QSizePolicy::Preferred });
@@ -109,7 +105,7 @@ ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app)
 	// Show all recent projects from project cache
 	FillTree();
 	selection.setHeaderHidden(true);
-	search.connect(&search, &QLineEdit::textEdited, this, &ProjectsWindow::OnFilterChanged);
+	search.connect(&search, &QLineEdit::textEdited, this, &MainPage::OnFilterChanged);
 	innerLay.addWidget(&selection);
 
 	begin.setFont({ "Arial", 16 });
@@ -118,33 +114,18 @@ ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app)
 	buttonLay.addWidget(&create);
 	buttonLay.addWidget(&open);
 
-	connect(&create, &QToolButton::clicked, this, &ProjectsWindow::OnCreateClicked);
-	connect(&open, &QToolButton::clicked, this, &ProjectsWindow::OnOpenClicked);
-	connect(&selection, &QTreeWidget::itemDoubleClicked, this, &ProjectsWindow::OnItemDoubleClicked);
+	connect(&create, &QToolButton::clicked, this, &MainPage::OnCreateClicked);
+	connect(&open, &QToolButton::clicked, this, &MainPage::OnOpenClicked);
+	connect(&selection, &QTreeWidget::itemDoubleClicked, this, &MainPage::OnItemDoubleClicked);
 
 	lay.addLayout(&hlay);
-}
-
-/**
- * @brief reaction on mouse movement
- * @param e incoming event
-*/
-void ProjectsWindow::mouseMoveEvent(QMouseEvent* e)
-{
-	if (isMaximized())
-	{
-		window.Restore();
-		move(e->globalPos() / 2);
-		return;
-	}
-	f.MouseMove(e);
 }
 
 /**
  * @brief On create new project button clicked callback
  * @param checked [unused]
 */
-void ProjectsWindow::OnCreateClicked(bool checked)
+void MainPage::OnCreateClicked(bool checked)
 {
 	fs::path proj_path { QFileDialog::getSaveFileName(
 		nullptr,
@@ -173,7 +154,7 @@ void ProjectsWindow::OnCreateClicked(bool checked)
  * @brief On open existing project button clicked callback
  * @param checked [unused]
 */
-void ProjectsWindow::OnOpenClicked(bool checked)
+void MainPage::OnOpenClicked(bool checked)
 {
 	fs::path proj_path{ QFileDialog::getOpenFileName(
 		nullptr,
@@ -190,14 +171,14 @@ void ProjectsWindow::OnOpenClicked(bool checked)
 	OpenApp(std::move(proj_path));
 }
 
-void ProjectsWindow::OpenApp(std::filesystem::path&& projPath) {
+void MainPage::OpenApp(std::filesystem::path&& projPath) {
 	QApplication::postEvent(&app, new ProjectEvent(std::move(projPath)));
 }
 
 /**
  * @brief Fills tree widget with subwidgets
 */
-void ProjectsWindow::FillTree()
+void MainPage::FillTree()
 {
 	selection.clear();
 	for (auto& x : pdata.GetRecent())
@@ -213,7 +194,7 @@ void ProjectsWindow::FillTree()
  * @brief Filtering search text box event callback
  * @param text text written (new filter)
 */
-void ProjectsWindow::OnFilterChanged(const QString& text)
+void MainPage::OnFilterChanged(const QString& text)
 {
 	auto cnt = selection.topLevelItemCount();
 
@@ -233,7 +214,7 @@ void ProjectsWindow::OnFilterChanged(const QString& text)
  * @param item clicked item
  * @param column [unused]
 */
-void ProjectsWindow::OnItemDoubleClicked(QTreeWidgetItem* item, int column)
+void MainPage::OnItemDoubleClicked(QTreeWidgetItem* item, int column)
 {
 	std::filesystem::path file{ item->data(1, Qt::UserRole).toString().toStdString() };
 
@@ -276,4 +257,24 @@ UI::Internal::ProjectsCW::ProjectsCW(QWidget* parent)
 	connect(&maximize, &QToolButton::clicked, this, &ProjectsCW::OnMaximizedClicked);
 	lay.addLayout(&buttons);
 	setLayout(&lay);
+}
+
+ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app)
+	:QMainWindow(nullptr, Qt::FramelessWindowHint),
+	window(this), f(this), pw(app)
+{
+	resize(width, height);
+	setCentralWidget(&window);
+	window.Layout().addWidget(&pw);
+}
+
+void ProjectsWindow::mouseMoveEvent(QMouseEvent* e)
+{
+	if (isMaximized())
+	{
+		window.Restore();
+		move(e->globalPos() / 2);
+		return;
+	}
+	f.MouseMove(e);
 }
