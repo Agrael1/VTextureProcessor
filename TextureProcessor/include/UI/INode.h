@@ -5,6 +5,7 @@
  */
 #pragma once
 #include <Utils/Macros.h>
+#include <QJsonObject>
 
 namespace UI
 {

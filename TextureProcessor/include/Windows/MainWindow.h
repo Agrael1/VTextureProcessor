@@ -5,31 +5,25 @@
  */
 #pragma once
 #include <QMainWindow>
+#include <QMenu>
+
 #include <UI/Properties.h>
 #include <UI/TabRelay.h>
 
 
-class Window : public QMainWindow
+class MainWindow : public QMainWindow
 {
 	class Internal
 	{
 	public:
 		Internal(QMainWindow* x, std::filesystem::path&& projPath);
 	public:
-		void OnClearTriggered()
-		{
-			if (cur_scene)
-				cur_scene->Clear();
-		}
+		void OnClearTriggered();
 		void OnProps()
 		{
 			props.show();
 		}
-		void OnExport()
-		{
-			if (cur_scene)
-				cur_scene->Export();
-		}
+		void OnExport();
 		void OnSave()
 		{
 			tab.OnSave();
@@ -41,20 +35,11 @@ class Window : public QMainWindow
 		void OnLoad();
 		void OnCreateNode();
 		void OnLoadNode();
-		void OnViewDelete()
-		{
-			if (cur_scene)
-				cur_scene->DeleteSelected();
-		}
-		void OnViewClrSel()
-		{
-			if (cur_scene)
-				cur_scene->ClearSelection();
-		}
+		void OnViewDelete();
+		void OnViewClrSel();
 	private:
-		TabRelay tab;
-
-		UI::Properties props;
+		UI::Windows::TabRelay tab;
+		UI::Windows::Properties props;
 
 		QMenu file;
 		QMenu windows;
@@ -72,21 +57,13 @@ class Window : public QMainWindow
 		QMenu view;
 		QAction Adelet;
 		QAction Aclrselect;
-		SceneTab* cur_scene = nullptr;
+		UI::Windows::SceneTab* cur_scene = nullptr;
 	};
 public:
 	static constexpr std::string_view AppName = "VTexEditor";
 public:
-	Window(int32_t width, int32_t height, std::filesystem::path&& projPath);
+	MainWindow(int32_t width, int32_t height, std::filesystem::path&& projPath);
 public:
-	void ShowMaximized()
-	{
-		showMaximized();
-	}
-	void Show()
-	{
-		showNormal();
-	}
 	void closeEvent(QCloseEvent* event)override
 	{
 		a.reset();

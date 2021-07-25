@@ -7,6 +7,8 @@
 #include <UI/Properties.h>
 #include <UI/Connection.h>
 #include <QMessageBox>
+#include <QPainter>
+#include <QJsonArray>
 
 /**
  * @brief Generates file name with incremented count if name already exists
@@ -38,7 +40,7 @@ using namespace UI;
  * @param parent
  * @param props
  */
-FlowScene::FlowScene(QObject* parent, Properties& props)
+FlowScene::FlowScene(QObject* parent, Windows::Properties& props)
 	:QGraphicsScene(parent)
 	, Cbackground("#393939")
 	, Clight("#2F2F2F")

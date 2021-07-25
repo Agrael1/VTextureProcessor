@@ -1,35 +1,38 @@
 #pragma once
 #include <Windows/Tab.h>
 #include <UI/FlowView.h>
+#include <UI/FlowScene.h>
 
-
-class SceneTab : public Tab
+namespace UI::Windows
 {
-public:
-	SceneTab(UI::Properties& props, std::filesystem::path&& xproj_path);
-public:
-	QWidget* Widget()noexcept override
+	class SceneTab : public Tab
 	{
-		return &view;
-	}
-	void Save()override;
-	void SaveAs()override;
-	void Clear()override;
-	void Load()override;
+	public:
+		SceneTab(Properties& props, std::filesystem::path&& xproj_path);
+	public:
+		QWidget* Widget()noexcept override
+		{
+			return &view;
+		}
+		void Save()override;
+		void SaveAs()override;
+		void Clear()override;
+		void Load()override;
 
-	void DeleteSelected()
-	{
-		scene.DeleteSelected();
-	}
-	void ClearSelection()
-	{
-		scene.clearSelection();
-	}
-	void Export()
-	{
-		scene.ExportAll();
-	}
-private:
-	UI::FlowScene scene;
-	FlowView view;
-};
+		void DeleteSelected()
+		{
+			scene.DeleteSelected();
+		}
+		void ClearSelection()
+		{
+			scene.clearSelection();
+		}
+		void Export()
+		{
+			scene.ExportAll();
+		}
+	private:
+		FlowScene scene;
+		FlowView view;
+	};
+}

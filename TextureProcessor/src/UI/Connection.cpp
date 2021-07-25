@@ -5,6 +5,9 @@
  */
 #include <UI/Connection.h>
 #include <UI/FlowScene.h>
+#include <QPainter>
+#include <QJsonArray>
+#include <QGraphicsSceneMouseEvent>
 
 using namespace UI;
 

@@ -9,9 +9,13 @@
 #include <UI/Properties.h>
 #include <UI/Sliders.h>
 #include <QLabel>
+#include <QPainter>
 #include <QFileDialog>
 #include <QCheckBox>
+#include <QJsonArray>
 #include <charconv>
+
+using namespace UI::Windows;
 
 /**
  * @brief Construct a new UI::TextureNode::TextureNode object
@@ -73,7 +77,7 @@ void UI::TextureNode::Update()
  * @brief Creates properties for dock window
  * @param props reference to properties window (visitor)
 */
-void UI::TextureNode::UpdateProperties(Properties& props)
+void UI::TextureNode::UpdateProperties(Windows::Properties& props)
 {
 	PropertyElement prop{ *this, model.GetName() };
 	prop.AppendWidget<CheckBox>(model.Tiling(), "Disable Tiling");

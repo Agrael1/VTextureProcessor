@@ -5,6 +5,16 @@
  */
 #pragma once
 #include <Logic/DynamicConstant.h>
+#include <QOpenGLFramebufferObject>
+#include <QOpenGLContext>
+#include <QOpenGLPaintDevice>
+#include <QOffscreenSurface>
+#include <QOpenGLFunctions>
+#include <QOpenGLShader>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLBuffer>
+
+class QOpenGLTexture;
 
 class Engine
 {
@@ -24,7 +34,7 @@ class Engine
 	};
 public:
 	Engine(QSize size);
-	~Engine() { Current(); Empty().destroy(); }
+	~Engine();
 public:
 	QImage Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> inputs, bool tile, std::span<std::shared_ptr<QOpenGLTexture>> outputs, ver::dc::Buffer& buffer);
 	QOpenGLFunctions& Functions() { return con.funcs; }

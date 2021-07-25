@@ -2,6 +2,7 @@
 #include <Editor/Highlight.h>
 #include <QPlainTextEdit>
 #include <QComboBox>
+#include <QBoxLayout>
 #include <QScrollBar>
 
 

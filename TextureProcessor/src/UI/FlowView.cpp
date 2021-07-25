@@ -4,6 +4,11 @@
  * @brief Flow view for handling the Node editor canvas view
  */
 #include <UI/FlowView.h>
+#include <UI/FlowScene.h>
+#include <QMouseEvent>
+#include <QGraphicsSceneContextMenuEvent>
+
+using namespace UI;
 
 /**
  * @brief Construct a new Flow View:: Flow View object
@@ -11,8 +16,7 @@
  * @param scene Scene to create View of
  */
 FlowView::FlowView(UI::FlowScene& scene)
-	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr), view_menu("View"),
-	delet("Delete selected"), clrselect("Clear Selection")
+	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr)
 {
 	setRenderHints(QPainter::Antialiasing |
 		QPainter::TextAntialiasing |
@@ -34,16 +38,6 @@ FlowView::FlowView(UI::FlowScene& scene)
 	}
 	menu.Finish();
 	menu.SetItemClickCallback([this](QTreeWidgetItem* item, int) {OnItemSelected(item, 0); });
-
-	// Register shortcuts for object deletion (DEL) and selection clearing (ESC)
-	clrselect.setShortcut(Qt::Key::Key_Escape);
-	delet.setShortcut(Qt::Key::Key_Delete);
-
-	connect(&clrselect, &QAction::triggered, &scene, &UI::FlowScene::clearSelection);
-	connect(&delet, &QAction::triggered, &scene, &UI::FlowScene::DeleteSelected);
-
-	view_menu.addAction(&delet);
-	view_menu.addAction(&clrselect);
 }
 
 /**

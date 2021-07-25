@@ -1,9 +1,13 @@
 #include <windows\SceneTab.h>
 #include <fstream>
+#include <QJsonDocument>
+#include <QFileDialog>
 
+
+using namespace UI::Windows;
 namespace fs = std::filesystem;
 
-SceneTab::SceneTab(UI::Properties& props, std::filesystem::path&& xproj_path)
+SceneTab::SceneTab(Properties& props, std::filesystem::path&& xproj_path)
 	:Tab(std::move(xproj_path)), scene(nullptr, props), view(scene)
 {
 	scene.setSceneRect(-32000, -32000, 64000, 64000);

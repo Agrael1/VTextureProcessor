@@ -1,6 +1,8 @@
 #pragma once
 #include <utils/Macros.h>
 
+class QWidget;
+
 struct NOVTABLE IEditable
 {
 	virtual ~IEditable() = default;

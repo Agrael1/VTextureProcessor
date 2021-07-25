@@ -5,6 +5,7 @@
  */
 
 #include <UI/NodeStyle.h>
+#include <QJsonArray>
 #include <array>
 
 using namespace UI;

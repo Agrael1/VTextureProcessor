@@ -6,6 +6,7 @@
 #pragma once
 #include <Logic/Node.h>
 #include <Logic/DynamicConstant.h>
+#include <QOpenGLShader>
 
 class Engine;
 

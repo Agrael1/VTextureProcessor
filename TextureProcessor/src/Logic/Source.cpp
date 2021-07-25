@@ -7,6 +7,7 @@
  */
 #include <Logic/Source.h>
 #include <utils/Exception.h>
+#include <algorithm>
 
 Source::Source(std::string_view name, PortType ty) :name(name), type(ty)
 {

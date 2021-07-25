@@ -5,6 +5,7 @@
  */
 #include <UI/Sliders.h>
 #include <UI/INode.h>
+#include <QVector2D>
 
 
 using namespace UI;

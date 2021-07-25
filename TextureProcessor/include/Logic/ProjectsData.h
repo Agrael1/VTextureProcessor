@@ -4,6 +4,7 @@
  * @brief Logic for projects window and persistant data writer for cache.vtxc
  */
 #pragma once
+#include <span>
 #include <array>
 #include <filesystem>
 

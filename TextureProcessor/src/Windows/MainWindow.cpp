@@ -4,11 +4,14 @@
  * @brief Handles menubar actions
  */
 
-#include <UI/Window.h>
+#include <Windows/MainWindow.h>
 #include <Windows/SceneTab.h>
 #include <Windows/EditorTab.h>
+#include <QFileDialog>
+#include <QMenuBar>
 
 namespace fs = std::filesystem;
+using namespace UI::Windows;
 
 /**
  * @brief Creates a main application window
@@ -16,13 +19,13 @@ namespace fs = std::filesystem;
  * @param height of a window
  * @param xprojPath file project that is being worked upon
 */
-Window::Window(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
+MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
 {
 	a.emplace(this, std::move(xprojPath));
 	resize(width, height);
 }
 
-Window::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath)
+MainWindow::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath)
 	: tab(x, cur_scene)
 	, file("File")
 	, windows("Windows")
@@ -83,7 +86,19 @@ Window::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath)
 	x->resizeDocks({ &props }, { 250 }, Qt::Horizontal);
 }
 
-void Window::Internal::OnLoad()
+void MainWindow::Internal::OnClearTriggered()
+{
+	if (cur_scene)
+		cur_scene->Clear();
+}
+
+void MainWindow::Internal::OnExport()
+{
+	if (cur_scene)
+		cur_scene->Export();
+}
+
+void MainWindow::Internal::OnLoad()
 {
 	fs::path proj_path{ QFileDialog::getOpenFileName(
 		nullptr,
@@ -97,12 +112,12 @@ void Window::Internal::OnLoad()
 	auto& cs = tab.LoadTab<SceneTab>({ proj_path }, proj_path.filename().string(), props, std::move(proj_path));
 }
 
-void Window::Internal::OnCreateNode()
+void MainWindow::Internal::OnCreateNode()
 {
 	tab.TempTab<EditorTab>("New Node");
 }
 
-void Window::Internal::OnLoadNode()
+void MainWindow::Internal::OnLoadNode()
 {
 	fs::path node_path{ QFileDialog::getOpenFileName(
 		nullptr,
@@ -114,4 +129,16 @@ void Window::Internal::OnLoadNode()
 	if (node_path.empty()) return;
 	node_path = node_path.make_preferred();
 	auto& cs = tab.LoadTab<EditorTab>({ node_path }, node_path.filename().string(), std::move(node_path));
+}
+
+void MainWindow::Internal::OnViewDelete()
+{
+	if (cur_scene)
+		cur_scene->DeleteSelected();
+}
+
+void MainWindow::Internal::OnViewClrSel()
+{
+	if (cur_scene)
+		cur_scene->ClearSelection();
 }

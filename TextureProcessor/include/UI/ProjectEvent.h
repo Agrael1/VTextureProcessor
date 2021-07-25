@@ -5,6 +5,7 @@
  */
 #pragma once
 #include <filesystem>
+#include <QEvent>
 
 struct ProjectEvent: public QEvent {
     std::filesystem::path projPath;

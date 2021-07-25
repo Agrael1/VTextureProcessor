@@ -4,10 +4,13 @@
  * @brief Class specifying Node behavior
  */
 #pragma once
+#include <QGraphicsItem>
+#include <QMenu>
+
 #include <UI/NodeStyle.h>
-#include <optional>
-#include <Logic/PortType.h>
 #include <UI/INode.h>
+#include <Logic/PortType.h>
+#include <optional>
 
 namespace ver
 {

@@ -4,6 +4,7 @@
  * @brief A simple interface for callback
  */
 #pragma once
+#include <QWidget>
 
 namespace UI
 {

@@ -4,8 +4,12 @@
  * @brief Class specifying Node behavior
  */
 
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+
 #include <UI/UINode.h>
 #include <UI/Connection.h>
+
 #include <fstream>
 
 /**

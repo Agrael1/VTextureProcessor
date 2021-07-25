@@ -1,5 +1,8 @@
 #include <Editor/Editor.h>
 #include <format>
+#include <QLineEdit>
+#include <QApplication>
+#include <QPainter>
 
 const QRegularExpression sz_re{ "^\\d{0,3} ?%?$" };
 constexpr std::string_view szbox_ss{

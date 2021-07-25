@@ -4,9 +4,13 @@
  * @brief Node header color specification
  */
 
-#include <UI/ProjectsWindow.h>
+#include <Windows/ProjectsWindow.h>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QApplication>
+#include <QMouseEvent>
+
+#include <UI/ProjectEvent.h>
 #include <fstream>
 
 using namespace UI;
@@ -186,6 +190,10 @@ void ProjectsWindow::OnOpenClicked(bool checked)
 	OpenApp(std::move(proj_path));
 }
 
+void ProjectsWindow::OpenApp(std::filesystem::path&& projPath) {
+	QApplication::postEvent(&app, new ProjectEvent(std::move(projPath)));
+}
+
 /**
  * @brief Fills tree widget with subwidgets
 */
@@ -242,4 +250,30 @@ void ProjectsWindow::OnItemDoubleClicked(QTreeWidgetItem* item, int column)
 		return;
 	}
 	OpenApp(std::move(file));
+}
+
+UI::Internal::ProjectsCW::ProjectsCW(QWidget* parent)
+	:QWidget(parent)
+{
+	lay.setAlignment(Qt::AlignTop | Qt::AlignRight);
+	setSizePolicy({ QSizePolicy::Maximum ,QSizePolicy::Maximum });
+
+	close.setIcon(QIcon{ ":/icon_window_close.png" });
+	maximize.setIcon(QIcon{ ":/icon_window_maximize.png" });
+	minimize.setIcon(QIcon{ ":/icon_window_minimize.png" });
+
+	minimize.setStyleSheet(style);
+	maximize.setStyleSheet(style);
+	close.setStyleSheet(closestyle);
+
+	buttons.setAlignment(Qt::AlignTop | Qt::AlignRight);
+	buttons.addWidget(&minimize);
+	buttons.addWidget(&maximize);
+	buttons.addWidget(&close);
+
+	connect(&close, &QToolButton::clicked, this, &ProjectsCW::OnCloseClicked);
+	connect(&minimize, &QToolButton::clicked, this, &ProjectsCW::OnMinimizedClicked);
+	connect(&maximize, &QToolButton::clicked, this, &ProjectsCW::OnMaximizedClicked);
+	lay.addLayout(&buttons);
+	setLayout(&lay);
 }

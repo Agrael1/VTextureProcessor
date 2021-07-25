@@ -7,6 +7,7 @@
  */
 #pragma once
 #include <Logic/PortType.h>
+#include <memory>
 
 class QOpenGLTexture;
 

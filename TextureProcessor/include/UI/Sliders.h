@@ -6,6 +6,10 @@
 #pragma once
 #include <UI/Updater.h>
 #include <QCheckBox>
+#include <QSlider>
+#include <QLineEdit>
+#include <QValidator>
+#include <QBoxLayout>
 
 namespace UI
 {

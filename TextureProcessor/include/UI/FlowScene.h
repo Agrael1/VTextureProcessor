@@ -5,13 +5,17 @@
  */
 #pragma once
 #include <UI/FlowCodex.h>
+#include <QGraphicsScene>
 
 namespace UI
 {
+	namespace Windows {
+		class Properties;
+	}
 	class FlowScene : public QGraphicsScene, public ISerialize
 	{
 	public:
-		FlowScene(QObject* parent, Properties& props);
+		FlowScene(QObject* parent, Windows::Properties& props);
 	public:
 		auto& GetGroupList()const noexcept
 		{
@@ -38,7 +42,7 @@ namespace UI
 		QPen Pdark;
 
 		QBrush Bbackground;
-		Properties& props;
+		UI::Windows::Properties& props;
 
 		UI::FlowCodex codex;
 		std::unordered_map<std::string, pv::polymorphic_value<UI::Node>> nodes;

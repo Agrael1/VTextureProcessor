@@ -9,6 +9,11 @@
 #include <cassert>
 #include <optional>
 #include <vector>
+#include <QVector2D>
+#include <QVector3D>
+#include <QVector4D>
+#include <QMatrix4x4>
+#include <span>
 
 #define LEAF_ELEMENT_TYPES \
 	X(Float)\

@@ -1,4 +1,8 @@
 #include <UI\TabRelay.h>
+#include <Windows/SceneTab.h>
+
+
+using namespace UI::Windows;
 
 TabRelay::TabRelay(QWidget* parent, SceneTab*& sc)
 	:QTabWidget(parent), cur_scene(sc)
@@ -6,6 +10,11 @@ TabRelay::TabRelay(QWidget* parent, SceneTab*& sc)
 	setMovable(true);
 	setTabsClosable(true);
 	connect(this, &QTabWidget::tabCloseRequested, this, &TabRelay::OnTabClosed);
+}
+
+void TabRelay::OnCurrentChanged(int index)
+{
+	cur_scene = dynamic_cast<SceneTab*>(GetCurrent());
 }
 
 Tab* TabRelay::GetCurrent()

@@ -9,6 +9,7 @@
 #include <optional>
 #include <Logic/PortType.h>
 #include <UI/INode.h>
+#include <QGraphicsItem>
 
 namespace UI
 {

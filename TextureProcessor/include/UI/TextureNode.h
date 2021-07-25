@@ -10,7 +10,9 @@ class Engine;
 
 namespace UI
 {
-	class Properties;
+	namespace Windows{
+		class Properties;
+	}
 	class TextureNode : public Node
 	{
 	public:
@@ -20,7 +22,7 @@ namespace UI
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
-		void UpdateProperties(Properties& properties);
+		void UpdateProperties(Windows::Properties& properties);
 	private:
 		virtual void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN)override
 		{

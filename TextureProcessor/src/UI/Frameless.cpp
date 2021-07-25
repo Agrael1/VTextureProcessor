@@ -5,6 +5,10 @@
  */
 
 #include <UI/Frameless.h>
+#include <QEvent>
+#include <QMouseEvent>
+
+using namespace UI;
 
 /**
  * @brief Sets incoming widget to become frameless

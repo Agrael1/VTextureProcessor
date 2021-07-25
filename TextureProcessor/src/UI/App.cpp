@@ -5,6 +5,7 @@
  */
 #include <UI/App.h>
 #include <UI/ProjectEvent.h>
+#include <QStyleFactory>
 
 /**
  * @brief Construct a new App:: App object
@@ -13,10 +14,10 @@
  * @param argv argument list
  */
 App::App(int &xargc, char** xargv)
-	:app(xargc, xargv)
+	:app(xargc, xargv), window{false}
 {
     // Basic setup of the application
-	QCoreApplication::setApplicationName(Window::AppName.data());
+	QCoreApplication::setApplicationName(MainWindow::AppName.data());
 	QCoreApplication::setApplicationVersion(AppVer.data());
 	app.setStyle(QStyleFactory::create(AppTheme.data()));
     app.setWindowIcon(QIcon{ ":/tlr.ico" });
@@ -43,8 +44,8 @@ App::App(int &xargc, char** xargv)
     QEvent::registerEventType(QEvent::User+1);
 
     // Set window size
-    projects.emplace(1280, 720, *this);
-    projects->show();
+    window.emplace<ProjectsWindow>(1280, 720, *this);
+    std::get<0>(window).show();
 }
 
 /**
@@ -68,9 +69,8 @@ bool App::event(QEvent* e)
     // Handling of opening projects
     if (e->type() == QEvent::User+1) {
         ProjectEvent& proj = static_cast<ProjectEvent&>(*e);
-        projects.reset();  // Destroys project selection window
-        window.emplace(1280, 720, std::move(proj.projPath));
-        window->ShowMaximized();
+        window.emplace<MainWindow>(1280, 720, std::move(proj.projPath));
+        std::get<1>(window).showMaximized();
     }
     return true;
 }

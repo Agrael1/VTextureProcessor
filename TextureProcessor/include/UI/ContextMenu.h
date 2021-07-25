@@ -5,6 +5,11 @@
  */
 #pragma once
 
+#include <QMenu>
+#include <QTreeWidget>
+#include <QLineEdit>
+#include <QBoxLayout>
+
 class ContextMenu : public QMenu
 {
 	friend class MenuBuilder;

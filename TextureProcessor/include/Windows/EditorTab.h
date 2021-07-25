@@ -2,20 +2,23 @@
 #include <Editor/Editor.h>
 #include <Windows/Tab.h>
 
-class EditorTab : public Tab
+namespace UI::Windows
 {
-public:
-	EditorTab() {}
-	using Tab::Tab;
-public:
-	QWidget* Widget() noexcept override
+	class EditorTab : public Tab
 	{
-		return &edit;
-	}
-	void Save() override {};
-	void SaveAs() override {};
-	void Clear() override {};
-	void Load() override;
-private:
-	Editor edit;
-};
+	public:
+		EditorTab() {}
+		using Tab::Tab;
+	public:
+		QWidget* Widget() noexcept override
+		{
+			return &edit;
+		}
+		void Save() override {};
+		void SaveAs() override {};
+		void Clear() override {};
+		void Load() override;
+	private:
+		Editor edit;
+	};
+}

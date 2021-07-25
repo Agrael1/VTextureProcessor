@@ -5,6 +5,7 @@
  * https://github.com/Agrael1/VeritasD3D
  */
 #pragma once 
+#include <string_view>
 
 #define ENUMERATE()\
 	X(None)\

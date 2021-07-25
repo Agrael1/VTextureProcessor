@@ -5,6 +5,7 @@
  */
 
 #include <Logic/Engine.h>
+#include <QOpenGLTexture>
 
 /**
  * @brief Creates GL context
@@ -42,6 +43,8 @@ Engine::Engine(QSize size)
 	vbuf.create();
 	vbuf.bind();
 }
+
+Engine::~Engine() { Current(); Empty().destroy(); }
 
 /**
  * @brief Creates static empty texture

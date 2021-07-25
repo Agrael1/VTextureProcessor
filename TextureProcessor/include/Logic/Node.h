@@ -9,6 +9,7 @@
 #include <Logic/Source.h>
 #include <Logic/Sink.h>
 #include <vector>
+#include <span>
 
 
 

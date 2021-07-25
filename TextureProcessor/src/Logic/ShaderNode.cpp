@@ -3,6 +3,10 @@
  * @author Ilya Doroshenko (xdoros01)
  * @brief ShaderNode model logic
  */
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QOpenGLTexture>
+
 #include <Logic/ShaderNode.h>
 #include <Logic/SourcesT.h>
 #include <Logic/SinksT.h>

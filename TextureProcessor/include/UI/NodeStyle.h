@@ -4,6 +4,10 @@
  * @brief Node, Port and Connection style specification
  */
 #pragma once
+#include <QColor>
+#include <QPen>
+#include <QBrush>
+#include <QJsonObject>
 
 namespace UI
 {

@@ -1,4 +1,5 @@
 #include <Editor/Highlight.h>
+#include <QRegularExpression>
 
 const std::array<QRegularExpression, 16> Highlighter::statements{
 	QRegularExpression{"\\bbreak\\b"}, QRegularExpression{"\\bcontinue\\b"}, QRegularExpression{"\\bdo\\b"}, QRegularExpression{"\\bfor\\b"}, QRegularExpression{"\\bwhile\\b"}, QRegularExpression{"\\bswitch\\b"}, QRegularExpression{"\\bcase\\b"}, QRegularExpression{"\\bdefault\\b"},

@@ -6,6 +6,7 @@
 #include <UI/FlowCodex.h>
 #include <fstream>
 #include <streambuf>
+#include <QJsonDocument>
 
 constexpr const char* output = R"(
 {"Output": {

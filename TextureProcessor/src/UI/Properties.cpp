@@ -5,7 +5,7 @@
  */
 #include <UI/Properties.h>
 
-using namespace UI;
+using namespace UI::Windows;
 
 /**
  * @brief Creates Sub Layout for selected node

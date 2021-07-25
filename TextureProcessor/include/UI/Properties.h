@@ -6,12 +6,14 @@
 #pragma once
 #include <QDockWidget>
 #include <QGroupBox>
+#include <QBoxLayout>
 #include <memory>
 #include <vector>
+
 #include <UI/INode.h>
 #include <UI/Updater.h>
 
-namespace UI
+namespace UI::Windows
 {
 	class PropertyElement : public QGroupBox
 	{
