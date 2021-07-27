@@ -10,9 +10,13 @@
 #include <QBoxLayout>
 #include <QTreeWidget>
 #include <QLineEdit>
+#include <QPushButton>
 
 #include <UI/Frameless.h>
 #include <Logic/ProjectsData.h>
+#include <Logic/Constants.h>
+
+class ApplicationConfig;
 
 namespace UI::Internal
 {
@@ -123,18 +127,18 @@ class MainPage : public QWidget
 		QLabel desc;
 	};
 public:
-	MainPage(QObject& app);
+	MainPage(QWidget* parent, ProjectsData& pdata);
 protected:
 	void OnCreateClicked(bool checked);
 	void OnOpenClicked(bool checked);
-	void OpenApp(std::filesystem::path&& projPath);
 private:
 	void FillTree();
 	void OnFilterChanged(const QString& text);
 	void OnItemDoubleClicked(QTreeWidgetItem* item, int column);
 
 private:
-	QObject& app;
+	QWidget* parent;
+	ProjectsData& pdata;
 
 	QVBoxLayout lay;
 	QHBoxLayout hlay;
@@ -149,7 +153,33 @@ private:
 	QLabel begin;
 	XButton create;
 	XButton open;
-	ProjectsData pdata;
+};
+
+class CreatePage : public QWidget
+{
+	static constexpr auto proj_def_name = ver::project<"TextureProject">();
+public:
+	CreatePage(QWidget* app, ApplicationConfig& cfg);
+protected:
+	void OnCreateClicked(bool checked);
+	void OnCancelClicked(bool checked);
+private:
+	QWidget* parent;
+	ApplicationConfig& cfg;
+	QVBoxLayout lay;
+
+	QLabel name;
+	QLabel project_name;
+	QLineEdit pname;
+
+	QLabel project_folder;
+	QHBoxLayout fl;
+	QLineEdit pfolder;
+	QPushButton search;
+
+	QHBoxLayout bl;
+	QPushButton cancel;
+	QPushButton create;
 };
 
 }
@@ -157,11 +187,17 @@ private:
 class ProjectsWindow : public QMainWindow
 {
 public:
-	ProjectsWindow(int32_t width, int32_t height, QObject& app);
+	ProjectsWindow(int32_t width, int32_t height, QObject& app, ApplicationConfig& cfg);
 protected:
 	void mouseMoveEvent(QMouseEvent* e)override;
+	void customEvent(QEvent* e)override;
 private:
+	QObject& app;
+
+	ProjectsData pdata;
+	
 	UI::Internal::ProjectsCW window;
 	UI::FrameLess f;
-	UI::MainPage pw;
+	UI::MainPage mp;
+	UI::CreatePage cp;
 };

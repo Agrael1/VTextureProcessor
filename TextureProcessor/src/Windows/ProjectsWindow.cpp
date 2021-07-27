@@ -6,6 +6,8 @@
 
 #include <Windows/ProjectsWindow.h>
 #include <UI/ProjectEvent.h>
+#include <Logic/ApplicationConfig.h>
+#include <utils/utils.h>
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -74,13 +76,13 @@ MainPage::XButton::XButton(std::string_view head, std::string_view descr, std::s
  * @param height window height
  * @param app tied applicaion to call back to
 */
-MainPage::MainPage(QObject& app)
-	:name("Veritas Texture Flow")
+MainPage::MainPage(QWidget* xparent, ProjectsData& pdata)
+	:parent(xparent), pdata(pdata)
+	, name("Veritas Texture Flow")
 	, recent("Open Recent")
 	, begin("Start now")
 	, create("Create New Project", "Create a new project file with specified\nresolution of the output texture", ":/icons8-add-file.png")
-	, open("Open Existing Project", "Open existing project from any location", ":/icons8-opened-folder.png"),
-	app(app)
+	, open("Open Existing Project", "Open existing project from any location", ":/icons8-opened-folder.png")
 {
 	setLayout(&lay);
 	lay.setAlignment(Qt::AlignTop | Qt::AlignLeft);
@@ -127,28 +129,10 @@ MainPage::MainPage(QObject& app)
 */
 void MainPage::OnCreateClicked(bool checked)
 {
-	fs::path proj_path { QFileDialog::getSaveFileName(
-		nullptr,
-		"Create new project",
-		"",
-		"(*.vtproj);;"
-	).toStdString() };
-
-	if (proj_path.empty()) return;
-
-	if (!proj_path.has_extension()) {
-		proj_path.replace_extension(".vtproj");
-	}
-
-	if (!pdata.contains(proj_path))
-		pdata.AppendCache(proj_path);
-
-	//create ifnot exists
-	if (!fs::exists(proj_path))
-		std::ofstream{ proj_path };
-
-	OpenApp(std::move(proj_path));
+	QApplication::postEvent(parent, new NewProjEvent());
 }
+
+
 
 /**
  * @brief On open existing project button clicked callback
@@ -160,20 +144,13 @@ void MainPage::OnOpenClicked(bool checked)
 		nullptr,
 		"Open existing project",
 		"",
-		"(*.vtproj);;"
+		ver::proj_filter.data()
 	).toStdString() };
 
 	if (proj_path.empty()) return;
-
-	if (!pdata.contains(proj_path))
-		pdata.AppendCache(proj_path);
-
-	OpenApp(std::move(proj_path));
+	QApplication::postEvent(parent, new ProjectEvent(std::move(proj_path)));
 }
 
-void MainPage::OpenApp(std::filesystem::path&& projPath) {
-	QApplication::postEvent(&app, new ProjectEvent(std::move(projPath)));
-}
 
 /**
  * @brief Fills tree widget with subwidgets
@@ -230,7 +207,7 @@ void MainPage::OnItemDoubleClicked(QTreeWidgetItem* item, int column)
 		}
 		return;
 	}
-	OpenApp(std::move(file));
+	QApplication::postEvent(parent, new ProjectEvent(std::move(file)));
 }
 
 UI::Internal::ProjectsCW::ProjectsCW(QWidget* parent)
@@ -259,13 +236,16 @@ UI::Internal::ProjectsCW::ProjectsCW(QWidget* parent)
 	setLayout(&lay);
 }
 
-ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app)
+ProjectsWindow::ProjectsWindow(int32_t width, int32_t height, QObject& app, ApplicationConfig& cfg)
 	:QMainWindow(nullptr, Qt::FramelessWindowHint),
-	window(this), f(this), pw(app)
+	window(this), f(this), mp(this, pdata), app(app), cp(this, cfg)
 {
 	resize(width, height);
 	setCentralWidget(&window);
-	window.Layout().addWidget(&pw);
+	window.Layout().addWidget(&mp);
+	window.Layout().addWidget(&cp);
+	cp.hide();
+	QEvent::registerEventType(QEvent::User + 2);
 }
 
 void ProjectsWindow::mouseMoveEvent(QMouseEvent* e)
@@ -277,4 +257,108 @@ void ProjectsWindow::mouseMoveEvent(QMouseEvent* e)
 		return;
 	}
 	f.MouseMove(e);
+}
+
+void ProjectsWindow::customEvent(QEvent* e)
+{
+	// Handling of opening projects
+
+	if (e->type() == QEvent::User + 1)
+	{
+		auto& x = static_cast<ProjectEvent&>(*e);
+		const auto& proj_path = x.projPath;
+		if (!pdata.contains(proj_path))
+			pdata.AppendCache(proj_path);
+
+		//create ifnot exists
+		if (!fs::exists(proj_path))
+			std::ofstream{ proj_path };
+		QApplication::postEvent(&app, new ProjectEvent(std::move(x.projPath)));
+		return;
+	}
+	if (e->type() == QEvent::User + 2) {
+		NewProjEvent& proj = static_cast<NewProjEvent&>(*e);
+		switch (proj.ty)
+		{
+		case NewProjEvent::Type::Forward:
+			mp.hide();
+			cp.show();
+			break;
+		case NewProjEvent::Type::Back:
+			cp.hide();
+			mp.show();
+			break;
+		default:
+			break;
+		}
+		return;
+	}
+}
+
+UI::CreatePage::CreatePage(QWidget* app, ApplicationConfig& cfg)
+	: cfg(cfg), name("New Project")
+	, project_name("Project Name")
+	, project_folder("Project Folder")
+	, search("...")
+	, cancel("Cancel"), create("Create"), parent(app)
+{
+	lay.setAlignment(Qt::AlignLeft);
+	name.setSizePolicy({ QSizePolicy::Expanding ,QSizePolicy::Preferred });
+	name.setFont({ "Arial", 24 });
+	lay.setContentsMargins({ 40,0,40,30 });
+	lay.addWidget(&name);
+	lay.addSpacing(30);
+	lay.setSpacing(10);
+
+	QFont font = { "Arial", 12 };
+	QFont rfont = { "Arial", 16 };
+
+	project_name.setFont(rfont);
+
+	pname.setFont(font);
+	pname.setTextMargins(5, 5, 5, 5);
+	lay.addWidget(&project_name);
+	lay.addWidget(&pname);
+	lay.addSpacing(30);
+
+	search.setMaximumWidth(40);
+	project_folder.setFont(rfont);
+	lay.addWidget(&project_folder);
+	fl.addWidget(&pfolder);
+	fl.addWidget(&search);
+
+	auto xfolder = cfg.GetProjFolder();
+	pfolder.setFont(font);
+	pfolder.setTextMargins(5, 5, 5, 5);
+	pfolder.setText(std::filesystem::absolute(xfolder).string().c_str());
+	search.setSizePolicy({ QSizePolicy::Preferred ,QSizePolicy::Preferred });
+	lay.addLayout(&fl);
+	lay.addStretch(1);
+
+	auto p = ver::generate(fs::path(xfolder) / proj_def_name.data());
+	pname.setText(p.stem().string().c_str());
+
+	cancel.setFixedHeight(25);
+	create.setFixedHeight(25);
+	bl.addWidget(&cancel);
+	bl.addWidget(&create);
+	bl.setAlignment(Qt::AlignRight | Qt::AlignBottom);
+	lay.addLayout(&bl);
+
+	connect(&cancel, &QPushButton::clicked, this, &CreatePage::OnCancelClicked);
+	connect(&create, &QPushButton::clicked, this, &CreatePage::OnCreateClicked);
+
+	setLayout(&lay);
+}
+
+void UI::CreatePage::OnCreateClicked(bool checked)
+{
+	fs::path p{ pfolder.text().toStdString() };
+	p = (p / pname.text().toStdString()).replace_extension(ver::proj_ext.c_str());
+	QApplication::postEvent(parent, new ProjectEvent(std::move(p)));
+}
+
+void UI::CreatePage::OnCancelClicked(bool checked)
+{
+	QApplication::postEvent(parent, new NewProjEvent(NewProjEvent::Type::Back));
 }

@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 	return App{ argc, argv }.Start();
 }
 
+
 /**
  * @mainpage ICP project documentation
  * @tableofcontents
