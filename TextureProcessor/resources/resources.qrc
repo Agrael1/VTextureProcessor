@@ -7,5 +7,7 @@
   <file>icon_window_restore.png</file>
   <file>icons8-add-file.png</file>
   <file>icons8-opened-folder.png</file>
+  <file>icons8-link.png</file>
+  <file>icons8-broken-link.png</file>
 </qresource>
 </RCC>

@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
 	class Internal
 	{
 	public:
-		Internal(QMainWindow* x, std::filesystem::path&& projPath);
+		Internal(QMainWindow* x, std::filesystem::path&& projPath, std::pair<int, int> resolution);
 	public:
 		void OnClearTriggered();
 		void OnProps()
@@ -62,7 +62,7 @@ class MainWindow : public QMainWindow
 public:
 	static constexpr std::string_view AppName = "VTexEditor";
 public:
-	MainWindow(int32_t width, int32_t height, std::filesystem::path&& projPath);
+	MainWindow(int32_t width, int32_t height, std::filesystem::path&& projPath, std::pair<int,int> resolution);
 public:
 	void closeEvent(QCloseEvent* event)override
 	{

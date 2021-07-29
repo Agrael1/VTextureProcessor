@@ -68,8 +68,8 @@ bool App::event(QEvent* e)
 {
     // Handling of opening projects
     if (e->type() == QEvent::User+1) {
-        ProjectEvent& proj = static_cast<ProjectEvent&>(*e);
-        window.emplace<MainWindow>(1280, 720, std::move(proj.projPath));
+        UI::ProjectEvent& proj = static_cast<UI::ProjectEvent&>(*e);
+        window.emplace<MainWindow>(1280, 720, std::move(proj.projPath),proj.size);
         std::get<MainWindow>(window).showMaximized();
         return true;
     }

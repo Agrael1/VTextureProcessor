@@ -19,13 +19,13 @@ using namespace UI::Windows;
  * @param height of a window
  * @param xprojPath file project that is being worked upon
 */
-MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xprojPath)
+MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xprojPath, std::pair<int, int> resolution)
 {
-	a.emplace(this, std::move(xprojPath));
+	a.emplace(this, std::move(xprojPath), resolution);
 	resize(width, height);
 }
 
-MainWindow::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath)
+MainWindow::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath, std::pair<int, int> resolution)
 	: tab(x, cur_scene)
 	, file("File")
 	, windows("Windows")

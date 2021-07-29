@@ -148,7 +148,7 @@ void MainPage::OnOpenClicked(bool checked)
 	).toStdString() };
 
 	if (proj_path.empty()) return;
-	QApplication::postEvent(parent, new ProjectEvent(std::move(proj_path)));
+	QApplication::postEvent(parent, new ProjectEvent(std::move(proj_path), {0,0}));
 }
 
 
@@ -207,7 +207,7 @@ void MainPage::OnItemDoubleClicked(QTreeWidgetItem* item, int column)
 		}
 		return;
 	}
-	QApplication::postEvent(parent, new ProjectEvent(std::move(file)));
+	QApplication::postEvent(parent, new ProjectEvent(std::move(file), { 0,0 }));
 }
 
 UI::Internal::ProjectsCW::ProjectsCW(QWidget* parent)
@@ -273,7 +273,7 @@ void ProjectsWindow::customEvent(QEvent* e)
 		//create ifnot exists
 		if (!fs::exists(proj_path))
 			std::ofstream{ proj_path };
-		QApplication::postEvent(&app, new ProjectEvent(std::move(x.projPath)));
+		QApplication::postEvent(&app, new ProjectEvent(std::move(x.projPath), x.size));
 		return;
 	}
 	if (e->type() == QEvent::User + 2) {
@@ -301,6 +301,8 @@ UI::CreatePage::CreatePage(QWidget* app, ApplicationConfig& cfg)
 	, project_folder("Project Folder")
 	, search("...")
 	, cancel("Cancel"), create("Create"), parent(app)
+	, tex_size("Texture Dimensions")
+	, lock(locked,"")
 {
 	lay.setAlignment(Qt::AlignLeft);
 	name.setSizePolicy({ QSizePolicy::Expanding ,QSizePolicy::Preferred });
@@ -316,7 +318,7 @@ UI::CreatePage::CreatePage(QWidget* app, ApplicationConfig& cfg)
 	project_name.setFont(rfont);
 
 	pname.setFont(font);
-	pname.setTextMargins(5, 5, 5, 5);
+	pname.setTextMargins(2, 2, 2, 2);
 	lay.addWidget(&project_name);
 	lay.addWidget(&pname);
 	lay.addSpacing(30);
@@ -329,14 +331,37 @@ UI::CreatePage::CreatePage(QWidget* app, ApplicationConfig& cfg)
 
 	auto xfolder = cfg.GetProjFolder();
 	pfolder.setFont(font);
-	pfolder.setTextMargins(5, 5, 5, 5);
+	pfolder.setTextMargins(2, 2, 2, 2);
 	pfolder.setText(std::filesystem::absolute(xfolder).string().c_str());
 	search.setSizePolicy({ QSizePolicy::Preferred ,QSizePolicy::Preferred });
 	lay.addLayout(&fl);
-	lay.addStretch(1);
 
 	auto p = ver::generate(fs::path(xfolder) / proj_def_name.data());
 	pname.setText(p.stem().string().c_str());
+
+	lay.addSpacing(30);
+	// texture dims
+	tex_size.setFont(rfont);
+	xwidth.setFont(font);
+	xwidth.setValidator(&size_v);
+	xwidth.setText(size_std_s.c_str());
+	xheight.setFont(font);
+	xheight.setValidator(&size_v);
+	xheight.setText(size_std_s.c_str());
+
+
+	lock.setCheckable(true);
+	lock.setSizePolicy({ QSizePolicy::Preferred ,QSizePolicy::Preferred });
+	lock.setStyleSheet("QPushButton { background-color: transparent; border: 0px }");
+	szl.addWidget(&xwidth);
+	szl.addWidget(&lock);
+	szl.addWidget(&xheight);
+	szl.addStretch(2);
+	szl.setSpacing(0);
+	lay.addWidget(&tex_size);
+	lay.addLayout(&szl);
+
+	lay.addStretch(1);
 
 	cancel.setFixedHeight(25);
 	create.setFixedHeight(25);
@@ -345,8 +370,15 @@ UI::CreatePage::CreatePage(QWidget* app, ApplicationConfig& cfg)
 	bl.setAlignment(Qt::AlignRight | Qt::AlignBottom);
 	lay.addLayout(&bl);
 
+
 	connect(&cancel, &QPushButton::clicked, this, &CreatePage::OnCancelClicked);
 	connect(&create, &QPushButton::clicked, this, &CreatePage::OnCreateClicked);
+	connect(&lock, &QPushButton::clicked, this, &CreatePage::OnLink);
+	connect(&search, &QPushButton::clicked, this, &CreatePage::OnFolderChange);
+	connect(&xwidth, &QLineEdit::textChanged, this, &CreatePage::OnWidthChanged);
+	connect(&xheight, &QLineEdit::textChanged, this, &CreatePage::OnHeightChanged);
+	connect(&xwidth, &QLineEdit::editingFinished, this, &CreatePage::OnWidthEChanged);
+	connect(&xheight, &QLineEdit::editingFinished, this, &CreatePage::OnHeightEChanged);
 
 	setLayout(&lay);
 }
@@ -355,10 +387,55 @@ void UI::CreatePage::OnCreateClicked(bool checked)
 {
 	fs::path p{ pfolder.text().toStdString() };
 	p = (p / pname.text().toStdString()).replace_extension(ver::proj_ext.c_str());
-	QApplication::postEvent(parent, new ProjectEvent(std::move(p)));
+	QApplication::postEvent(parent, new ProjectEvent(std::move(p), {xwidth.text().toInt(), xheight.text().toInt() }));
 }
 
 void UI::CreatePage::OnCancelClicked(bool checked)
 {
 	QApplication::postEvent(parent, new NewProjEvent(NewProjEvent::Type::Back));
+}
+
+void UI::CreatePage::OnLink(bool checked)
+{
+	if (checked)
+	{
+		lock.setIcon(unlocked);
+		return;
+	}
+	lock.setIcon(locked);
+}
+
+void UI::CreatePage::OnFolderChange(bool checked)
+{
+	QString dir = QFileDialog::getExistingDirectory(this, "Open Directory",
+		cfg.GetProjFolder().data(),
+		QFileDialog::ShowDirsOnly
+		| QFileDialog::DontResolveSymlinks);
+
+	pfolder.setText(dir);
+}
+
+void UI::CreatePage::OnWidthEChanged()
+{
+	auto x = xwidth.text().toInt();
+	if (x < size_min)
+		xwidth.setText(size_min_s.c_str());
+}
+void UI::CreatePage::OnHeightEChanged()
+{
+	auto x = xheight.text().toInt();
+	if (x < size_min)
+		xheight.setText(size_min_s.c_str());
+}
+
+void UI::CreatePage::OnWidthChanged(const QString& text)
+{
+	if (!lock.isChecked())
+		xheight.setText(xwidth.text());
+}
+
+void UI::CreatePage::OnHeightChanged(const QString& text)
+{
+	if (!lock.isChecked())
+		xwidth.setText(xheight.text());
 }

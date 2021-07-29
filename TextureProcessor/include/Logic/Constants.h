@@ -14,6 +14,7 @@ namespace ver
 		constexpr StringLiteral(const char(&str)[N]) {
 			std::copy_n(str, N, value);
 		}
+		constexpr StringLiteral() = default;
 		constexpr StringLiteral(sts::static_string<N> str) {
 			std::copy(str.begin(), str.begin() + N + 1, value);
 		}
@@ -23,7 +24,7 @@ namespace ver
 		}
 		constexpr auto length()const noexcept
 		{
-			return N - 1;
+			return N;
 		}
 		char value[N + 1]{};
 	};
@@ -62,5 +63,42 @@ namespace ver
 		return _ncat<f, proj_ext>();
 	}
 
+	template<std::integral auto f>
+	consteval size_t IntLength()
+	{
+		size_t l = 0, n = f;
+		if (f == 0) return size_t(1);
+		if (f < 0) { l++; n = -f; };
+
+		while (n > 0)
+		{
+			l++;
+			n = n / 10;
+		}
+		return l;
+	}
+
+	template<std::integral auto value>
+	consteval auto int2str()
+	{
+		auto xvalue = value;
+		constexpr auto l = IntLength<value>();
+		StringLiteral<l> str;
+		
+		if (value == 0)
+		{
+			str.value[0] = '0';
+			return sts::static_string<l>(str.value);
+		}
+		if (value < 0)
+		{
+			str.value[0] = '-';
+			xvalue = -xvalue;
+		}
+		for (auto end = int(str.length() - 1); end >= 0; end--, xvalue /= 10)
+			str.value[end] = "0123456789"[xvalue % 10];
+		return sts::static_string<l>(str.value);
+	}
+	
 	constexpr auto proj_filter = filter_p<proj_ext>();
 }

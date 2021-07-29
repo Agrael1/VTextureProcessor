@@ -2,6 +2,7 @@
 #include <fstream>
 #include <QJsonDocument>
 #include <QFileDialog>
+#include <Logic/Constants.h>
 
 
 using namespace UI::Windows;
@@ -26,13 +27,13 @@ void SceneTab::SaveAs()
 		nullptr,
 		"Create new project",
 		"",
-		"(*.vtproj);;"
+		ver::proj_filter.c_str()
 	).toStdString() };
 
 	if (proj_path.empty()) return;
 
 	if (!proj_path.has_extension()) {
-		proj_path.replace_extension(".vtproj");
+		proj_path.replace_extension(ver::proj_ext.c_str());
 	}
 
 	std::fstream f;
