@@ -74,17 +74,6 @@ FlowCodex::FlowCodex()
 }
 
 /**
- * @brief Fallback constructor
- *
- * @param nodes
- */
-FlowCodex::FlowCodex(QJsonDocument nodes)
-	:engine(QSize{ 128,128 })
-{
-	ParseJson(nodes);
-}
-
-/**
  * @brief Loads a Node type from its JSON specification
  *
  * @param json JSON definition of the Node type

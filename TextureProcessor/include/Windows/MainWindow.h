@@ -9,6 +9,7 @@
 
 #include <UI/Properties.h>
 #include <UI/TabRelay.h>
+#include <UI/FlowCodex.h>
 
 
 class MainWindow : public QMainWindow

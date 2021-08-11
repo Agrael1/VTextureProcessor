@@ -7,6 +7,8 @@
 #include <UI/FlowCodex.h>
 #include <QGraphicsScene>
 
+#include <UI/Node.h>
+
 namespace UI
 {
 	namespace Windows {
@@ -47,5 +49,7 @@ namespace UI
 		UI::FlowCodex codex;
 		std::unordered_map<std::string, pv::polymorphic_value<UI::Node>> nodes;
 		std::vector<UI::Node*> outputs;
+
+		XNode test;
 	};
 }

@@ -55,6 +55,8 @@ FlowScene::FlowScene(QObject* parent, Windows::Properties& props)
 	setBackgroundBrush(Bbackground);
 	setItemIndexMethod(QGraphicsScene::NoIndex);
 	connect(this, &QGraphicsScene::selectionChanged, this, &FlowScene::OnSelectionChanged);
+
+	addItem(&test);
 }
 
 /**
