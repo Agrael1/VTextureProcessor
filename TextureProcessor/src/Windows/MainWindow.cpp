@@ -10,6 +10,9 @@
 #include <QFileDialog>
 #include <QMenuBar>
 
+#include <UI/REFlowCodex.h>
+
+
 namespace fs = std::filesystem;
 using namespace UI::Windows;
 
@@ -23,6 +26,12 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 {
 	a.emplace(this, std::move(xprojPath), resolution);
 	resize(width, height);
+}
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+	a.reset();
+	UI::RE::XFlowCodex::DestroyEngine();
 }
 
 MainWindow::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath, std::pair<int, int> resolution)

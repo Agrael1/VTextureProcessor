@@ -2,27 +2,31 @@
 #include <UI/Node.h>
 #include <Logic/Engine.h>
 
+
 namespace UI::RE
 {
-	class FlowCodex
+	class XFlowCodex
 	{
 		static constexpr std::string_view NodesDir = "nodes";
-		struct RefCountPair
+		struct RefCountPair : public std::unique_ptr<IXNode>
 		{
-			template<typename ...Args>
+			template<typename T, typename ...Args>
 			static RefCountPair set(Args&&... in)
 			{
-				return { .node{std::make_unique<XNode>(std::forward<Args>(in)...)} };
+				return { std::make_unique<T>(std::forward<Args>(in)...) };
 			}
-			std::unique_ptr<XNode> node;
 			mutable size_t refcount = 0;
 		};
-		FlowCodex();
+		XFlowCodex();
 	public:
-		FlowCodex& Instance()noexcept
+		static XFlowCodex& Instance()noexcept
 		{
-			static FlowCodex instance;
+			static XFlowCodex instance;
 			return instance;
+		}
+		static void DestroyEngine()
+		{
+			Instance().engine.reset();
 		}
 		const auto& CatMap()const noexcept
 		{
@@ -33,8 +37,10 @@ namespace UI::RE
 			for (auto&& x : codex)
 				x.second.refcount = 0;
 		}
-		const std::unique_ptr<XNode>& GetNode(std::string_view nodety)const;
-		const std::unique_ptr<XNode>* TryGetNode(std::string_view nodety)const;
+
+		std::unique_ptr<IXNode> GetNode(std::string_view nodety)const;
+		const std::unique_ptr<IXNode>* TryGetNode(std::string_view nodety)const;
+
 		void SetMaxRef(std::string_view nodety, size_t cnt);
 		size_t AddRef(std::string_view nodety);
 	private:
@@ -42,6 +48,6 @@ namespace UI::RE
 	private:
 		std::unordered_map<std::string, RefCountPair> codex;
 		std::unordered_map<std::string, std::vector<std::string_view>> cats;
-		Engine engine;
+		std::optional<Engine> engine;
 	};
 }

@@ -65,10 +65,7 @@ public:
 public:
 	MainWindow(int32_t width, int32_t height, std::filesystem::path&& projPath, std::pair<int,int> resolution);
 public:
-	void closeEvent(QCloseEvent* event)override
-	{
-		a.reset();
-	}
+	void closeEvent(QCloseEvent* event)override;
 private:
 	std::optional<Internal> a;
 };

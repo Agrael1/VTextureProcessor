@@ -40,21 +40,24 @@ namespace UI
 	};
 
 	//template<class XModel> requires std::derived_from<XModel, ver::Node>
-	class XNode : public QGraphicsWidget//, public ISerialize
+	class XNode : public IXNode//, public ISerialize
 	{
 	public:
-		XNode() :gll(new QGraphicsLinearLayout) { Init(); };
-		XNode(QJsonObject document, std::string_view name/*, Engine& e*/);
+		//XNode() :gll(new QGraphicsLinearLayout) { Init(); };
+		XNode(QJsonObject document, std::string_view name, Engine& e);
+		XNode(const XNode& in);
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
+		virtual std::unique_ptr<IXNode> Clone(std::string&& name)const override;
+		virtual std::string_view Name()const override;
 	private:
 		void DrawBackground(QPainter* painter);
 		void DrawCaptionName(QPainter* painter);
 		void Init();
 	private:
 		NodeStyle style;
-		//ver::ShaderNode model;
+		ver::ShaderNode model;
 
 		QGraphicsLinearLayout* gll;
 		Module m;

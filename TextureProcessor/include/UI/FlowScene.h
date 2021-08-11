@@ -31,6 +31,8 @@ namespace UI
 		virtual QJsonObject Serialize()override;
 		virtual void Deserialize(QJsonObject)override;
 	protected:
+		UI::IXNode& InsertNode(std::string_view name);
+
 		UI::Node& InsertNode(std::string_view name, std::string&& unique_name);
 		UI::Node* TryInsertNode(std::string_view name, std::string&& unique_name);
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
@@ -50,6 +52,6 @@ namespace UI
 		std::unordered_map<std::string, pv::polymorphic_value<UI::Node>> nodes;
 		std::vector<UI::Node*> outputs;
 
-		XNode test;
+		std::unique_ptr<IXNode> test;
 	};
 }

@@ -6,6 +6,8 @@
 #pragma once
 #include <Utils/Macros.h>
 #include <QJsonObject>
+#include <QGraphicsWidget>
+#include <memory>
 
 namespace UI
 {
@@ -24,5 +26,12 @@ namespace UI
 		virtual ~ISerialize() = default;
 		virtual QJsonObject Serialize() = 0;
 		virtual void Deserialize(QJsonObject) = 0;
+	};
+
+	struct NOVTABLE IXNode:public QGraphicsWidget
+	{
+		virtual ~IXNode() = default;
+		virtual std::unique_ptr<IXNode> Clone(std::string&& name)const = 0;
+		virtual std::string_view Name()const = 0;
 	};
 }

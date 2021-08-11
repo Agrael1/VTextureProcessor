@@ -25,6 +25,7 @@ namespace ver
 		std::span<const std::unique_ptr<Sink>> GetSinks()const noexcept	{return sinks;}
 
 		void SetUniqueName(std::string_view xname) { name = xname; }
+		void SetUniqueName(std::string&& xname) { name = std::move(xname); }
 		std::string_view GetName() const noexcept;
 
 		Source& GetSource(std::string_view registeredName);
@@ -44,7 +45,7 @@ namespace ver
 	protected:
 		std::vector<std::unique_ptr<Sink>> sinks;
 		std::vector<std::unique_ptr<Source>> sources;
-		std::string_view name;
+		std::string name;
 	};
 
 }

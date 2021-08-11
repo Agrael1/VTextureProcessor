@@ -4,16 +4,38 @@
 using namespace UI;
 
 
-UI::XNode::XNode(QJsonObject document, std::string_view name/*, Engine& e*/)
-	:gll(new QGraphicsLinearLayout), style(document, name)/*, model(document, e)*/
+UI::XNode::XNode(QJsonObject document, std::string_view name, Engine& e)
+	:gll(new QGraphicsLinearLayout), style(document, name), model(document, e)
 {
 	Init();
+}
+
+UI::XNode::XNode(const XNode& in)
+	:style(in.style)
+	, model(in.model)
+	, gll(new QGraphicsLinearLayout)
+{
 }
 
 void UI::XNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	DrawBackground(painter);
+	DrawCaptionName(painter);
 	QGraphicsWidget::paint(painter, option, widget);
+}
+
+std::unique_ptr<IXNode> UI::XNode::Clone(std::string&& name) const
+{
+	printf("copy called\n");
+	auto x = std::make_unique<XNode>(*this);
+	x->Init();
+	x->model.SetUniqueName(name);
+	return x;
+}
+
+std::string_view UI::XNode::Name() const
+{
+	return model.GetName();
 }
 
 void UI::XNode::DrawBackground(QPainter* painter)

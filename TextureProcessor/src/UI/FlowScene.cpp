@@ -10,6 +10,8 @@
 #include <QPainter>
 #include <QJsonArray>
 
+
+#include <UI/REFlowCodex.h>
 /**
  * @brief Generates file name with incremented count if name already exists
  *
@@ -56,7 +58,8 @@ FlowScene::FlowScene(QObject* parent, Windows::Properties& props)
 	setItemIndexMethod(QGraphicsScene::NoIndex);
 	connect(this, &QGraphicsScene::selectionChanged, this, &FlowScene::OnSelectionChanged);
 
-	addItem(&test);
+	InsertNode("Output");
+	addItem(test.get());
 }
 
 /**
@@ -384,4 +387,11 @@ void FlowScene::Deserialize(QJsonObject xobj)
 	if (missing)
 		QMessageBox{ QMessageBox::Warning, "Warning", "Some nodes were missing, because their type was not loaded properly",
 		QMessageBox::Ok}.exec();
+}
+
+UI::IXNode& UI::FlowScene::InsertNode(std::string_view name)
+{
+	auto& i = UI::RE::XFlowCodex::Instance();
+	test = i.GetNode(name);
+	return *test;
 }
