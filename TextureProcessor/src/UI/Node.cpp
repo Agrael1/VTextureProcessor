@@ -105,9 +105,15 @@ void UI::XNode::Init()
 
 	gll->setOrientation(Qt::Vertical);
 	gll->setContentsMargins(NodeStyle::h_offset, NodeStyle::title_height + NodeStyle::h_offset, NodeStyle::h_offset, NodeStyle::h_offset);
-	gll->addItem(&m);
-	gll->addItem(&m2);
+	ConstructModules();
 	setLayout(gll);
+}
+
+void UI::XNode::ConstructModules()
+{
+	modules.reserve(model.SourcesCount());
+	for (const auto& x : model.GetSources())
+		gll->addItem(&modules.emplace_back(x->YieldTexture()));
 }
 
 void UI::Module::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

@@ -4,20 +4,22 @@
 using namespace UI::RE;
 
 constexpr const char* output = R"(
-{"Output": {
+{
+"Output": {
 	"Node": {
 		"Class": "Texture",
 			"Group" : "Output",
 			"Sinks" : [{"Name": "In", "Type" : "Grayscale"}]
-	},
+		},
 		"NodeStyle" : {
 			"TitleColor": "black",
-				"FontColor" : "white"
+			"FontColor" : "white"
 		},
-			"Value" : ["uniform sampler2D u_Sampler;								\n",
-				"in vec2 texcoords;\n",
-				"out vec4 color;\n",
-				"void main() { color = texture2D(u_Sampler, texcoords);}"]
+		"Layout" : [{"Type" : "sink", "Value":0}],
+		"Value" : ["uniform sampler2D u_Sampler;								\n",
+			"in vec2 texcoords;\n",
+			"out vec4 color;\n",
+			"void main() { color = texture2D(u_Sampler, texcoords);}"]
 }})";
 
 

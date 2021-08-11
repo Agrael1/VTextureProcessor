@@ -38,5 +38,11 @@ namespace ver
 		Engine& e;
 		bool tiling = false;
 	};
+
+	class OutputNode : public Node
+	{
+	public:
+		OutputNode();
+	};
 }
 

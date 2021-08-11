@@ -13,8 +13,18 @@ namespace UI
 	class Module : public QGraphicsLayoutItem, public QGraphicsItem
 	{
 	public:
-		Module(QGraphicsItem* parent = nullptr) : QGraphicsItem(parent)
-			, img(128, 128, QImage::Format::Format_ARGB32)
+		Module(std::shared_ptr<QOpenGLTexture>&& tex) : 
+			img(128, 128, QImage::Format::Format_ARGB32), tex(std::move(tex))
+		{
+			setGraphicsItem(this);
+		}
+		Module(Module&& in)noexcept
+			:img(std::move(in.img))
+			,tex(std::move(in.tex))
+		{
+			setGraphicsItem(this);
+		}
+		Module() :  img(128, 128, QImage::Format::Format_ARGB32)
 		{
 			setGraphicsItem(this);
 		}
@@ -36,6 +46,7 @@ namespace UI
 			return img.size();
 		}
 	private:
+		std::shared_ptr<QOpenGLTexture> tex;
 		QImage img;
 	};
 
@@ -55,13 +66,13 @@ namespace UI
 		void DrawBackground(QPainter* painter);
 		void DrawCaptionName(QPainter* painter);
 		void Init();
+		void ConstructModules();
 	private:
 		NodeStyle style;
 		ver::ShaderNode model;
 
 		QGraphicsLinearLayout* gll;
-		Module m;
-		Module m2;
+		std::vector<Module> modules;
 	};
 }
 
