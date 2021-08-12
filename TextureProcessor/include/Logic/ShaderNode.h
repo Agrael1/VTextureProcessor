@@ -26,13 +26,18 @@ namespace ver
 		ShaderNode(const ShaderNode& other);
 	public:
 		QImage Update();
+		void XUpdate();
 		dc::Buffer& GetBuffer() { return buf; }
 		bool& Tiling() { return tiling; }
+		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
+		{
+			return outputs;
+		}
 	private:
 		void SetProperties(const QJsonArray& props, QString& scode);
 	private:
-		std::vector<std::shared_ptr<QOpenGLTexture>> inputs;
-		std::vector<std::shared_ptr<QOpenGLTexture>> outputs;
+		std::vector<std::shared_ptr<QImage>> inputs;
+		std::vector<std::shared_ptr<QImage>> outputs;
 		std::shared_ptr<NodePrivate> shader;
 		dc::Buffer buf;
 		Engine& e;
@@ -42,7 +47,15 @@ namespace ver
 	class OutputNode : public Node
 	{
 	public:
-		OutputNode();
+		OutputNode(QJsonObject document, Engine& e);
+		OutputNode(const OutputNode& in);
+	public:
+		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
+		{
+			return { &inout, 1 };
+		}
+	private:
+		std::shared_ptr<QImage> inout;
 	};
 }
 

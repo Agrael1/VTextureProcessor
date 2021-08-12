@@ -8,7 +8,6 @@
 
 #include <Logic/Node.h>
 #include <utils/Exception.h>
-#include "..\..\include\UI\Node.h"
 
 using namespace ver;
 

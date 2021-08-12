@@ -14,7 +14,7 @@ template <PortType ty = PortType::Grayscale>
 class DirectTextureSink : public Sink
 {
 public:
-	static std::unique_ptr<Sink> Make(std::string_view registeredName, std::shared_ptr<QOpenGLTexture>& target)
+	static std::unique_ptr<Sink> Make(std::string_view registeredName, std::shared_ptr<QImage>& target)
 	{
 		return std::make_unique<DirectTextureSink>(registeredName, target);
 	}
@@ -42,13 +42,13 @@ public:
 		target = std::move(p);
 		return true;
 	}
-	DirectTextureSink(std::string_view registeredName, std::shared_ptr<QOpenGLTexture>& target)
+	DirectTextureSink(std::string_view registeredName, std::shared_ptr<QImage>& target)
 		:
 		Sink(registeredName, ty),
 		target(target)
 	{}
 private:
-	std::shared_ptr<QOpenGLTexture>& target;
+	std::shared_ptr<QImage>& target;
 };
 
 using GrayscaleSink = DirectTextureSink<PortType::Grayscale>;

@@ -9,7 +9,7 @@
 #include <Logic/PortType.h>
 #include <memory>
 
-class QOpenGLTexture;
+class QImage;
 
 class Source
 {
@@ -19,7 +19,7 @@ public:
 
 	virtual ~Source() = default;
 	virtual std::string_view YieldShader();
-	virtual std::shared_ptr<QOpenGLTexture> YieldTexture();
+	virtual std::shared_ptr<QImage> YieldTexture();
 protected:
 	Source(std::string_view name, PortType ty);
 private:

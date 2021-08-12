@@ -6,6 +6,7 @@
 
 #include <Logic/Engine.h>
 #include <QOpenGLTexture>
+#include <optional>
 
 /**
  * @brief Creates GL context
@@ -71,14 +72,18 @@ QOpenGLTexture& Engine::Empty()
  * @param buffer constant buffer
  * @return Image to be drawn to the node
 */
-QImage Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTexture>> inputs, bool tile, std::span<std::shared_ptr<QOpenGLTexture>> outputs, ver::dc::Buffer& buffer)
+void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs, bool tile, std::span<std::shared_ptr<QImage>> outputs, ver::dc::Buffer& buffer)
 {
 	Current();
 	shaders.addShader(&ps);
 	shaders.link();
 	shaders.bind();
 
-	for (uint32_t s = 0; auto & i: inputs)
+	std::vector<std::optional<QOpenGLTexture>> xinputs(inputs.size());
+	for (uint32_t s = 0; const auto& x : inputs)
+		if(x)xinputs[s].emplace(*x, QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
+
+	for (uint32_t s = 0; auto& i: xinputs)
 	{
 		if (i)
 		{
@@ -97,13 +102,11 @@ QImage Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QOpenGLTextur
 	shaders.removeShader(&ps);
 
 	if(tile)
-		for (auto& i : inputs)
+		for (auto& i : xinputs)
 			if (i)i->setWrapMode(QOpenGLTexture::Repeat);
 
 	for (int i = 0; auto & o : outputs)
-		o = std::make_shared<QOpenGLTexture>(frame.toImage(false, i++));
-
-	return frame.toImage(true, 0);
+		*o = frame.toImage(false, i++);
 }
 
 /**

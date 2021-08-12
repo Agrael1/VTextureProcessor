@@ -86,7 +86,7 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
 			auto sname = source["Name"].toString().toStdString();
 			xshader += std::format("layout(location={})out vec4 {};\n", outputs.size(), sname).c_str();
 			RegisterSource(GrayscaleSource::Make(sname,
-				"", outputs.emplace_back(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D))));
+				"", outputs.emplace_back(std::make_shared<QImage>())));
 			break;
 		}
 		case PortType::Color:
@@ -126,13 +126,10 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 		{
 		case PortType::Grayscale:
 		{
-			auto r = std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D);
-			r->setSize(256, 256);
-			r->create();
-			r->allocateStorage();
-
+			auto r = std::make_shared<QImage>();
 			RegisterSource(GrayscaleSource::Make(s->GetName(),
 				shader->shadercode, outputs.emplace_back(std::move(r))));
+			break;
 		}
 		default:
 			break;
@@ -147,6 +144,7 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 		case PortType::Grayscale:
 			RegisterSink(GrayscaleSink::Make(s->GetRegisteredName(),
 				inputs.emplace_back()));
+			break;
 		default:
 			break;
 		}
@@ -160,7 +158,12 @@ ShaderNode::ShaderNode(const ShaderNode& other)
  */
 QImage ShaderNode::Update()
 {
-	return e.Render(shader->shader, inputs, tiling, outputs, buf);
+	return {};
+}
+
+void ver::ShaderNode::XUpdate()
+{
+	e.Render(shader->shader, inputs, tiling, outputs, buf);
 }
 
 /**
@@ -195,4 +198,14 @@ void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 			buf[tags[i]] = p["Val"].toVariant();
 		i++;
 	}
+}
+
+ver::OutputNode::OutputNode(QJsonObject document, Engine& e)
+{
+	RegisterSink(GrayscaleSink::Make("Out", inout));
+}
+
+ver::OutputNode::OutputNode(const OutputNode& in)
+{
+	RegisterSink(GrayscaleSink::Make("Out", inout));
 }

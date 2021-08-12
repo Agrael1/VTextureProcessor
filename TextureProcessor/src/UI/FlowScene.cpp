@@ -58,7 +58,7 @@ FlowScene::FlowScene(QObject* parent, Windows::Properties& props)
 	setItemIndexMethod(QGraphicsScene::NoIndex);
 	connect(this, &QGraphicsScene::selectionChanged, this, &FlowScene::OnSelectionChanged);
 
-	InsertNode("Output");
+	InsertNode("Add");
 	addItem(test.get());
 }
 
