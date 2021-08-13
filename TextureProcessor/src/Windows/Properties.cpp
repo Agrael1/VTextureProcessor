@@ -3,7 +3,7 @@
  * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
  * @brief Controls for properties dock window
  */
-#include <UI/Properties.h>
+#include <Windows/Properties.h>
 
 using namespace UI::Windows;
 
@@ -63,7 +63,7 @@ PropertyElement& Properties::AppendProperty(INode& node, std::string_view name)
 }
 
 /**
- * @brief Moves existing preoperty in vector
+ * @brief Moves existing property in vector
  * @param prop previous property
 */
 void Properties::AppendProperty(PropertyElement&& prop)

@@ -5,7 +5,6 @@
  */
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QOpenGLTexture>
 
 #include <Logic/ShaderNode.h>
 #include <Logic/SourcesT.h>

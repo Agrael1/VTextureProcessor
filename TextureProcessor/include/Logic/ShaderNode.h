@@ -7,6 +7,7 @@
 #include <Logic/Node.h>
 #include <Logic/DynamicConstant.h>
 #include <QOpenGLShader>
+#include <Logic/PropertyView.h>
 
 class Engine;
 
@@ -14,6 +15,11 @@ namespace ver
 {
 	class ShaderNode : public Node
 	{
+		static constexpr auto desc = MakeDesc({
+			{DescType::Buffer, "Buffer"},
+			{DescType::Boolean, "Tiling"},
+			{DescType::Boolean, "Buffer"}
+			});
 		//Shared value between same type of nodes
 		struct NodePrivate
 		{
@@ -33,15 +39,26 @@ namespace ver
 		{
 			return outputs;
 		}
+		PropertyView GetProperties()override
+		{
+			PropertyView pv;
+			if (buffer)
+				pv.TieProp<desc[0]>(buf);
+			pv.TieProp<desc[1]>(tiling);
+			pv.TieProp<desc[2]>(buffer);
+			return pv;
+		}
 	private:
 		void SetProperties(const QJsonArray& props, QString& scode);
 	private:
 		std::vector<std::shared_ptr<QImage>> inputs;
 		std::vector<std::shared_ptr<QImage>> outputs;
 		std::shared_ptr<NodePrivate> shader;
-		dc::Buffer buf;
 		Engine& e;
+
+		dc::Buffer buf;
 		bool tiling = false;
+		bool buffer = true;
 	};
 
 	class OutputNode : public Node

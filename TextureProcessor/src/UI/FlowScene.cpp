@@ -4,7 +4,7 @@
  * @brief Logic behind Node editor canvas
  */
 #include <UI/FlowScene.h>
-#include <UI/Properties.h>
+#include <Windows/Properties.h>
 #include <UI/Connection.h>
 #include <QMessageBox>
 #include <QPainter>

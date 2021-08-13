@@ -8,6 +8,7 @@
 #pragma once
 #include <Logic/Source.h>
 #include <Logic/Sink.h>
+#include <Logic/PropertyView.h>
 #include <vector>
 #include <span>
 
@@ -42,6 +43,7 @@ namespace ver
 
 		void SetSinkLinkage(std::string_view registeredName, std::string_view to_node, std::string_view source);
 		void SetSinkLinkage(size_t index, std::string_view to_node, std::string_view source);
+		virtual PropertyView GetProperties() = 0;
 	protected:
 		std::vector<std::unique_ptr<Sink>> sinks;
 		std::vector<std::unique_ptr<Source>> sources;

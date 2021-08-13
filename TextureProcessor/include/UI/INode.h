@@ -11,6 +11,7 @@
 
 namespace UI
 {
+	namespace Windows{class Properties;}
 	class Node;
 	struct NOVTABLE INode
 	{
@@ -33,5 +34,6 @@ namespace UI
 		virtual ~IXNode() = default;
 		virtual std::unique_ptr<IXNode> Clone(std::string&& name)const = 0;
 		virtual std::string_view Name()const = 0;
+		virtual void UpdateProperties(Windows::Properties& properties) = 0;
 	};
 }

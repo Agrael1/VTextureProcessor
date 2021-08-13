@@ -7,7 +7,7 @@
 #include <QMainWindow>
 #include <QMenu>
 
-#include <UI/Properties.h>
+#include <Windows/Properties.h>
 #include <UI/TabRelay.h>
 #include <UI/FlowCodex.h>
 

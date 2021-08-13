@@ -6,7 +6,7 @@
 
 #include <UI/TextureNode.h>
 #include <UI/Connection.h>
-#include <UI/Properties.h>
+#include <Windows/Properties.h>
 #include <UI/Sliders.h>
 #include <QLabel>
 #include <QPainter>

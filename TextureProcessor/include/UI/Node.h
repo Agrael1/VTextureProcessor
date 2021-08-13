@@ -3,6 +3,7 @@
 #include <UI/Connection.h>
 #include <UI/INode.h>
 #include <UI/NodeModules.h>
+#include <Windows/Properties.h>
 #include <Logic/Node.h>
 
 #include <QPainter>
@@ -58,6 +59,10 @@ namespace UI
 		virtual std::string_view Name()const override
 		{
 			return model.GetName();
+		}
+		virtual void UpdateProperties(Windows::Properties& properties) override
+		{
+
 		}
 	private:
 		void DrawBackground(QPainter* painter)
