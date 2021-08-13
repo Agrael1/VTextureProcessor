@@ -14,6 +14,8 @@
 #include <QCheckBox>
 #include <QJsonArray>
 #include <charconv>
+#include <Logic/Sink.h>
+#include <Logic/Source.h>
 
 using namespace UI::Windows;
 
@@ -117,6 +119,18 @@ void UI::TextureNode::UpdateProperties(Windows::Properties& props)
 		}
 	}
 	props.AppendProperty(std::move(prop));
+}
+
+void UI::TextureNode::OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN)
+{
+	model.GetSink(sinkN).Link(source.Model().GetSource(sourceN));
+	Update();
+}
+
+void UI::TextureNode::OnDisconnect(uint8_t sinkN)
+{
+	model.GetSink(sinkN).Unlink();
+	Update();
 }
 
 /**

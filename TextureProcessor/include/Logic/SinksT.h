@@ -10,45 +10,49 @@
 #include <utils/Exception.h>
 
 
-template <PortType ty = PortType::Grayscale>
-class DirectTextureSink : public Sink
+namespace ver
 {
-public:
-	static std::unique_ptr<Sink> Make(std::string_view registeredName, std::shared_ptr<QImage>& target)
+	template <PortType ty = PortType::Grayscale>
+	class DirectTextureSink : public Sink
 	{
-		return std::make_unique<DirectTextureSink>(registeredName, target);
-	}
-	void Unlink()override
-	{
-		target = nullptr;
-	}
-	bool Link(Source& source) override
-	{
-		auto p = source.YieldTexture();
-		if (!p)
+	public:
+		static std::unique_ptr<Sink> Make(std::string_view registeredName, std::shared_ptr<QImage>& target)
 		{
-			auto msg = std::format("Binding input[{}] to output [{}.{}]. Source has no texture in it.\n",
-				GetRegisteredName(),
-				GetOutputNodeName(),
-				GetSourceName());
-			printf(msg.c_str());
-			return false;
+			return std::make_unique<DirectTextureSink>(registeredName, target);
 		}
-		if (source.GetType() != ty)
+		void Unlink()override
 		{
-			printf("Types do not match\n");
-			return false;
+			target = nullptr;
 		}
-		target = std::move(p);
-		return true;
-	}
-	DirectTextureSink(std::string_view registeredName, std::shared_ptr<QImage>& target)
-		:
-		Sink(registeredName, ty),
-		target(target)
-	{}
-private:
-	std::shared_ptr<QImage>& target;
-};
+		bool Link(Source& source) override
+		{
+			auto p = source.YieldTexture();
+			if (!p)
+			{
+				auto msg = std::format("Binding input[{}] to output [{}.{}]. Source has no texture in it.\n",
+					GetRegisteredName(),
+					GetOutputNodeName(),
+					GetSourceName());
+				printf(msg.c_str());
+				return false;
+			}
+			if (source.GetType() != ty)
+			{
+				printf("Types do not match\n");
+				return false;
+			}
+			target = std::move(p);
+			return true;
+		}
+		DirectTextureSink(std::string_view registeredName, std::shared_ptr<QImage>& target)
+			:
+			Sink(registeredName, ty),
+			target(target)
+		{}
+	private:
+		std::shared_ptr<QImage>& target;
+	};
+	using GrayscaleSink = DirectTextureSink<PortType::Grayscale>;
+}
 
-using GrayscaleSink = DirectTextureSink<PortType::Grayscale>;
+

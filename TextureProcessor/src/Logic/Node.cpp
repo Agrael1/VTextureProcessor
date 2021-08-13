@@ -6,10 +6,15 @@
  * https://github.com/Agrael1/VeritasD3D
  */
 
+
+#include <Logic/Source.h>
+#include <Logic/Sink.h>
 #include <Logic/Node.h>
 #include <utils/Exception.h>
 
 using namespace ver;
+
+ver::Node::~Node(){}
 
 std::string_view Node::GetName() const noexcept
 {

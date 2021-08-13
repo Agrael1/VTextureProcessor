@@ -6,21 +6,19 @@
  * https://github.com/Agrael1/VeritasD3D
  */
 #pragma once
-#include <Logic/Source.h>
-#include <Logic/Sink.h>
 #include <Logic/PropertyView.h>
-#include <vector>
 #include <span>
-
-
 
 namespace ver
 {
+	class Sink;
+	class Source;
+
 	class Node
 	{
 	public:
 		Node() = default;
-		virtual ~Node() = default;
+		virtual ~Node();
 	public:
 		std::span<const std::unique_ptr<Source>> GetSources()const noexcept	{return sources;}
 		std::span<const std::unique_ptr<Sink>> GetSinks()const noexcept	{return sinks;}

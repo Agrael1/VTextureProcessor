@@ -9,6 +9,8 @@
 #include <utils/Exception.h>
 #include <algorithm>
 
+using namespace ver;
+
 std::string_view Sink::GetRegisteredName() const noexcept
 {
 	return registeredName;

@@ -24,16 +24,8 @@ namespace UI
 			QWidget* widget = nullptr) override;
 		void UpdateProperties(Windows::Properties& properties);
 	private:
-		virtual void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN)override
-		{
-			model.GetSink(sinkN).Link(source.Model().GetSource(sourceN));
-			Update();
-		}
-		virtual void OnDisconnect(uint8_t sinkN)override
-		{
-			model.GetSink(sinkN).Unlink();
-			Update();
-		}
+		virtual void OnConnect(uint8_t sinkN, Node& source, uint8_t sourceN)override;
+		virtual void OnDisconnect(uint8_t sinkN)override;
 		virtual void Update()override;
 		virtual ver::Node& Model()override { return model; }
 		virtual void SetUniqueName(std::string_view xname)override { model.SetUniqueName(xname); }

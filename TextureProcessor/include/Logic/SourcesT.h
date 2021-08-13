@@ -8,30 +8,34 @@
 #pragma once
 #include <Logic/Source.h>
 
-template <PortType ty = PortType::Grayscale>
-class DirectTextureSource : public Source
+namespace ver
 {
-public:
-	DirectTextureSource(std::string_view name, std::string_view shader_value, std::shared_ptr<QImage>& buffer)
-		:Source(name, ty),
-		shader_value(shader_value),
-		buffer(buffer)
-	{}
-	static auto Make(std::string_view name, std::string_view shader_value, std::shared_ptr<QImage>& buffer)
+	template <PortType ty = PortType::Grayscale>
+	class DirectTextureSource : public Source
 	{
-		return std::make_unique<DirectTextureSource>(name, shader_value, buffer);
-	}
-	std::string_view YieldShader()override
-	{
-		return shader_value;
-	}
-	std::shared_ptr<QImage> YieldTexture()override
-	{
-		return buffer;
-	}
-private:
-	std::shared_ptr<QImage>& buffer;
-	std::string_view shader_value;
-};
+	public:
+		DirectTextureSource(std::string_view name, std::string_view shader_value, std::shared_ptr<QImage>& buffer)
+			:Source(name, ty),
+			shader_value(shader_value),
+			buffer(buffer)
+		{}
+		static auto Make(std::string_view name, std::string_view shader_value, std::shared_ptr<QImage>& buffer)
+		{
+			return std::make_unique<DirectTextureSource>(name, shader_value, buffer);
+		}
+		std::string_view YieldShader()override
+		{
+			return shader_value;
+		}
+		std::shared_ptr<QImage> YieldTexture()override
+		{
+			return buffer;
+		}
+	private:
+		std::shared_ptr<QImage>& buffer;
+		std::string_view shader_value;
+	};
 
-using GrayscaleSource = DirectTextureSource<PortType::Grayscale>;
+	using GrayscaleSource = DirectTextureSource<PortType::Grayscale>;
+}
+

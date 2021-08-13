@@ -1,9 +1,8 @@
 #pragma once
 #include <UI/NodeStyle.h>
 #include <UI/Connection.h>
-#include <UI/INode.h>
 #include <UI/NodeModules.h>
-#include <Windows/Properties.h>
+#include <UI/PropertyGenerator.h>
 #include <Logic/Node.h>
 
 #include <QPainter>
@@ -62,7 +61,7 @@ namespace UI
 		}
 		virtual void UpdateProperties(Windows::Properties& properties) override
 		{
-
+			AppendProperties(properties, model, *this);
 		}
 	private:
 		void DrawBackground(QPainter* painter)

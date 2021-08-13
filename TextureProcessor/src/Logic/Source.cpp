@@ -9,6 +9,8 @@
 #include <utils/Exception.h>
 #include <algorithm>
 
+using namespace ver;
+
 Source::Source(std::string_view name, PortType ty) :name(name), type(ty)
 {
 	if (name.empty())

@@ -1,16 +1,19 @@
 #pragma once
 #include <variant>
 #include <vector>
-#include <bitset>
 #include <array>
-#include <Logic/DynamicConstant.h>
-#include <Logic/Constants.h>
+
+namespace ver::dc
+{
+	class Buffer;
+}
 
 namespace ver
 {
 #define TYPES(m) \
 	X(Buffer)\
 	m##X(Boolean)
+
 
 	enum class DescType
 	{
@@ -43,10 +46,6 @@ namespace ver
 		constexpr PropertyDesc(const arg_v(&args)[N])noexcept
 		{
 			std::copy_n(args, N, desc.begin());
-		}
-		constexpr std::span<const arg_v, N> Get()const noexcept
-		{
-			return desc;
 		}
 		constexpr auto operator[](size_t i)const
 		{

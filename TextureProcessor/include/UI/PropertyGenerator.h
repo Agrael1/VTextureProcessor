@@ -6,9 +6,10 @@ namespace ver
 
 namespace UI
 {
+	struct IXNode;
 	namespace Windows
 	{
 		class Properties;
 	}
-	void AppendProperties(Windows::Properties& window, ver::Node& node);
+	void AppendProperties(Windows::Properties& window, ver::Node& node, IXNode& entity);
 }

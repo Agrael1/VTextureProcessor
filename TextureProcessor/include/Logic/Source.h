@@ -11,18 +11,22 @@
 
 class QImage;
 
-class Source
+namespace ver
 {
-public:
-	std::string_view GetName()const noexcept;
-	PortType GetType()const noexcept { return type; }
+	class Source
+	{
+	public:
+		std::string_view GetName()const noexcept;
+		PortType GetType()const noexcept { return type; }
 
-	virtual ~Source() = default;
-	virtual std::string_view YieldShader();
-	virtual std::shared_ptr<QImage> YieldTexture();
-protected:
-	Source(std::string_view name, PortType ty);
-private:
-	std::string name;
-	PortType type;
-};
+		virtual ~Source() = default;
+		virtual std::string_view YieldShader();
+		virtual std::shared_ptr<QImage> YieldTexture();
+	protected:
+		Source(std::string_view name, PortType ty);
+	private:
+		std::string name;
+		PortType type;
+	};
+}
+
