@@ -155,12 +155,12 @@ ShaderNode::ShaderNode(const ShaderNode& other)
  *
  * @return QImage Generated texture preview
  */
-QImage ShaderNode::Update()
+QImage ShaderNode::XUpdate()
 {
 	return {};
 }
 
-void ver::ShaderNode::XUpdate()
+void ver::ShaderNode::Update()
 {
 	e.Render(shader->shader, inputs, tiling, outputs, buf);
 }

@@ -8,7 +8,7 @@ namespace UI::Windows
 	class SceneTab : public Tab
 	{
 	public:
-		SceneTab(Properties& props, std::filesystem::path&& xproj_path);
+		SceneTab(XProperties& props, std::filesystem::path&& xproj_path);
 	public:
 		QWidget* Widget()noexcept override
 		{

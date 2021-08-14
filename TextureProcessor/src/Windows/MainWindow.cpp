@@ -51,7 +51,7 @@ MainWindow::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath,
 	, Adelet("Delete Selected")
 	, Aclrselect("Clear Selection")
 {
-	auto& cs = tab.LoadTab<SceneTab>({ projPath }, projPath.filename().string(), props, std::move(projPath));
+	auto& cs = tab.LoadTab<SceneTab>({ projPath }, projPath.filename().string(), xprops, std::move(projPath));
 	auto& mb = *x->menuBar();
 
 	mb.addMenu(&file);
@@ -91,8 +91,8 @@ MainWindow::Internal::Internal(QMainWindow* x, std::filesystem::path&& projPath,
 	Aload.setShortcut(QKeySequence{ QKeySequence::StandardKey::Open });
 
 	x->setCentralWidget(&tab);
-	x->addDockWidget(Qt::RightDockWidgetArea, &props);
-	x->resizeDocks({ &props }, { 250 }, Qt::Horizontal);
+	x->addDockWidget(Qt::RightDockWidgetArea, &xprops);
+	x->resizeDocks({ &xprops }, { 250 }, Qt::Horizontal);
 }
 
 void MainWindow::Internal::OnClearTriggered()
@@ -118,7 +118,7 @@ void MainWindow::Internal::OnLoad()
 
 	if (proj_path.empty()) return;
 	proj_path = proj_path.make_preferred();
-	auto& cs = tab.LoadTab<SceneTab>({ proj_path }, proj_path.filename().string(), props, std::move(proj_path));
+	auto& cs = tab.LoadTab<SceneTab>({ proj_path }, proj_path.filename().string(), xprops, std::move(proj_path));
 }
 
 void MainWindow::Internal::OnCreateNode()

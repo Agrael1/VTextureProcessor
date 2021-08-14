@@ -8,6 +8,7 @@
 #include <QMenu>
 
 #include <Windows/Properties.h>
+#include <Windows/REProperties.h>
 #include <UI/TabRelay.h>
 #include <UI/FlowCodex.h>
 
@@ -41,6 +42,7 @@ class MainWindow : public QMainWindow
 	private:
 		UI::Windows::TabRelay tab;
 		UI::Windows::Properties props;
+		UI::Windows::XProperties xprops;
 
 		QMenu file;
 		QMenu windows;

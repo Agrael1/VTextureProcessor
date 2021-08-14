@@ -61,7 +61,7 @@ void UI::TextureNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 void UI::TextureNode::DrawTexture(QPainter* painter)
 {
 	QPointF point{ body_size.width() / 2 - 64, EffectiveHeight() / 2 - 64 + NodeStyle::title_height + NodeStyle::item_padding };
-	texture = model.Update().scaled(texture.size());
+	texture = model.XUpdate().scaled(texture.size());
 	painter->drawImage(point, texture);
 }
 
@@ -145,7 +145,7 @@ std::string UI::TextureNode::Export()
 		"All files (*.*);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PNG (*.png);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm)"
 	);
 	if (str.isEmpty())return"";
-	model.Update().save(str);
+	model.XUpdate().save(str);
 	return str.toStdString();
 }
 
@@ -156,7 +156,7 @@ std::string UI::TextureNode::Export()
 void UI::TextureNode::ExportSilent(std::string_view hint)
 {
 	if (hint.empty())return;
-	model.Update().save(hint.data());
+	model.XUpdate().save(hint.data());
 }
 
 /**

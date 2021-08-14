@@ -81,7 +81,7 @@ void FloatSlider::TextEdited(const QString& text)
  *
  * @param to
  */
-void FloatSlider::SetChangedCallback(INode* to)
+void FloatSlider::SetChangedCallback(IXNode* to)
 {
 	connect(&slider, &QSlider::valueChanged, [this, to](int v)
 		{
@@ -111,7 +111,7 @@ Vec2Slider::Vec2Slider(QVector2D& value, float min, float max)
  *
  * @param to New callback
  */
-void Vec2Slider::SetChangedCallback(INode* to)
+void Vec2Slider::SetChangedCallback(IXNode* to)
 {
 	upper.SetChangedCallback(to);
 	lower.SetChangedCallback(to);
@@ -181,7 +181,7 @@ void IntSlider::TextEdited(const QString& text)
  *
  * @param to
  */
-void IntSlider::SetChangedCallback(INode* to)
+void IntSlider::SetChangedCallback(IXNode* to)
 {
 	connect(&slider, &QSlider::valueChanged, [this, to](int v)
 		{
@@ -209,7 +209,7 @@ CheckBox::CheckBox(bool& value, const QString& name)
  * @brief Sets check box callback
  * @param to calls update upon
 */
-void CheckBox::SetChangedCallback(INode* to)
+void CheckBox::SetChangedCallback(IXNode* to)
 {
 	connect(&box, &QCheckBox::stateChanged, [this, to](int v)
 		{

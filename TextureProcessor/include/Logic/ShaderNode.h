@@ -31,8 +31,8 @@ namespace ver
 		ShaderNode(QJsonObject document, Engine& e);
 		ShaderNode(const ShaderNode& other);
 	public:
-		QImage Update();
-		void XUpdate();
+		QImage XUpdate();
+		void Update();
 		dc::Buffer& GetBuffer() { return buf; }
 		bool& Tiling() { return tiling; }
 		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
@@ -45,7 +45,8 @@ namespace ver
 			if (buffer)
 				pv.TieProp<desc[0]>(buf);
 			pv.TieProp<desc[1]>(tiling);
-			pv.TieProp<desc[2]>(buffer);
+			if(buf)
+				pv.TieProp<desc[2]>(buffer);
 			return pv;
 		}
 	private:

@@ -14,12 +14,12 @@
 namespace UI
 {
 	struct INode;
-	class FloatSlider : public Updater
+	class FloatSlider : public IUpdater
 	{
 	public:
 		FloatSlider(float& value, float min = 0.0f, float max = 20.0f);
 	public:
-		void SetChangedCallback(INode* to)override;
+		void SetChangedCallback(IXNode* to)override;
 	private:
 		void ValueChanged(int value);
 		void TextEdited(const QString& text);
@@ -32,12 +32,12 @@ namespace UI
 		float dpi;
 	};
 
-	class Vec2Slider : public Updater
+	class Vec2Slider : public IUpdater
 	{
 	public:
 		Vec2Slider(QVector2D& value, float min = 0.0f, float max = 20.0f);
 	public:
-		void SetChangedCallback(INode* to)override;
+		void SetChangedCallback(IXNode* to)override;
 	private:
 		QVBoxLayout lay;
 		FloatSlider upper;
@@ -45,12 +45,12 @@ namespace UI
 		QVector2D& value;
 	};
 
-	class IntSlider : public Updater
+	class IntSlider : public IUpdater
 	{
 	public:
 		IntSlider(int& value);
 	public:
-		void SetChangedCallback(INode* to)override;
+		void SetChangedCallback(IXNode* to)override;
 	private:
 		void ValueChanged(int value);
 		void TextEdited(const QString& text);
@@ -62,12 +62,12 @@ namespace UI
 		int& value;
 	};
 
-	class CheckBox : public Updater
+	class CheckBox : public IUpdater
 	{
 	public:
 		CheckBox(bool& value, const QString& name);
 	public:
-		void SetChangedCallback(INode* to)override;
+		void SetChangedCallback(IXNode* to)override;
 	private:
 		bool& value;
 		QVBoxLayout lay;

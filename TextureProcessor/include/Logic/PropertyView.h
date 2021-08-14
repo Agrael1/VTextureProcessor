@@ -2,6 +2,7 @@
 #include <variant>
 #include <vector>
 #include <array>
+#include <span>
 
 namespace ver::dc
 {
@@ -13,14 +14,15 @@ namespace ver
 #define TYPES(m) \
 	X(Buffer)\
 	m##X(Boolean)
-
+#define MXRX(a) X(a)
+#define TYPES_() TYPES(MXR)
+#define XTYPES TYPES_()
 
 	enum class DescType
 	{
 #define X(a) a,
-#define _X(a) a
-		TYPES(_)
-#undef _X
+		XTYPES
+		Count
 #undef X
 	};
 	template<DescType x>
@@ -61,6 +63,7 @@ namespace ver
 		return PropertyDesc<N>{args};
 	}
 
+
 	class PropertyView
 	{
 #define _X(a) DescMap<DescType::a>::tied_t*
@@ -69,6 +72,7 @@ namespace ver
 		using view_t = std::pair<arg_v, prop_ref>;
 #undef _X
 #undef X
+
 	public:
 		//template<arg_v...v>
 		//static PropertyView Make(typename DescMap<v.first>::tied_t&... ref)
@@ -82,9 +86,20 @@ namespace ver
 		{
 			refs.emplace_back(view_t{v, prop_ref{ &ref }});
 		}
+		std::span<view_t> Get()
+		{
+			return refs;
+		}
 	private:
 		std::vector<view_t> refs;
 	};
 
+
+
+#ifndef USE_TYPES
 #undef TYPES
+#undef MXRX
+#undef TYPES_
+#undef XTYPES
+#endif
 }

@@ -4,7 +4,7 @@
  * @brief Logic behind Node editor canvas
  */
 #include <UI/FlowScene.h>
-#include <Windows/Properties.h>
+#include <Windows/REProperties.h>
 #include <UI/Connection.h>
 #include <QMessageBox>
 #include <QPainter>
@@ -42,7 +42,7 @@ using namespace UI;
  * @param parent
  * @param props
  */
-FlowScene::FlowScene(QObject* parent, Windows::Properties& props)
+FlowScene::FlowScene(QObject* parent, Windows::XProperties& props)
 	:QGraphicsScene(parent)
 	, Cbackground("#393939")
 	, Clight("#2F2F2F")
@@ -58,7 +58,7 @@ FlowScene::FlowScene(QObject* parent, Windows::Properties& props)
 	setItemIndexMethod(QGraphicsScene::NoIndex);
 	connect(this, &QGraphicsScene::selectionChanged, this, &FlowScene::OnSelectionChanged);
 
-	InsertNode("Add");
+	InsertNode("Polygon");
 	addItem(test.get());
 }
 
@@ -122,7 +122,7 @@ void FlowScene::OnSelectionChanged()
 	props.Clear();
 	for (auto* i : selectedItems())
 	{
-		auto* focus = dynamic_cast<TextureNode*>(i);
+		auto* focus = dynamic_cast<IXNode*>(i);
 		if (focus) { focus->UpdateProperties(props); }
 	}
 	props.Set();
