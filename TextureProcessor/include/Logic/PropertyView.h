@@ -13,6 +13,7 @@ namespace ver
 {
 #define TYPES(m) \
 	X(Buffer)\
+	X(BooleanUpd)\
 	m##X(Boolean)
 #define MXRX(a) X(a)
 #define TYPES_() TYPES(MXR)
@@ -26,7 +27,7 @@ namespace ver
 #undef X
 	};
 	template<DescType x>
-	struct DescMap 
+	struct DescMap
 	{
 		using tied_t = void;
 	};
@@ -35,6 +36,10 @@ namespace ver
 		using tied_t = dc::Buffer;
 	};
 	template<>struct DescMap<DescType::Boolean>
+	{
+		using tied_t = bool;
+	};
+	template<>struct DescMap<DescType::BooleanUpd>
 	{
 		using tied_t = bool;
 	};
@@ -64,11 +69,54 @@ namespace ver
 	}
 
 
+	template<typename T, typename... Ts>
+	consteval bool contains() {
+		return std::disjunction_v<std::is_same<T, Ts>...>;
+	}
+
+	template<class... A>
+	struct Join;
+
+	template<class T1>
+	struct Join<T1> {
+
+		template <class... A>
+		struct tx { using t = std::variant<T1, A...>; };
+		template<>
+		struct tx<void> { using t = std::variant<T1>; };
+
+		template <class... A>
+		using a_t = typename tx<A...>::t;
+		using t = typename tx<void>::t;
+	};
+
+	template<class T1, class...T2>
+	struct Join<T1, T2...> : public Join<T2...>
+	{
+		using base = Join<T2...>;
+
+		template <class... A>
+		struct tx {
+			using t = std::conditional_t<contains<T1, T2...>(),
+				typename Join<T2...>::template tx<A...>::t,
+				typename Join<T2...>::template tx<T1, A...>::t>;
+		};
+		template <>
+		struct tx<void> { using t = std::conditional_t < contains<T1, T2...>(), typename Join<T2...>::t, typename Join<T2...>::template a_t<T1>>; };
+
+		template <class... A>
+		using a_t = typename tx<A...>::t;
+		using t = typename tx<void>::t;
+	};
+
+	template<class... T>
+	using unique_variant = typename Join<T...>::t;
+
 	class PropertyView
 	{
 #define _X(a) DescMap<DescType::a>::tied_t*
 #define X(a) _X(a),
-		using prop_ref = std::variant<TYPES(_)>;
+		using prop_ref = unique_variant<TYPES(_)>;
 		using view_t = std::pair<arg_v, prop_ref>;
 #undef _X
 #undef X
@@ -84,7 +132,7 @@ namespace ver
 		template<arg_v v>
 		void TieProp(typename DescMap<v.first>::tied_t& ref)
 		{
-			refs.emplace_back(view_t{v, prop_ref{ &ref }});
+			refs.emplace_back(view_t{ v, prop_ref{ &ref } });
 		}
 		std::span<view_t> Get()
 		{

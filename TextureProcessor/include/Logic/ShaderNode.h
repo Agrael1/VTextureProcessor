@@ -18,7 +18,7 @@ namespace ver
 		static constexpr auto desc = MakeDesc({
 			{DescType::Buffer, "Buffer"},
 			{DescType::Boolean, "Tiling"},
-			{DescType::Boolean, "Buffer"}
+			{DescType::BooleanUpd, "Buffer"}
 			});
 		//Shared value between same type of nodes
 		struct NodePrivate

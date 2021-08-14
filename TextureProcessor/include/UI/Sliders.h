@@ -73,4 +73,15 @@ namespace UI
 		QVBoxLayout lay;
 		QCheckBox box;
 	};
+	class RefreshCheckBox : public PropertyUpdater
+	{
+	public:
+		RefreshCheckBox(bool& value, const QString& name);
+	public:
+		void SetChangedCallback(IXNode* to, Windows::XPropertyElement& self)override;
+	private:
+		bool& value;
+		QVBoxLayout lay;
+		QCheckBox box;
+	};
 }

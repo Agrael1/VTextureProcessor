@@ -44,10 +44,14 @@ static void PropertyBoolean(Windows::XPropertyElement& elem, const char* name, b
 {
 	elem.AppendWidget<CheckBox>(buf, name);
 }
-
-void UI::AppendProperties(Windows::XProperties& window, ver::Node& node, IXNode& entity)
+static void PropertyBooleanUpd(Windows::XPropertyElement& elem, const char* name, bool& buf)
 {
-	Windows::XPropertyElement elem{ entity, node.GetName() };
+	elem.AppendWidget<RefreshCheckBox>(buf, name);
+}
+
+void UI::PlaceProperties(Windows::XPropertyElement& elem, ver::Node& node, IXNode& entity)
+{
+	elem.Clear();
 	auto props = node.GetProperties();
 	for (const auto& x : props.Get())
 	{
@@ -60,6 +64,4 @@ void UI::AppendProperties(Windows::XProperties& window, ver::Node& node, IXNode&
 			break;
 		}
 	}
-
-	window.AppendProperty(std::move(elem));
 }

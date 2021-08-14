@@ -58,9 +58,9 @@ namespace UI
 			{
 				return model.GetName();
 			}
-			virtual void UpdateProperties(Windows::XProperties& properties) override
+			virtual void UpdateProperties(Windows::XPropertyElement& properties) override
 			{
-				AppendProperties(properties, model, *this);
+				PlaceProperties(properties, model, *this);
 			}
 			virtual void Update()override
 			{

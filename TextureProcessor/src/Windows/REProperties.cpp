@@ -38,13 +38,9 @@ XPropertyElement::XPropertyElement(XPropertyElement&& o)
         lay.addWidget(w.get());
 }
 
-/**
- * @brief Moves existing property in vector
- * @param prop previous property
-*/
-void XProperties::AppendProperty(XPropertyElement&& prop)
+XPropertyElement& UI::Windows::XProperties::MakeElement(IXNode& parent, std::string_view title)
 {
-    props.emplace_back(std::move(prop));
+    return props.emplace_back(parent, title);
 }
 
 /**

@@ -123,7 +123,7 @@ void FlowScene::OnSelectionChanged()
 	for (auto* i : selectedItems())
 	{
 		auto* focus = dynamic_cast<IXNode*>(i);
-		if (focus) { focus->UpdateProperties(props); }
+		if (focus) focus->UpdateProperties(props.MakeElement(*focus, focus->Name()));
 	}
 	props.Set();
 }

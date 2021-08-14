@@ -217,3 +217,21 @@ void CheckBox::SetChangedCallback(IXNode* to)
 			to->Update();
 		});
 }
+
+UI::RefreshCheckBox::RefreshCheckBox(bool& value, const QString& name)
+	:value(value), box(name)
+{
+	box.setChecked(value);
+	lay.addWidget(&box);
+	setLayout(&lay);
+}
+
+
+void UI::RefreshCheckBox::SetChangedCallback(IXNode* to, Windows::XPropertyElement& self)
+{
+	connect(&box, &QCheckBox::stateChanged, [this, to, &self](int v)
+		{
+			value = bool(v);
+			to->UpdateProperties(self);
+		});
+}

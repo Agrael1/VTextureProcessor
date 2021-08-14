@@ -9,7 +9,7 @@ namespace UI
 	struct IXNode;
 	namespace Windows
 	{
-		class XProperties;
+		class XPropertyElement;
 	}
-	void AppendProperties(Windows::XProperties& window, ver::Node& node, IXNode& entity);
+	void PlaceProperties(Windows::XPropertyElement& props, ver::Node& node, IXNode& entity);
 }
