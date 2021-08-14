@@ -69,54 +69,34 @@ namespace ver
 	}
 
 
-	template<typename T, typename... Ts>
-	consteval bool contains() {
-		return std::disjunction_v<std::is_same<T, Ts>...>;
-	}
+	template <class... Ts>
+	struct typelist;
 
-	template<class... A>
-	struct Join;
+	template <class List, class... Ts>
+	struct unique_variant;
 
-	template<class T1>
-	struct Join<T1> {
-
-		template <class... A>
-		struct tx { using t = std::variant<T1, A...>; };
-		template<>
-		struct tx<void> { using t = std::variant<T1>; };
-
-		template <class... A>
-		using a_t = typename tx<A...>::t;
-		using t = typename tx<void>::t;
+	template <class... Uniqs>
+	struct unique_variant<typelist<Uniqs...>> {
+		using type = std::variant<Uniqs...>;
 	};
 
-	template<class T1, class...T2>
-	struct Join<T1, T2...> : public Join<T2...>
-	{
-		using base = Join<T2...>;
-
-		template <class... A>
-		struct tx {
-			using t = std::conditional_t<contains<T1, T2...>(),
-				typename Join<T2...>::template tx<A...>::t,
-				typename Join<T2...>::template tx<T1, A...>::t>;
-		};
-		template <>
-		struct tx<void> { using t = std::conditional_t < contains<T1, T2...>(), typename Join<T2...>::t, typename Join<T2...>::template a_t<T1>>; };
-
-		template <class... A>
-		using a_t = typename tx<A...>::t;
-		using t = typename tx<void>::t;
+	template <class... Uniqs, class Head, class... Tail>
+	struct unique_variant<typelist<Uniqs...>, Head, Tail...> {
+		using type = std::conditional_t<
+			(std::is_same_v<Head, Uniqs> || ...),
+			typename unique_variant<typelist<Uniqs...      >, Tail...>::type,
+			typename unique_variant<typelist<Uniqs..., Head>, Tail...>::type
+		>;
 	};
+	template <class... Ts>
+	using unique_variant_t = typename unique_variant<typelist<>, Ts...>::type;
 
-	template<class... T>
-	using unique_variant = typename Join<T...>::t;
 
 	class PropertyView
 	{
 #define _X(a) DescMap<DescType::a>::tied_t*
 #define X(a) _X(a),
-		using prop_ref = unique_variant<TYPES(_)>;
+		using prop_ref = unique_variant_t<TYPES(_)>;
 		using view_t = std::pair<arg_v, prop_ref>;
 #undef _X
 #undef X
