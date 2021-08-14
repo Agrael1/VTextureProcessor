@@ -26,6 +26,8 @@ namespace ver
 		Count
 #undef X
 	};
+
+
 	template<DescType x>
 	struct DescMap
 	{
@@ -91,16 +93,20 @@ namespace ver
 	template <class... Ts>
 	using unique_variant_t = typename unique_variant<typelist<>, Ts...>::type;
 
+	template <class T>
+	struct enum2type;
+
+	template<typename T, T... size>
+	struct enum2type<std::integer_sequence<T, size...>> {
+		using type = unique_variant_t<typename DescMap<(DescType)size>::tied_t*...>;
+	};	
+	using unique_variant_tg = enum2type<std::make_integer_sequence<size_t, size_t(DescType::Count)>>::type;
+	
 
 	class PropertyView
 	{
-#define _X(a) DescMap<DescType::a>::tied_t*
-#define X(a) _X(a),
-		using prop_ref = unique_variant_t<TYPES(_)>;
+		using prop_ref = unique_variant_tg;
 		using view_t = std::pair<arg_v, prop_ref>;
-#undef _X
-#undef X
-
 	public:
 		//template<arg_v...v>
 		//static PropertyView Make(typename DescMap<v.first>::tied_t&... ref)
