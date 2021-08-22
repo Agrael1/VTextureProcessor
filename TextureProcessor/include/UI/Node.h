@@ -4,7 +4,9 @@
 #include <UI/NodeModules.h>
 #include <UI/PropertyGenerator.h>
 #include <Logic/Node.h>
+#include <Logic/Sink.h>
 
+#include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
 namespace UI
@@ -70,6 +72,24 @@ namespace UI
 				update();
 			}
 		private:
+			void mousePressEvent(QGraphicsSceneMouseEvent* event)override
+			{
+				auto pos = event->pos();
+				// Detects colision with ports
+				if (pos.y() < NodeStyle::title_height + NodeStyle::item_padding ||
+					pos.y() > geometry().height() - NodeStyle::item_padding ||
+					pos.x() > PortStyle::port_bbox / 2 && pos.x() < geometry().width() - PortStyle::port_bbox / 2)
+					return QGraphicsItem::mousePressEvent(event);
+
+				// Port lookup
+				if (auto port = PortHit(pos); port.first != Port::None)
+				{
+					if (port.first == Port::Sink && connections[port.second])
+						return XConnMapper::AttachTemporary(std::move(connections[port.second]));
+					XConnMapper::MakeTemporary(*this, port.first, port.second);
+				}
+			}
+
 			void DrawBackground(QPainter* painter)
 			{
 				constexpr qreal edge_size = 10.0;
@@ -149,6 +169,7 @@ namespace UI
 					ypos += pdelta_source;
 				}
 			}
+
 			void Init()
 			{
 				setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);
@@ -176,13 +197,75 @@ namespace UI
 				for (const auto& x : r)
 					gll->addItem(&modules.emplace_back(x));
 			}
+			std::pair<Port, uint8_t> PortHit(QPointF point)const
+			{
+				auto h = geometry().height();
+				auto pdelta_sink = h / (model.SinksCount() + 1);
+				auto pdelta_source = h / (model.SourcesCount() + 1);
+
+				if (point.x() < PortStyle::port_bbox)
+				{
+					auto startheight = pdelta_sink;
+					if (point.y() < startheight)return { Port::None, 0 };
+					for (uint8_t si = 0; si < model.SinksCount(); si++, startheight += pdelta_sink)
+					{
+						if (point.y() < startheight + PortStyle::port_bbox)
+						{
+							return { Port::Sink,si };
+						}
+					}
+					return { Port::None, 0 };
+				}
+
+				auto startheight = pdelta_source;
+				if (point.y() < startheight)return { Port::None, 0 };
+				for (uint8_t si = 0; si < model.SourcesCount(); si++, startheight += pdelta_sink)
+				{
+					if (point.y() < startheight + PortStyle::port_bbox)
+						return { Port::Source,si };
+				}
+				return { Port::None, 0 };
+			}
+			virtual ver::Node& Model()noexcept override
+			{
+				return model;
+			}
+			virtual void OnConnect(uint8_t sinkN, IXNode& source, uint8_t sourceN)override
+			{
+				model.GetSink(sinkN).Link(source.Model().GetSource(sourceN));
+				Update();
+			}
+			virtual void OnDisconnect(uint8_t sinkN) override
+			{
+				model.GetSink(sinkN).Unlink();
+				Update();
+			}
+
+			virtual std::pair<Port, uint8_t> PortHitScene(QPointF scene_point)override
+			{
+				return PortHit(mapFromScene(scene_point));
+			}
+			virtual void SetConnection(std::unique_ptr<XConnection>&& in, uint8_t portN)override
+			{
+				assert(portN < model.SinksCount());
+				connections[portN] = std::move(in);
+			}
+			virtual QPointF GetPortPos(Port portTy, uint8_t portN)override
+			{
+				auto h = geometry().height();
+
+				return mapToScene({
+					portTy == Port::Sink ? 0 : geometry().width(),
+					portTy == Port::Sink ? h / (model.SinksCount() + 1) * (portN + 1) + PortStyle::diameter / 2 :
+					(h / (model.SourcesCount() + 1)) * (portN + 1) + PortStyle::diameter / 2 });
+			}
 		private:
 			NodeStyle style;
 			XModel model;
 
 			QGraphicsLinearLayout* gll;
 			std::vector<Module> modules;
-			std::vector<std::unique_ptr<Connection>> connections; //sink holds connection
+			std::vector<std::unique_ptr<XConnection>> connections; //sink holds connection
 		};
 }
 

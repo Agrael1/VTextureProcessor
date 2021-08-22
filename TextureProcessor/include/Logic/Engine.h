@@ -38,7 +38,7 @@ public:
 public:
 	void Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs, bool tile, std::span<std::shared_ptr<QImage>> outputs, ver::dc::Buffer& buffer);
 	QOpenGLFunctions& Functions() { return con.funcs; }
-	static QOpenGLTexture& Empty();
+	QOpenGLTexture& Empty();
 private:
 	void BindBuffer(ver::dc::Buffer& buffer);
 	void Current();

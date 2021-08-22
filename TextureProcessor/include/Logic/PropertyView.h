@@ -11,18 +11,15 @@ namespace ver::dc
 
 namespace ver
 {
-#define TYPES(m) \
+#define TYPES \
 	X(Buffer)\
 	X(BooleanUpd)\
-	m##X(Boolean)
-#define MXRX(a) X(a)
-#define TYPES_() TYPES(MXR)
-#define XTYPES TYPES_()
+	X(Boolean)
 
 	enum class DescType
 	{
 #define X(a) a,
-		XTYPES
+		TYPES
 		Count
 #undef X
 	};
@@ -132,8 +129,5 @@ namespace ver
 
 #ifndef USE_TYPES
 #undef TYPES
-#undef MXRX
-#undef TYPES_
-#undef XTYPES
 #endif
 }

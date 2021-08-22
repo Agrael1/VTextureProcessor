@@ -58,7 +58,7 @@ void UI::PlaceProperties(Windows::XPropertyElement& elem, ver::Node& node, IXNod
 		switch (x.first.first)
 		{
 #define X(a) case ver::DescType::a: Property##a(elem, x.first.second, *std::get<ver::DescMap<ver::DescType::a>::tied_t*>(x.second));break;
-			XTYPES
+			TYPES
 #undef X
 		default:
 			break;

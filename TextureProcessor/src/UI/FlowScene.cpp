@@ -58,7 +58,7 @@ FlowScene::FlowScene(QObject* parent, Windows::XProperties& props)
 	setItemIndexMethod(QGraphicsScene::NoIndex);
 	connect(this, &QGraphicsScene::selectionChanged, this, &FlowScene::OnSelectionChanged);
 
-	InsertNode("Polygon");
+	InsertNode("Add");
 	addItem(test.get());
 }
 
@@ -125,7 +125,7 @@ void FlowScene::OnSelectionChanged()
 		auto* focus = dynamic_cast<IXNode*>(i);
 		if (focus) focus->UpdateProperties(props.MakeElement(*focus, focus->Name()));
 	}
-	props.Set();
+	props.Show();
 }
 
 /**

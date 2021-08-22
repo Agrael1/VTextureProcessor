@@ -8,6 +8,12 @@
 #include <QJsonObject>
 #include <QGraphicsWidget>
 #include <memory>
+#include <Logic/PortType.h>
+
+namespace ver
+{
+	class Node;
+}
 
 namespace UI
 {
@@ -29,6 +35,7 @@ namespace UI
 		virtual void Deserialize(QJsonObject) = 0;
 	};
 
+	class XConnection;
 	struct NOVTABLE IXNode:public QGraphicsWidget
 	{
 		virtual ~IXNode() = default;
@@ -36,5 +43,12 @@ namespace UI
 		virtual std::string_view Name()const = 0;
 		virtual void UpdateProperties(Windows::XPropertyElement& properties) = 0;
 		virtual void Update() = 0;
+		virtual void OnConnect(uint8_t sinkN, IXNode& source, uint8_t sourceN) = 0;
+		virtual void OnDisconnect(uint8_t sinkN) = 0;
+		virtual ver::Node& Model()noexcept = 0;
+
+		virtual std::pair<Port, uint8_t> PortHitScene(QPointF scene_point) = 0;
+		virtual void SetConnection(std::unique_ptr<XConnection>&& in, uint8_t portN) = 0;
+		virtual QPointF GetPortPos(Port portTy, uint8_t portN) = 0;
 	};
 }

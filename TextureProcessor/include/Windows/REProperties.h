@@ -8,7 +8,6 @@ namespace UI::Windows
 {
 	class XPropertyElement : public QGroupBox
 	{
-		friend class XProperties;
 	public:
 		XPropertyElement(IXNode& parent, std::string_view title);
 		XPropertyElement(XPropertyElement&& o);
@@ -48,7 +47,7 @@ namespace UI::Windows
 		XProperties(QWidget* parent = nullptr);
 	public:
 		XPropertyElement& MakeElement(IXNode& parent, std::string_view title);
-		void Set();
+		void Show();
 		void Clear();
 	private:
 		Dummy dum;

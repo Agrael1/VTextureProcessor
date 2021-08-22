@@ -46,7 +46,7 @@ XPropertyElement& UI::Windows::XProperties::MakeElement(IXNode& parent, std::str
 /**
  * @brief Adds all widgets to dock window
 */
-void XProperties::Set()
+void XProperties::Show()
 {
     for (auto& w : props)
         dum.lay.addWidget(&w);

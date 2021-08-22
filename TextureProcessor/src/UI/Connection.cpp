@@ -8,9 +8,10 @@
 #include <QPainter>
 #include <QJsonArray>
 #include <QGraphicsSceneMouseEvent>
+#include <Logic/Source.h>
 
 using namespace UI;
-
+#pragma region delet
 /**
  * @brief Construct a new Connection:: Connection object
  *
@@ -182,10 +183,12 @@ void UI::Connection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> por
 	bFinished = true;
 }
 
+
 /**
- * @brief Propagates changes to nodes following current Node
- *
- */
+* @brief Propagates changes to nodes following current Node
+*
+*/
+
 void UI::Connection::Update()
 {
 	connector.second->OnConnect(sinkN, *connector.first, sourceN);
@@ -395,4 +398,298 @@ void UI::ConnMapper::ClearTemporary()
 {
 	Instance().tmp->ungrabMouse();
 	Instance().tmp.reset();
+}
+#pragma endregion
+
+#include <ranges>
+
+static UI::IXNode* LocateNode(QGraphicsScene& scene, QPointF pos)noexcept
+{
+	auto xitems = scene.items(pos);
+	auto node = [](QGraphicsItem* item)
+	{
+		return (dynamic_cast<UI::IXNode*>(item) != nullptr);
+	};
+
+	for (auto* i : xitems | std::views::filter(node))
+		return static_cast<UI::IXNode*>(i);
+	return nullptr;
+}
+
+UI::XConnection::XConnection(IXNode& node, Port ty, uint8_t portidx)
+{
+	// Renders the connection between nodes
+	node.scene()->addItem(this);
+	// Gets coordinates of the target port
+	sink = source = node.GetPortPos(ty, portidx);
+	switch (ty)
+	{
+	case Port::Sink:
+		// If this node is the connection Sink
+		connector.second = &node;
+		sinkN = portidx;
+		break;
+	case Port::Source:
+		// If this node is the connection Source
+		connector.first = &node;
+		sourceN = portidx;
+		break;
+	default:
+		break;
+	}
+	Init();
+}
+
+UI::XConnection::~XConnection()
+{
+	// Only unmaps if the nodes were correctly connected
+	if (bFinished)
+		XConnMapper::Unmap(connector.first, this);
+}
+
+void UI::XConnection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+	painter->setBrush(Qt::NoBrush);
+	// Selects style based on connection status (connected, selected or currently being dragged)
+	if (isSelected())
+		painter->setPen(ConnectionStyle::Grayscale.selected);
+	else if (bFinished)
+		painter->setPen(ConnectionStyle::Grayscale.connected);
+	else
+		painter->setPen(ConnectionStyle::Grayscale.sketch);
+
+	auto c1c2 = PointsC1C2();
+	// Draws a cubic spline using the calculated pivot points
+	QPainterPath cubic(source);
+	cubic.cubicTo(c1c2.first, c1c2.second, sink);
+	painter->drawPath(cubic);
+}
+
+QRectF UI::XConnection::boundingRect() const
+{
+	auto points = PointsC1C2();
+	QRectF c1c2Rect = QRectF(points.first, points.second).normalized();
+	QRectF commonRect = QRectF(source, sink).normalized().united(c1c2Rect);
+
+	constexpr QPointF cornerOffset(PortStyle::diameter, PortStyle::diameter);
+
+	commonRect.setTopLeft(commonRect.topLeft() - cornerOffset);
+	commonRect.setBottomRight(commonRect.bottomRight() + 2 * cornerOffset);
+	return commonRect;
+}
+
+void UI::XConnection::Move(QPointF deltapos, Port ty)
+{
+	prepareGeometryChange();
+	switch (ty)
+	{
+	case Port::Sink:
+		sink += deltapos;
+		break;
+	case Port::Source:
+		source += deltapos;
+		break;
+	default:
+		break;
+	}
+}
+
+void UI::XConnection::Update()
+{
+	connector.second->OnConnect(sinkN, *connector.first, sourceN);
+}
+
+void UI::XConnection::UpdateDisconnect()
+{
+	connector.second->OnDisconnect(sinkN);
+}
+
+QJsonObject UI::XConnection::Serialize()
+{
+	/*
+	The returned JSON has the following structure:
+
+	{
+		"Source": ["Node_name", source_index],
+		"Sink": ["Node_name", sink_index]
+	}
+	*/
+	QJsonObject top;
+
+	QJsonArray source;
+	source.append(connector.first->Name().data());
+	source.append(sourceN);
+	top.insert("Source", source);
+
+	QJsonArray sink;
+
+	sink.append(connector.second->Name().data());
+	sink.append(sinkN);
+	top.insert("Sink", sink);
+
+	return top;
+}
+
+void UI::XConnection::Init()
+{
+	// Set Qt properties of the connection
+	setFlag(QGraphicsItem::ItemIsMovable, false);
+	setFlag(QGraphicsItem::ItemIsFocusable, true);
+	setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+	setAcceptHoverEvents(true);
+	setZValue(-1.0);
+}
+
+void UI::XConnection::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{
+	prepareGeometryChange();
+
+	// Endpoint only moved if the position has changed
+	if (auto x = Requires(); any(x))
+		Move(event->pos() - event->lastPos(), x);
+
+	update();
+	event->accept();
+}
+
+void UI::XConnection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+	ungrabMouse();
+	event->accept();
+
+	auto* node = LocateNode(*scene(), event->scenePos());
+
+	// Finishes connection if mouse was released on a target
+	if (node && node != StartNode())
+		if (auto p = node->PortHitScene(event->scenePos()); any(p.first))
+			return PlaceConnection(p, node);
+
+	if (any(Requires()))XConnMapper::ClearTemporary();
+}
+
+void UI::XConnection::PlaceConnection(std::optional<std::pair<Port, uint8_t>> port, IXNode* node)
+{
+	auto re = Requires();
+	// If connecting Sink to Sink (or Source to Source)
+	if (port->first != re) {
+		XConnMapper::ClearTemporary();
+		return;
+	};
+	prepareGeometryChange();
+
+	// Extrapolates missing Sink or Source
+	switch (re)
+	{
+	case Port::Sink:
+	{
+		sinkN = port->second;
+		connector.second = node;
+		node->SetConnection(XConnMapper::DetachTemporary(), sinkN);
+		sink = node->GetPortPos(Port::Sink, sinkN);
+		break;
+	}
+	case Port::Source:
+		connector.first = node;
+		sourceN = port->second;
+		connector.second->SetConnection(XConnMapper::DetachTemporary(), sinkN);
+		source = node->GetPortPos(Port::Source, sourceN);
+		break;
+	}
+	XConnMapper::Map(connector.first, this);
+	connector.second->OnConnect(sinkN, *connector.first, sourceN);
+
+	// Set connection as properly terminated (for cleanup)
+	bFinished = true;
+}
+
+void UI::XConnection::RemoveForce() noexcept
+{
+	if (bFinished)
+	{
+		UpdateDisconnect();
+		connector.second->SetConnection(nullptr, sinkN);
+	}
+}
+
+std::pair<QPointF, QPointF> UI::XConnection::PointsC1C2() const
+{
+	constexpr qreal defaultOffset = 200;
+	qreal xDistance = sink.x() - source.x();
+	// Maximum offset is 200
+	qreal horizontalOffset = std::min(defaultOffset, std::abs(xDistance));
+	qreal verticalOffset = 0;
+	qreal ratioX = 0.5;
+
+	// If the Sink is left of Source
+	if (xDistance <= 0)
+	{
+		verticalOffset = qMin(defaultOffset, 20.0);
+		ratioX = 1.0;
+	}
+	horizontalOffset *= ratioX;
+
+	// Returns spline pivot points
+	return {
+		{source.x() + horizontalOffset, source.y() + verticalOffset},
+		{sink.x() - horizontalOffset, sink.y() - verticalOffset }
+	};
+}
+
+Port UI::XConnection::Requires() const
+{
+	if (!connector.first) return Port::Source;
+	if (!connector.second) return Port::Sink;
+	return Port::None;
+}
+
+PortType UI::XConnection::GetType() const noexcept
+{
+	if (connector.first)
+		return connector.first->Model().GetSource(sourceN).GetType();
+
+	if (connector.second)
+		return connector.first->Model().GetSink(sinkN).GetType();
+
+	return PortType::None;
+}
+
+
+void UI::XConnMapper::MakeTemporary(IXNode& node, Port port, uint8_t portidx)
+{
+	Instance().tmp.reset(new XConnection{ node, port, portidx });
+	Instance().tmp->grabMouse();
+}
+
+void UI::XConnMapper::AttachTemporary(std::unique_ptr<XConnection>&& in)
+{
+	auto& x = Instance().tmp;
+	x = std::move(in);
+	Unmap(x->connector.first, x.get());
+	x->UpdateDisconnect();
+	x->ResetSink();
+	x->grabMouse();
+}
+
+void UI::XConnMapper::ClearTemporary()
+{
+	//Instance().tmp->ungrabMouse();
+	Instance().tmp.reset();
+}
+
+XConnMapper& UI::XConnMapper::Instance()
+{
+	static XConnMapper mapper;
+	return mapper;
+}
+
+void UI::XConnMapper::Map(IXNode* n, XConnection* c)
+{
+	auto& i = Instance();
+	i.map[n].push_back(c);
+}
+
+std::span<XConnection*> UI::XConnMapper::Get(IXNode* n)
+{
+	return Instance().map[n];
 }

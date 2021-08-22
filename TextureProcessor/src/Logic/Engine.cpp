@@ -8,9 +8,9 @@
 #include <QOpenGLTexture>
 #include <optional>
 
-/**
- * @brief Creates GL context
-*/
+ /**
+  * @brief Creates GL context
+ */
 Engine::Context::Context()
 {
 	QSurfaceFormat surfaceFormat;
@@ -45,7 +45,9 @@ Engine::Engine(QSize size)
 	vbuf.bind();
 }
 
-Engine::~Engine() { Current(); Empty().destroy(); }
+Engine::~Engine() {
+	Empty().destroy();
+}
 
 /**
  * @brief Creates static empty texture
@@ -57,7 +59,6 @@ QOpenGLTexture& Engine::Empty()
 	if (!empty.isCreated())
 	{
 		empty.setSize(1, 1, 1);
-		empty.create();
 		empty.allocateStorage();
 	}
 	return empty;
@@ -80,10 +81,10 @@ void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs
 	shaders.bind();
 
 	std::vector<std::optional<QOpenGLTexture>> xinputs(inputs.size());
-	for (uint32_t s = 0; const auto& x : inputs)
-		if(x)xinputs[s].emplace(*x, QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
+	for (uint32_t s = 0; const auto & x : inputs)
+		if (x)xinputs[s].emplace(*x, QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
 
-	for (uint32_t s = 0; auto& i: xinputs)
+	for (uint32_t s = 0; auto & i: xinputs)
 	{
 		if (i)
 		{
@@ -101,7 +102,7 @@ void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs
 	con.funcs.glDrawArrays(GL_TRIANGLES, 0, 3);
 	shaders.removeShader(&ps);
 
-	if(tile)
+	if (tile)
 		for (auto& i : xinputs)
 			if (i)i->setWrapMode(QOpenGLTexture::Repeat);
 
