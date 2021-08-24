@@ -148,7 +148,7 @@ void MainPage::OnOpenClicked(bool checked)
 	).toStdString() };
 
 	if (proj_path.empty()) return;
-	QApplication::postEvent(parent, new ProjectEvent(std::move(proj_path), {0,0}));
+	QApplication::postEvent(parent, new ProjectEvent(std::move(proj_path), {}));
 }
 
 
@@ -207,7 +207,7 @@ void MainPage::OnItemDoubleClicked(QTreeWidgetItem* item, int column)
 		}
 		return;
 	}
-	QApplication::postEvent(parent, new ProjectEvent(std::move(file), { 0,0 }));
+	QApplication::postEvent(parent, new ProjectEvent(std::move(file), {}));
 }
 
 UI::Internal::ProjectsCW::ProjectsCW(QWidget* parent)

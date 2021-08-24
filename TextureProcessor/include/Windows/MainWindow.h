@@ -16,7 +16,7 @@
 class MainWindow : public QMainWindow
 {
 public:
-	MainWindow(int32_t width, int32_t height, std::filesystem::path&& projPath, std::pair<int,int> resolution);
+	MainWindow(int32_t width, int32_t height, std::filesystem::path&& projPath, QSize resolution);
 public:
 	void closeEvent(QCloseEvent* event)override;
 

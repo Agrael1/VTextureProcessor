@@ -22,7 +22,7 @@ using namespace UI::Windows;
  * @param height of a window
  * @param xprojPath file project that is being worked upon
 */
-MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xprojPath, std::pair<int, int> resolution)
+MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xprojPath, QSize resolution)
 	:tab(this, cur_scene)
 	, file("File")
 	, windows("Windows")
@@ -84,7 +84,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	addDockWidget(Qt::RightDockWidgetArea, &xprops);
 	resizeDocks({ &xprops }, { 250 }, Qt::Horizontal);
 	
-	tab.LoadTab<SceneTab>({ xprojPath }, xprojPath.filename().string(), xprops, std::move(xprojPath), QSize(resolution.first, resolution.second));
+	tab.LoadTab<SceneTab>({ xprojPath }, xprojPath.filename().string(), xprops, std::move(xprojPath), resolution);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

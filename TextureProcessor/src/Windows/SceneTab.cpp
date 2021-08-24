@@ -13,6 +13,7 @@ SceneTab::SceneTab(XProperties& props, std::filesystem::path&& xproj_path, QSize
 	:Tab(std::move(xproj_path)), scene(nullptr, props, resolution), view(&scene)
 {
 	scene.setSceneRect(-32000, -32000, 64000, 64000);
+	if (resolution != QSize{})Save();
 }
 
 UI::Windows::SceneTab::~SceneTab()

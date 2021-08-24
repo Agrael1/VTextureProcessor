@@ -11,9 +11,9 @@ namespace UI
 {
 	struct ProjectEvent : public QEvent {
 		std::filesystem::path projPath;
-		std::pair<int, int> size;
+		QSize size;
 
-		ProjectEvent(std::filesystem::path&& projPath, std::pair<int, int> size)
+		ProjectEvent(std::filesystem::path&& projPath, QSize size)
 			:projPath(std::move(projPath)), QEvent((QEvent::Type)(QEvent::User + 1)), size(size) {}
 	};
 	struct NewProjEvent : public QEvent {
