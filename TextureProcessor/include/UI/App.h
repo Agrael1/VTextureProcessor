@@ -24,4 +24,5 @@ private:
 private:
 	static constexpr std::string_view AppVer = "0.2.1";
 	static constexpr std::string_view AppTheme = "Fusion";
+	static constexpr std::string_view AppName = "VTexEditor";
 };

@@ -32,7 +32,7 @@
 #include <QApplication>
 #include <QPushButton>
 #include <QMouseEvent>
-//#include <QPainter>
+#include <QPainter>
 
 #include <fstream>
 #include <filesystem>

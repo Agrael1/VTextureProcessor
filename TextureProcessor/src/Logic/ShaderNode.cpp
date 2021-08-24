@@ -30,8 +30,7 @@ ShaderNode::NodePrivate::NodePrivate(QString&& code)
  * @param document JSON specification of the shader node
  * @param e Engine for compiling textures
  */
-ShaderNode::ShaderNode(QJsonObject document, Engine& e)
-	: e(e)
+ShaderNode::ShaderNode(QJsonObject document)
 {
 	auto node = document["Node"].toObject();
 	QString xshader{ "#version 420 \n" };
@@ -111,7 +110,7 @@ ShaderNode::ShaderNode(QJsonObject document, Engine& e)
  * @param other Shader node to be duplicated (without recompiling shader)
  */
 ShaderNode::ShaderNode(const ShaderNode& other)
-	:shader(other.shader), e(other.e), buf(other.buf)
+	:shader(other.shader), buf(other.buf)
 {
 	sinks.reserve(other.SinksCount());
 	sources.reserve(other.SourcesCount());
@@ -162,7 +161,7 @@ QImage ShaderNode::XUpdate()
 
 void ver::ShaderNode::Update()
 {
-	e.Render(shader->shader, inputs, tiling, outputs, buf);
+	Engine::Instance().Render(shader->shader, inputs, tiling, outputs, buf);
 }
 
 /**
@@ -199,7 +198,7 @@ void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 	}
 }
 
-ver::OutputNode::OutputNode(QJsonObject document, Engine& e)
+ver::OutputNode::OutputNode(QJsonObject document)
 {
 	RegisterSink(GrayscaleSink::Make("Out", inout));
 }

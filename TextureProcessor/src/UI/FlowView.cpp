@@ -4,7 +4,8 @@
  * @brief Flow view for handling the Node editor canvas view
  */
 #include <UI/FlowView.h>
-#include <UI/FlowScene.h>
+#include <UI/SceneEvent.h>
+//#include <UI/FlowScene.h>
 #include <QMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
 
@@ -15,8 +16,8 @@ using namespace UI;
  *
  * @param scene Scene to create View of
  */
-FlowView::FlowView(UI::FlowScene& scene)
-	:scene(scene), QGraphicsView(&scene, nullptr), menu(nullptr)
+FlowView::FlowView(QGraphicsScene* scene)
+	:QGraphicsView(scene, nullptr), menu(nullptr)
 {
 	setRenderHints(QPainter::Antialiasing |
 		QPainter::TextAntialiasing |
@@ -28,16 +29,16 @@ FlowView::FlowView(UI::FlowScene& scene)
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 	setCacheMode(QGraphicsView::CacheBackground);
 
-	// Create context menu
-	auto& m = scene.GetGroupList();
-	for (const auto& x : m)
-	{
-		menu.AppendGroup(x.first);
-		for (const auto& y : x.second)
-			menu.AppendItem(y);
-	}
-	menu.Finish();
-	menu.SetItemClickCallback([this](QTreeWidgetItem* item, int) {OnItemSelected(item, 0); });
+	//// Create context menu
+	//auto& m = scene.GetGroupList();
+	//for (const auto& x : m)
+	//{
+	//	menu.AppendGroup(x.first);
+	//	for (const auto& y : x.second)
+	//		menu.AppendItem(y);
+	//}
+	//menu.Finish();
+	//menu.SetItemClickCallback([this](QTreeWidgetItem* item, int) {OnItemSelected(item, 0); });
 }
 
 /**
@@ -70,17 +71,18 @@ void FlowView::wheelEvent(QWheelEvent* event)
  */
 void FlowView::contextMenuEvent(QContextMenuEvent* event)
 {
-	last_event = event->pos();
-	if (auto* x = itemAt(event->pos()); x && x->isSelected())
-	{
-		QGraphicsSceneContextMenuEvent e{ QGraphicsSceneContextMenuEvent::GraphicsSceneContextMenu };
-		e.setPos(event->pos());
-		e.setScreenPos(event->globalPos());
-		scene.sendEvent(x, &e);
-		return;
-	}
-
-	menu.Execute(event->globalPos());
+	//QApplication::postEvent(scene(), event);
+	//last_event = event->pos();
+	//if (auto* x = itemAt(event->pos()); x && x->isSelected())
+	//{
+	//	QGraphicsSceneContextMenuEvent e{ QGraphicsSceneContextMenuEvent::GraphicsSceneContextMenu };
+	//	e.setPos(event->pos());
+	//	e.setScreenPos(event->globalPos());
+	//	scene.sendEvent(x, &e);
+	//	return;
+	//}
+	//
+	//menu.Execute(event->globalPos());
 }
 
 /**
@@ -118,11 +120,11 @@ void FlowView::scaleDown()
  */
 void FlowView::OnItemSelected(QTreeWidgetItem* item, int)
 {
-	auto modelName = item->data(0, Qt::UserRole).toString().toStdString();
-	if (modelName == skipper) return;
-
-	auto& type = scene.CreateNode(modelName);
-	type.setPos(mapToScene(last_event));
-
-	menu.close();
+	//auto modelName = item->data(0, Qt::UserRole).toString().toStdString();
+	//if (modelName == skipper) return;
+	//
+	//auto& type = scene.CreateNode(modelName);
+	//type.setPos(mapToScene(last_event));
+	//
+	//menu.close();
 }

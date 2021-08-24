@@ -17,7 +17,7 @@ App::App(int &xargc, char** xargv)
 	:app(xargc, xargv), window{false}
 {
     // Basic setup of the application
-	QCoreApplication::setApplicationName(MainWindow::AppName.data());
+	QCoreApplication::setApplicationName(AppName.data());
 	QCoreApplication::setApplicationVersion(AppVer.data());
 	app.setStyle(QStyleFactory::create(AppTheme.data()));
     app.setWindowIcon(QIcon{ ":/tlr.ico" });

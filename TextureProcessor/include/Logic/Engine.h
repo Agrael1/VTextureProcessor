@@ -15,6 +15,11 @@
 #include <QOpenGLBuffer>
 
 class QOpenGLTexture;
+namespace UI
+{
+	class FlowScene;
+}
+
 
 class Engine
 {
@@ -33,9 +38,21 @@ class Engine
 		QOpenGLFunctions funcs;
 	};
 public:
-	Engine(QSize size);
+	Engine();
+public:
+	static Engine& Instance()noexcept{
+		if (!Engine::e)Engine::e.emplace();
+		return *Engine::e;
+	}
+	static void Destroy()noexcept{
+		Engine::e.reset();
+	}
 	~Engine();
 public:
+	void BindScene(UI::FlowScene* scene, QSize size);
+	void UnbindScene(UI::FlowScene* scene);
+	void SwitchScene(UI::FlowScene* scene);
+
 	void Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs, bool tile, std::span<std::shared_ptr<QImage>> outputs, ver::dc::Buffer& buffer);
 	QOpenGLFunctions& Functions() { return con.funcs; }
 	QOpenGLTexture& Empty();
@@ -44,7 +61,8 @@ private:
 	void Current();
 private:
 	Context con;
-	QOpenGLFramebufferObject frame;
+	std::unordered_map<UI::FlowScene*, QOpenGLFramebufferObject> frames;
+	QOpenGLFramebufferObject* current;
 
 	QOpenGLBuffer vlay;
 	QOpenGLVertexArrayObject vbuf;
@@ -60,4 +78,5 @@ private:
 			gl_Position = vec4(vertices[gl_VertexID], 0, 1);
 			sv_texc = 0.5 * gl_Position.xy + vec2(0.5);
 		})";
+	static std::optional<Engine> e;
 };

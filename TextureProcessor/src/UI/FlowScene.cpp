@@ -5,19 +5,20 @@
  */
 #include <UI/FlowScene.h>
 #include <Windows/REProperties.h>
-#include <UI/Connection.h>
 #include <QMessageBox>
 #include <QPainter>
 #include <QJsonArray>
 
+#include <UI/Node.h>
+#include <Logic/ShaderNode.h>
+#include <ranges>
 
-#include <UI/REFlowCodex.h>
-/**
- * @brief Generates file name with incremented count if name already exists
- *
- * @param p File path
- * @return std::filesystem::path Final filename
- */
+ /**
+  * @brief Generates file name with incremented count if name already exists
+  *
+  * @param p File path
+  * @return std::filesystem::path Final filename
+  */
 std::filesystem::path generate(const std::filesystem::path& p)
 {
 	namespace fs = std::filesystem;
@@ -42,7 +43,7 @@ using namespace UI;
  * @param parent
  * @param props
  */
-FlowScene::FlowScene(QObject* parent, Windows::XProperties& props)
+FlowScene::FlowScene(QObject* parent, Windows::XProperties& props, QSize dims)
 	:QGraphicsScene(parent)
 	, Cbackground("#393939")
 	, Clight("#2F2F2F")
@@ -51,15 +52,13 @@ FlowScene::FlowScene(QObject* parent, Windows::XProperties& props)
 	, Pdark(Cdark)
 	, Bbackground(Cbackground)
 	, props(props)
+	, dims(dims)
 {
 	Plight.setWidth(0);
 	Pdark.setWidth(0);
 	setBackgroundBrush(Bbackground);
 	setItemIndexMethod(QGraphicsScene::NoIndex);
 	connect(this, &QGraphicsScene::selectionChanged, this, &FlowScene::OnSelectionChanged);
-
-	InsertNode("Add");
-	addItem(test.get());
 }
 
 /**
@@ -129,77 +128,6 @@ void FlowScene::OnSelectionChanged()
 }
 
 /**
- * @brief Creates new Node on the canvas
- *
- * @param name Name of the new Node
- * @return UI::Node& Newly created node
- */
-UI::Node& FlowScene::CreateNode(std::string_view name)
-{
-	auto &node = InsertNode(name, std::format("{}_{}", name, codex.AddRef(name)));
-	addItem(&node);
-
-	// Add to Output nodes if output
-	if (name == "Output")
-		outputs.push_back(&node);
-
-	return node;
-}
-
-/**
- * @brief Locates item that is at the target position
- *
- * @param pos Position to look at
- * @return UI::Node* Found first found object
- */
-UI::Node* FlowScene::LocateNode(QPointF pos)noexcept
-{
-	auto xitems = items(pos);
-
-	// TODO: Refactor?
-	std::vector<QGraphicsItem*> filteredItems;
-	std::copy_if(xitems.begin(), xitems.end(), std::back_inserter(filteredItems),
-		[](QGraphicsItem* item)
-		{
-			return (dynamic_cast<UI::Node*>(item) != nullptr);
-		});
-	if (filteredItems.empty())
-		return nullptr;
-
-	return static_cast<UI::Node*>(filteredItems.front());
-}
-
-/**
- * @brief Creates new Node of selected type
- *
- * @param name Name of the Node type
- * @param unique_name Name of the new Node (must be unique)
- * @return UI::Node&
- */
-UI::Node& FlowScene::InsertNode(std::string_view name, std::string&& unique_name)
-{
-	const auto &r = codex.GetNode(name);
-	auto x = nodes.emplace(std::piecewise_construct,
-		std::forward_as_tuple(std::move(unique_name)),
-		std::forward_as_tuple(r)
-	);
-	x.first->second->SetUniqueName(x.first->first);
-	return *x.first->second;
-}
-UI::Node* FlowScene::TryInsertNode(std::string_view name, std::string&& unique_name)
-{
-	const auto* r = codex.TryGetNode(name);
-	if (!r)return nullptr;
-	auto x = nodes.emplace(std::piecewise_construct,
-		std::forward_as_tuple(std::move(unique_name)),
-		std::forward_as_tuple(*r)
-	);
-	x.first->second->SetUniqueName(x.first->first);
-	return &*x.first->second;
-}
-
-
-/**
  * @brief Deletes the object in focus
  *
  */
@@ -209,21 +137,22 @@ void FlowScene::DeleteSelected()
 	for (QGraphicsItem* item : selectedItems())
 	{
 		// Disconnects object from other scene objects
-		if (auto c = dynamic_cast<Connection*>(item))
+		if (auto c = dynamic_cast<XConnection*>(item))
 			c->RemoveForce();
 	}
 
 	// Delete Nodes
 	for (QGraphicsItem* item : selectedItems())
 	{
-		if (auto n = dynamic_cast<Node*>(item))
+		// Deregister output
+		if (auto n = dynamic_cast<XNode<ver::OutputNode>*>(item))
 		{
-			// Deregister output
-			if (n->GetStyleName() == "Output")
-				outputs.erase(std::find(outputs.begin(), outputs.end(), n));
-
-			nodes.erase(n->GetName().data());
+			outputs.erase(std::find(outputs.begin(), outputs.end(), n));
+			nodes.erase(n->Name().data());
+			continue;
 		}
+		if (auto n = dynamic_cast<IXNode*>(item))
+			nodes.erase(n->Name().data());
 	}
 }
 
@@ -249,11 +178,11 @@ void FlowScene::ExportAll()
 	{
 		if (name.empty())
 		{
-			name = x->Export();
+			name = x->Model().Export();
 			continue;
 		}
 		// Exports output silently if name already valid
-		x->ExportSilent(generate(name).string());
+		x->Model().ExportSilent(generate(name).string());
 	}
 }
 
@@ -277,16 +206,21 @@ QJsonObject FlowScene::Serialize()
 	}
 	*/
 	QJsonObject sc;
+	QJsonArray xdims;
 	QJsonArray xnodes;
 	QJsonArray conns;
+
+	xdims.append(dims.width());
+	xdims.append(dims.height());
 
 	for (auto& x : nodes)
 	{
 		xnodes.append(x.second->Serialize());
 		auto* node = &*(x.second);
-		for (auto* c : ConnMapper::Get(node))
+		for (auto* c : XConnMapper::Get(node))
 			conns.append(c->Serialize());
 	}
+	sc.insert("Dimensions", xdims);
 	sc.insert("Nodes", xnodes);
 	sc.insert("Connections", conns);
 
@@ -300,98 +234,124 @@ QJsonObject FlowScene::Serialize()
  */
 void FlowScene::Deserialize(QJsonObject xobj)
 {
-	// Nothing to draw if no Nodes
-	if (!xobj.contains("Nodes")) return;
-
-	bool missing = false;
-
-	QJsonArray arr = xobj["Nodes"].toArray();
-	for (auto ref : arr)
-	{
-		QJsonObject obj = ref.toObject();
-
-		if(obj.isEmpty())continue;
-		auto stype = obj.keys().first();
-		auto type = stype.toStdString();
-		auto node = obj[stype].toObject();
-
-		// Skip if Node is not uniquely identifiable
-		if (!node.contains("Ref")) continue;
-		auto xref = node["Ref"].toInt();
-
-		// Create unique name from Ref and Type
-		auto* xnode = TryInsertNode(type, std::format("{}_{}", type, xref));
-		if (!xnode) { missing = true; continue; }
-
-		codex.SetMaxRef(type, xref + 1);
-		addItem(xnode);
-
-		// Register output
-		if (type == "Output")
-			outputs.push_back(xnode);
-
-		// Load config from JSON into the new Node
-		xnode->Deserialize(node);
+	if (!xobj.contains("Dimensions")) return;
+	QJsonArray arr = xobj["Dimensions"].toArray();
+	if (arr.count() != 2){
+		qDebug() << "Bad Dimensions";
+		return;
 	}
+	dims = QSize(arr[0].toInt(), arr[1].toInt());
 
-	if (!xobj.contains("Connections")) return;
+	//// Nothing to draw if no Nodes
+	//if (!xobj.contains("Nodes")) return;
 
-	QJsonArray conns = xobj["Connections"].toArray();
-	for (auto c : conns)
-	{
-		auto o = c.toObject();
-		// Skip incomplete connections
-		if (!(o.contains("Sink") && o.contains("Source"))) continue;
-		auto source = o["Source"].toArray();
-		UI::Node* node = nullptr;
-		uint8_t sourceN = 0;
+	//bool missing = false;
 
-		// Lookup source index
-		for (auto v : source)
-		{
-			if (v.isString())
-			{
-				auto key = v.toString().toStdString();
-				auto xnode = nodes.find(key);
-				if (xnode == nodes.end()) break;
-				node = xnode->second.operator->();
-				continue;
-			}
-			sourceN = v.toInt();
-		}
+	// arr = xobj["Nodes"].toArray();
+	//for (auto ref : arr)
+	//{
+	//	QJsonObject obj = ref.toObject();
 
-		if (!node) continue;
-		// Similar to manual drag and drop connection
-		ConnMapper::MakeTemporary(*node, Port::Source, sourceN);
+	//	if (obj.isEmpty())continue;
+	//	auto stype = obj.keys().first();
+	//	auto type = stype.toStdString();
+	//	auto node = obj[stype].toObject();
 
-		auto sink = o["Sink"].toArray();
-		node = nullptr;
-		uint8_t sinkN = 0;
-		// Lookup sink index
-		for (auto v : sink)
-		{
-			if (v.isString())
-			{
-				auto key = v.toString().toStdString();
-				auto xnode = nodes.find(key);
-				if (xnode == nodes.end())break;
-				node = xnode->second.operator->();
-				continue;
-			}
-			sinkN = v.toInt();
-		}
-		if (!node) { ConnMapper::ClearTemporary(); continue; }
-		ConnMapper::ConnectTemporary(*node, Port::Sink, sinkN);
-	}
+	//	// Skip if Node is not uniquely identifiable
+	//	if (!node.contains("Ref")) continue;
+	//	auto xref = node["Ref"].toInt();
 
-	if (missing)
-		QMessageBox{ QMessageBox::Warning, "Warning", "Some nodes were missing, because their type was not loaded properly",
-		QMessageBox::Ok}.exec();
+	//	// Create unique name from Ref and Type
+	//	auto* xnode = TryInsertNode(type);
+	//	if (!xnode) { missing = true; continue; }
+
+	//	codex.SetMaxRef(type, xref + 1);
+	//	addItem(xnode);
+
+	//	// Register output
+	//	if (type == "Output")
+	//		outputs.push_back(xnode);
+
+	//	// Load config from JSON into the new Node
+	//	xnode->Deserialize(node);
+	//}
+
+	//if (!xobj.contains("Connections")) return;
+
+	//QJsonArray conns = xobj["Connections"].toArray();
+	//for (auto c : conns)
+	//{
+	//	auto o = c.toObject();
+	//	// Skip incomplete connections
+	//	if (!(o.contains("Sink") && o.contains("Source"))) continue;
+	//	auto source = o["Source"].toArray();
+	//	UI::IXNode* node = nullptr;
+	//	uint8_t sourceN = 0;
+
+	//	// Lookup source index
+	//	for (auto v : source)
+	//	{
+	//		if (v.isString())
+	//		{
+	//			auto key = v.toString().toStdString();
+	//			auto xnode = nodes.find(key);
+	//			if (xnode == nodes.end()) break;
+	//			node = xnode->second.get();
+	//			continue;
+	//		}
+	//		sourceN = v.toInt();
+	//	}
+
+	//	if (!node) continue;
+	//	// Similar to manual drag and drop connection
+	//	XConnMapper::MakeTemporary(*node, Port::Source, sourceN);
+
+	//	auto sink = o["Sink"].toArray();
+	//	node = nullptr;
+	//	uint8_t sinkN = 0;
+	//	// Lookup sink index
+	//	for (auto v : sink)
+	//	{
+	//		if (v.isString())
+	//		{
+	//			auto key = v.toString().toStdString();
+	//			auto xnode = nodes.find(key);
+	//			if (xnode == nodes.end())break;
+	//			node = xnode->second.operator->();
+	//			continue;
+	//		}
+	//		sinkN = v.toInt();
+	//	}
+	//	if (!node) { XConnMapper::ClearTemporary(); continue; }
+	//	XConnMapper::ConnectTemporary(*node, Port::Sink, sinkN);
+	//}
+
+	//if (missing)
+	//	QMessageBox{ QMessageBox::Warning, "Warning", "Some nodes were missing, because their type was not loaded properly",
+	//	QMessageBox::Ok }.exec();
 }
 
+/**
+ * @brief Creates new Node of selected type
+ *
+ * @param name Name of the Node type
+ * @param unique_name Name of the new Node (must be unique)
+ * @return UI::Node&
+ */
+UI::IXNode* FlowScene::TryInsertNode(std::string_view name)
+{
+	if (!codex.contains(name))
+		return nullptr;
+	return &InsertNode(name);
+}
+bool UI::FlowScene::event(QEvent* e)
+{
+	if (e->type() == QEvent::ContextMenu)
+		return true;
+		return true;
+}
 UI::IXNode& UI::FlowScene::InsertNode(std::string_view name)
 {
-	auto& i = UI::RE::XFlowCodex::Instance();
-	test = i.GetNode(name);
-	return *test;
+	auto x = codex.GetNode(name);
+	return *nodes.emplace(x->Name(), std::move(x)).first->second;
 }

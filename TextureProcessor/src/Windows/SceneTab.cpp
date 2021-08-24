@@ -3,15 +3,21 @@
 #include <QJsonDocument>
 #include <QFileDialog>
 #include <Logic/Constants.h>
+#include <Logic/Engine.h>
 
 
 using namespace UI::Windows;
 namespace fs = std::filesystem;
 
-SceneTab::SceneTab(XProperties& props, std::filesystem::path&& xproj_path)
-	:Tab(std::move(xproj_path)), scene(nullptr, props), view(scene)
+SceneTab::SceneTab(XProperties& props, std::filesystem::path&& xproj_path, QSize resolution)
+	:Tab(std::move(xproj_path)), scene(nullptr, props, resolution), view(&scene)
 {
 	scene.setSceneRect(-32000, -32000, 64000, 64000);
+}
+
+UI::Windows::SceneTab::~SceneTab()
+{
+	Engine::Instance().UnbindScene(&scene);
 }
 
 void SceneTab::Save()
@@ -72,5 +78,11 @@ void SceneTab::Load()
 	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e);
 	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return; }
 	scene.Deserialize(json.object());
+	Engine::Instance().BindScene(&scene, scene.Dimensions());
+}
+
+void UI::Windows::SceneTab::SetCurrent() noexcept
+{
+	Engine::Instance().SwitchScene(&scene);
 }
 

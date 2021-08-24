@@ -1,4 +1,5 @@
 #include <UI/REFlowCodex.h>
+#include <UI/Node.h>
 #include <QJsonDocument>
 #include <Logic/ShaderNode.h>
 
@@ -8,7 +9,6 @@ using namespace UI::RE;
 XFlowCodex::XFlowCodex()
 {
 	namespace fs = std::filesystem;
-	engine.emplace(QSize{ 256, 256 });
 
 	fs::path ndir{ NodesDir };
 	// Creates node directory and exits if it doesn't exist
@@ -51,6 +51,11 @@ std::unique_ptr<UI::IXNode> XFlowCodex::GetNode(std::string_view nodety)const
 	return x->Clone(std::format("{}_{}", nodety, x.refcount++));
 }
 
+bool UI::RE::XFlowCodex::contains(std::string_view nodety) const
+{
+	return codex.contains(nodety.data());
+}
+
 void UI::RE::XFlowCodex::ParseJson(const QJsonDocument& json)
 {
 	QJsonObject topLevelObject = json.object();
@@ -65,7 +70,7 @@ void UI::RE::XFlowCodex::ParseJson(const QJsonDocument& json)
 		// Loads texture Node style
 		RefCountPair p;
 		if (node["Class"].toString() == "Texture")
-			p = RefCountPair::set<XNode<ver::ShaderNode>>(obj, wkey, *engine);
+			p = RefCountPair::set<XNode<ver::ShaderNode>>(obj, wkey);
 
 		// Adds new group to the context menu
 		auto pair = codex.emplace(wkey, std::move(p));

@@ -36,7 +36,7 @@ namespace UI
 	};
 
 	class XConnection;
-	struct NOVTABLE IXNode:public QGraphicsWidget
+	struct NOVTABLE IXNode:public QGraphicsWidget, public ISerialize
 	{
 		virtual ~IXNode() = default;
 		virtual std::unique_ptr<IXNode> Clone(std::string&& name)const = 0;

@@ -13,54 +13,54 @@
 
 namespace UI
 {
-	class Node;
-	class Connection : public QGraphicsItem, public ISerialize
-	{
-		friend class ConnMapper;
-	private:
-		Connection(Node& node, Port ty, uint8_t portidx);
-	public:
-		~Connection();
-	public:
-		void paint(QPainter* painter,
-			const QStyleOptionGraphicsItem* option,
-			QWidget* widget = nullptr) override;
-		QRectF boundingRect()const override;
-		Node* GetSink()const noexcept { return connector.second; }
-		void Move(QPointF deltapos, Port ty);
-		void ResetSink()
-		{
-			connector.second = nullptr;
-			bFinished = false;
-		}
-		void RemoveForce()noexcept;
-		/**
-		* @brief Propagates changes to nodes following current Node
-		*
-		*/
-		void Update();
-		void UpdateDisconnect();
+	//class Node;
+	//class Connection : public QGraphicsItem, public ISerialize
+	//{
+	//	friend class ConnMapper;
+	//private:
+	//	Connection(Node& node, Port ty, uint8_t portidx);
+	//public:
+	//	~Connection();
+	//public:
+	//	void paint(QPainter* painter,
+	//		const QStyleOptionGraphicsItem* option,
+	//		QWidget* widget = nullptr) override;
+	//	QRectF boundingRect()const override;
+	//	Node* GetSink()const noexcept { return connector.second; }
+	//	void Move(QPointF deltapos, Port ty);
+	//	void ResetSink()
+	//	{
+	//		connector.second = nullptr;
+	//		bFinished = false;
+	//	}
+	//	void RemoveForce()noexcept;
+	//	/**
+	//	* @brief Propagates changes to nodes following current Node
+	//	*
+	//	*/
+	//	void Update();
+	//	void UpdateDisconnect();
 
-		virtual QJsonObject Serialize()override;
-		virtual void Deserialize(QJsonObject)override {}
-	private:
-		void Init();
-		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
-		void mouseReleaseEvent(QGraphicsSceneMouseEvent* event)override;
-		void PlaceConnection(std::optional<std::pair<Port, uint8_t>> port, Node* node);
+	//	virtual QJsonObject Serialize()override;
+	//	virtual void Deserialize(QJsonObject)override {}
+	//private:
+	//	void Init();
+	//	void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
+	//	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event)override;
+	//	void PlaceConnection(std::optional<std::pair<Port, uint8_t>> port, Node* node);
 
-		std::pair<QPointF, QPointF> PointsC1C2()const;
-		Port Requires()const;
-		PortType GetType()const noexcept;
-		Node* StartNode()const noexcept { return connector.first ? connector.first : (connector.second ? connector.second : nullptr); }
-	private:
-		std::pair<Node*/*source*/, Node*/*sink*/> connector{};
-		uint8_t sourceN;
-		uint8_t sinkN;
-		bool bFinished = false;
-		QPointF source;
-		QPointF sink;
-	};
+	//	std::pair<QPointF, QPointF> PointsC1C2()const;
+	//	Port Requires()const;
+	//	PortType GetType()const noexcept;
+	//	Node* StartNode()const noexcept { return connector.first ? connector.first : (connector.second ? connector.second : nullptr); }
+	//private:
+	//	std::pair<Node*/*source*/, Node*/*sink*/> connector{};
+	//	uint8_t sourceN;
+	//	uint8_t sinkN;
+	//	bool bFinished = false;
+	//	QPointF source;
+	//	QPointF sink;
+	//};
 
 
 	class XConnection : public QGraphicsItem, public ISerialize
@@ -87,12 +87,12 @@ namespace UI
 
 		virtual QJsonObject Serialize()override;
 		virtual void Deserialize(QJsonObject)override {}
+		void RemoveForce()noexcept;
 	private:
 		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
 		void mouseReleaseEvent(QGraphicsSceneMouseEvent* event)override;
 		void PlaceConnection(std::optional<std::pair<Port, uint8_t>> port, IXNode* node);
-		void RemoveForce()noexcept;
 
 		std::pair<QPointF, QPointF> PointsC1C2()const;
 		Port Requires()const;
@@ -155,7 +155,7 @@ namespace UI
 	};
 
 
-	class ConnMapper
+	/*class ConnMapper
 	{
 	public:
 		static void MakeTemporary(Node& node, Port port, uint8_t portidx);
@@ -200,6 +200,6 @@ namespace UI
 	private:
 		std::unordered_map<Node*, std::vector<Connection*>> map;
 		std::unique_ptr<Connection> tmp;
-	};
+	};*/
 }
 

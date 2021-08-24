@@ -4,40 +4,35 @@
  * @brief Logic behind Node editor canvas
  */
 #pragma once
-#include <UI/FlowCodex.h>
+#include <UI/REFlowCodex.h>
 #include <QGraphicsScene>
-
-#include <UI/Node.h>
 
 namespace UI
 {
+	struct IXNode;
 	namespace Windows {
 		class XProperties;
 	}
 	class FlowScene : public QGraphicsScene, public ISerialize
 	{
 	public:
-		FlowScene(QObject* parent, Windows::XProperties& props);
+		FlowScene(QObject* parent, Windows::XProperties& props, QSize dims);
 	public:
-		auto& GetGroupList()const noexcept
-		{
-			return codex.CatMap();
-		}
-		UI::Node& CreateNode(std::string_view name);
-		UI::Node* LocateNode(QPointF pos)noexcept;
 		void DeleteSelected();
 		void Clear();
 		void ExportAll();
+		QSize Dimensions()const noexcept { return dims; }
+
 		virtual QJsonObject Serialize()override;
 		virtual void Deserialize(QJsonObject)override;
 	protected:
+		bool event(QEvent* e)override;
 		UI::IXNode& InsertNode(std::string_view name);
-
-		UI::Node& InsertNode(std::string_view name, std::string&& unique_name);
-		UI::Node* TryInsertNode(std::string_view name, std::string&& unique_name);
+		UI::IXNode* TryInsertNode(std::string_view name);
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
 		void OnSelectionChanged();
 	private:
+		QSize dims;
 		QColor Cbackground;
 		QColor Clight;
 		QColor Cdark;
@@ -47,11 +42,9 @@ namespace UI
 
 		QBrush Bbackground;
 		UI::Windows::XProperties& props;
+		UI::RE::XFlowCodex codex;
 
-		UI::FlowCodex codex;
-		std::unordered_map<std::string, pv::polymorphic_value<UI::Node>> nodes;
-		std::vector<UI::Node*> outputs;
-
-		std::unique_ptr<IXNode> test;
+		std::unordered_map<std::string, std::unique_ptr<IXNode>> nodes;
+		std::vector<IXNode*> outputs;
 	};
 }

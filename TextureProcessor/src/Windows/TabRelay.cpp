@@ -1,4 +1,4 @@
-#include <UI\TabRelay.h>
+#include <Windows/TabRelay.h>
 #include <Windows/SceneTab.h>
 
 
@@ -15,6 +15,7 @@ TabRelay::TabRelay(QWidget* parent, SceneTab*& sc)
 void TabRelay::OnCurrentChanged(int index)
 {
 	cur_scene = dynamic_cast<SceneTab*>(GetCurrent());
+	if (cur_scene) cur_scene->SetCurrent();
 }
 
 Tab* TabRelay::GetCurrent()

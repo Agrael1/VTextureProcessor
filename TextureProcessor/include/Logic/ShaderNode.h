@@ -28,7 +28,7 @@ namespace ver
 			std::string shadercode;
 		};
 	public:
-		ShaderNode(QJsonObject document, Engine& e);
+		ShaderNode(QJsonObject document);
 		ShaderNode(const ShaderNode& other);
 	public:
 		QImage XUpdate();
@@ -49,13 +49,14 @@ namespace ver
 				pv.TieProp<desc[2]>(buffer);
 			return pv;
 		}
+		virtual void ExportSilent(std::string_view name) {};
+		std::string Export()override { return ""; };
 	private:
 		void SetProperties(const QJsonArray& props, QString& scode);
 	private:
 		std::vector<std::shared_ptr<QImage>> inputs;
 		std::vector<std::shared_ptr<QImage>> outputs;
 		std::shared_ptr<NodePrivate> shader;
-		Engine& e;
 
 		dc::Buffer buf;
 		bool tiling = false;
@@ -65,13 +66,20 @@ namespace ver
 	class OutputNode : public Node
 	{
 	public:
-		OutputNode(QJsonObject document, Engine& e);
+		OutputNode(QJsonObject document);
 		OutputNode(const OutputNode& in);
 	public:
 		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
 		{
 			return { &inout, 1 };
 		}
+		void Update() {};
+		PropertyView GetProperties()override
+		{
+			return {};
+		}
+		std::string Export()override { return ""; };
+		virtual void ExportSilent(std::string_view name) {};
 	private:
 		std::shared_ptr<QImage> inout;
 	};

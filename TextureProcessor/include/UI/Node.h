@@ -259,6 +259,8 @@ namespace UI
 					portTy == Port::Sink ? h / (model.SinksCount() + 1) * (portN + 1) + PortStyle::diameter / 2 :
 					(h / (model.SourcesCount() + 1)) * (portN + 1) + PortStyle::diameter / 2 });
 			}
+			virtual QJsonObject Serialize()override { return{}; };
+			virtual void Deserialize(QJsonObject)override {};
 		private:
 			NodeStyle style;
 			XModel model;

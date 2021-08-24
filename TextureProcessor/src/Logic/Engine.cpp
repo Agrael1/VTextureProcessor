@@ -8,6 +8,9 @@
 #include <QOpenGLTexture>
 #include <optional>
 
+std::optional<Engine> Engine::e;
+
+
  /**
   * @brief Creates GL context
  */
@@ -32,12 +35,9 @@ Engine::Context::Context()
  * @brief Creates Engine with specified texture size
  * @param size size of the input and output textures
 */
-Engine::Engine(QSize size)
-	:vs(QOpenGLShader::Vertex), frame(size, con.Format()), vlay(QOpenGLBuffer::VertexBuffer)
+Engine::Engine()
+	:vs(QOpenGLShader::Vertex), vlay(QOpenGLBuffer::VertexBuffer)
 {
-	con.funcs.glViewport(0, 0, size.width(), size.height());
-	frame.bind();
-
 	vs.compileSourceCode(vertexShaderSource);
 	shaders.addShader(&vs);
 
@@ -47,6 +47,21 @@ Engine::Engine(QSize size)
 
 Engine::~Engine() {
 	Empty().destroy();
+}
+
+void Engine::BindScene(UI::FlowScene* scene, QSize size)
+{
+	frames.emplace(std::piecewise_construct, std::forward_as_tuple(scene), std::forward_as_tuple(size, con.Format()));
+}
+void Engine::UnbindScene(UI::FlowScene* const scene)
+{
+	frames.erase(scene);
+}
+
+void Engine::SwitchScene(UI::FlowScene* scene)
+{
+	current = &frames.at(scene);
+	current->bind();
 }
 
 /**
@@ -107,7 +122,7 @@ void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs
 			if (i)i->setWrapMode(QOpenGLTexture::Repeat);
 
 	for (int i = 0; auto & o : outputs)
-		*o = frame.toImage(false, i++);
+		*o = current->toImage(false, i++);
 }
 
 /**

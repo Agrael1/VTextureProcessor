@@ -1,7 +1,5 @@
 #pragma once
-#include <UI/Node.h>
-#include <Logic/Engine.h>
-
+#include <UI/INode.h>
 
 namespace UI::RE
 {
@@ -17,17 +15,9 @@ namespace UI::RE
 			}
 			mutable size_t refcount = 0;
 		};
+	public:
 		XFlowCodex();
 	public:
-		static XFlowCodex& Instance()noexcept
-		{
-			static XFlowCodex instance;
-			return instance;
-		}
-		static void DestroyEngine()
-		{
-			Instance().engine.reset();
-		}
 		const auto& CatMap()const noexcept
 		{
 			return cats;
@@ -39,7 +29,7 @@ namespace UI::RE
 		}
 
 		std::unique_ptr<IXNode> GetNode(std::string_view nodety)const;
-		const std::unique_ptr<IXNode>* TryGetNode(std::string_view nodety)const;
+		bool contains(std::string_view nodety)const;
 
 		void SetMaxRef(std::string_view nodety, size_t cnt);
 		size_t AddRef(std::string_view nodety);
@@ -48,6 +38,5 @@ namespace UI::RE
 	private:
 		std::unordered_map<std::string, RefCountPair> codex;
 		std::unordered_map<std::string, std::vector<std::string_view>> cats;
-		std::optional<Engine> engine;
 	};
 }
