@@ -21,11 +21,6 @@ namespace UI
 		void contextMenuEvent(QContextMenuEvent* event)override;
 		void scaleUp();
 		void scaleDown();
-		void OnItemSelected(QTreeWidgetItem* item, int);
-	private:
-		//UI::FlowScene& scene;
-		ContextMenu menu;
-		QPoint last_event;
 	};
 }
 

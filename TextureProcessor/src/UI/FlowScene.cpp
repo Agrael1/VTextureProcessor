@@ -347,8 +347,12 @@ UI::IXNode* FlowScene::TryInsertNode(std::string_view name)
 bool UI::FlowScene::event(QEvent* e)
 {
 	if (e->type() == QEvent::ContextMenu)
-		return true;
-		return true;
+	{
+		auto& x = static_cast<QContextMenuEvent&>(*e);
+		last_event = x.pos();
+		menu.Execute(last_event);
+	}
+	return true;
 }
 UI::IXNode& UI::FlowScene::InsertNode(std::string_view name)
 {

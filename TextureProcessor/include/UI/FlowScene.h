@@ -6,6 +6,7 @@
 #pragma once
 #include <UI/REFlowCodex.h>
 #include <QGraphicsScene>
+#include <UI/ContextMenu.h>
 
 namespace UI
 {
@@ -46,5 +47,8 @@ namespace UI
 
 		std::unordered_map<std::string, std::unique_ptr<IXNode>> nodes;
 		std::vector<IXNode*> outputs;
+
+		QPoint last_event;
+		ContextMenu menu;
 	};
 }

@@ -63,12 +63,6 @@ namespace UI::Windows
 				return;
 			}
 		}
-		void Clear()noexcept
-		{
-			clear();
-			tabs.clear();
-			temp_tabs.clear();
-		}
 	private:
 		Tab* GetCurrent();
 		std::string UKeyTemp(std::string_view pattern);

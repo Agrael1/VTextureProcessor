@@ -23,8 +23,7 @@ using namespace UI::Windows;
  * @param xprojPath file project that is being worked upon
 */
 MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xprojPath, QSize resolution)
-	:tab(this, cur_scene)
-	, file("File")
+	:file("File")
 	, windows("Windows")
 	, nodes("Nodes")
 	, view("View")
@@ -41,7 +40,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 {
 	Engine::Instance();
 	resize(width, height);
-
+	tab.emplace(this, cur_scene);
 
 	auto& mb = *menuBar();
 	mb.addMenu(&file);
@@ -80,16 +79,16 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	Asaveas.setShortcut(QKeySequence{ tr("Ctrl+Shift+S") });
 	Aload.setShortcut(QKeySequence{ QKeySequence::StandardKey::Open });
 
-	setCentralWidget(&tab);
+	setCentralWidget(&*tab);
 	addDockWidget(Qt::RightDockWidgetArea, &xprops);
 	resizeDocks({ &xprops }, { 250 }, Qt::Horizontal);
 	
-	tab.LoadTab<SceneTab>({ xprojPath }, xprojPath.filename().string(), xprops, std::move(xprojPath), resolution);
+	tab->LoadTab<SceneTab>({ xprojPath }, xprojPath.filename().string(), xprops, std::move(xprojPath), resolution);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-	tab.Clear();
+	tab.reset();
 	Engine::Destroy();
 }
 
@@ -116,12 +115,12 @@ void MainWindow::OnLoad()
 
 	if (proj_path.empty()) return;
 	proj_path = proj_path.make_preferred();
-	auto& cs = tab.LoadTab<SceneTab>({ proj_path }, proj_path.filename().string(), xprops, std::move(proj_path), QSize(256, 256));
+	auto& cs = tab->LoadTab<SceneTab>({ proj_path }, proj_path.filename().string(), xprops, std::move(proj_path), QSize(256, 256));
 }
 
 void MainWindow::OnCreateNode()
 {
-	tab.TempTab<EditorTab>("New Node");
+	tab->TempTab<EditorTab>("New Node");
 }
 
 void MainWindow::OnLoadNode()
@@ -135,7 +134,7 @@ void MainWindow::OnLoadNode()
 
 	if (node_path.empty()) return;
 	node_path = node_path.make_preferred();
-	auto& cs = tab.LoadTab<EditorTab>({ node_path }, node_path.filename().string(), std::move(node_path));
+	auto& cs = tab->LoadTab<EditorTab>({ node_path }, node_path.filename().string(), std::move(node_path));
 }
 
 void MainWindow::OnViewDelete()

@@ -5,7 +5,6 @@
  */
 #include <UI/FlowView.h>
 #include <UI/SceneEvent.h>
-//#include <UI/FlowScene.h>
 #include <QMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
 
@@ -17,7 +16,7 @@ using namespace UI;
  * @param scene Scene to create View of
  */
 FlowView::FlowView(QGraphicsScene* scene)
-	:QGraphicsView(scene, nullptr), menu(nullptr)
+	:QGraphicsView(scene, nullptr)
 {
 	setRenderHints(QPainter::Antialiasing |
 		QPainter::TextAntialiasing |
@@ -71,7 +70,7 @@ void FlowView::wheelEvent(QWheelEvent* event)
  */
 void FlowView::contextMenuEvent(QContextMenuEvent* event)
 {
-	//QApplication::postEvent(scene(), event);
+	QApplication::postEvent(scene(), new QContextMenuEvent(*event));
 	//last_event = event->pos();
 	//if (auto* x = itemAt(event->pos()); x && x->isSelected())
 	//{
@@ -111,20 +110,4 @@ void FlowView::scaleDown()
 	if (t.m11() < 0.2)
 		return;
 	scale(factor, factor);
-}
-
-/**
- * @brief Creates new Node of selected type when selected in context menu
- *
- * @param item
- */
-void FlowView::OnItemSelected(QTreeWidgetItem* item, int)
-{
-	//auto modelName = item->data(0, Qt::UserRole).toString().toStdString();
-	//if (modelName == skipper) return;
-	//
-	//auto& type = scene.CreateNode(modelName);
-	//type.setPos(mapToScene(last_event));
-	//
-	//menu.close();
 }

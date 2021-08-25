@@ -28,11 +28,11 @@ public:
 	void OnExport();
 	void OnSave()
 	{
-		tab.OnSave();
+		tab->OnSave();
 	}
 	void OnSaveAs()
 	{
-		tab.OnSaveAs();
+		tab->OnSaveAs();
 	}
 	void OnLoad();
 	void OnCreateNode();
@@ -40,7 +40,7 @@ public:
 	void OnViewDelete();
 	void OnViewClrSel();
 private:
-	UI::Windows::TabRelay tab;
+	std::optional<UI::Windows::TabRelay> tab;
 	UI::Windows::XProperties xprops;
 
 	QMenu file;
