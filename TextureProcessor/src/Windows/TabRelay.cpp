@@ -10,6 +10,7 @@ TabRelay::TabRelay(QWidget* parent, SceneTab*& sc)
 	setMovable(true);
 	setTabsClosable(true);
 	connect(this, &QTabWidget::tabCloseRequested, this, &TabRelay::OnTabClosed);
+	connect(this, &QTabWidget::tabBarClicked, this, &TabRelay::OnCurrentChanged);
 }
 
 void TabRelay::OnCurrentChanged(int index)

@@ -4,7 +4,7 @@
  * @brief Flow view for handling the Node editor canvas view
  */
 #include <UI/FlowView.h>
-#include <UI/SceneEvent.h>
+#include <UI/FlowScene.h>
 #include <QMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
 
@@ -27,17 +27,6 @@ FlowView::FlowView(QGraphicsScene* scene)
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 	setCacheMode(QGraphicsView::CacheBackground);
-
-	//// Create context menu
-	//auto& m = scene.GetGroupList();
-	//for (const auto& x : m)
-	//{
-	//	menu.AppendGroup(x.first);
-	//	for (const auto& y : x.second)
-	//		menu.AppendItem(y);
-	//}
-	//menu.Finish();
-	//menu.SetItemClickCallback([this](QTreeWidgetItem* item, int) {OnItemSelected(item, 0); });
 }
 
 /**
@@ -111,3 +100,4 @@ void FlowView::scaleDown()
 		return;
 	scale(factor, factor);
 }
+

@@ -7,6 +7,7 @@
 #include <Windows/REProperties.h>
 #include <QMessageBox>
 #include <QPainter>
+#include <QGraphicsView>
 #include <QJsonArray>
 
 #include <UI/Node.h>
@@ -59,6 +60,17 @@ FlowScene::FlowScene(QObject* parent, Windows::XProperties& props, QSize dims)
 	setBackgroundBrush(Bbackground);
 	setItemIndexMethod(QGraphicsScene::NoIndex);
 	connect(this, &QGraphicsScene::selectionChanged, this, &FlowScene::OnSelectionChanged);
+
+	// Create context menu
+	auto& m = codex.CatMap();
+	for (const auto& x : m)
+	{
+		menu.AppendGroup(x.first);
+		for (const auto& y : x.second)
+			menu.AppendItem(y);
+	}
+	menu.Finish();
+	menu.SetItemClickCallback([this](QTreeWidgetItem* item, int) {OnItemSelected(item, 0); });
 }
 
 /**
@@ -125,6 +137,36 @@ void FlowScene::OnSelectionChanged()
 		if (focus) focus->UpdateProperties(props.MakeElement(*focus, focus->Name()));
 	}
 	props.Show();
+}
+
+/**
+ * @brief Creates new Node on the canvas
+ *
+ * @param name Name of the new Node
+ * @return UI::Node& Newly created node
+ */
+UI::IXNode& FlowScene::CreateNode(std::string_view name)
+{
+	auto& node = InsertNode(name);
+	addItem(&node);
+
+	// Add to Output nodes if output
+	if (name == "Output")
+		outputs.push_back(&node);
+
+	return node;
+}
+
+void UI::FlowScene::OnItemSelected(QTreeWidgetItem* item, int)
+{
+	auto modelName = item->data(0, Qt::UserRole).toString().toStdString();
+	if (modelName == ContextMenu::skipper) return;
+
+	auto& type = CreateNode(modelName);
+	type.setPos(views()[0]->mapToScene(last_event));
+	update();
+
+	menu.close();
 }
 
 /**
@@ -236,7 +278,7 @@ void FlowScene::Deserialize(QJsonObject xobj)
 {
 	if (!xobj.contains("Dimensions")) return;
 	QJsonArray arr = xobj["Dimensions"].toArray();
-	if (arr.count() != 2){
+	if (arr.count() != 2) {
 		qDebug() << "Bad Dimensions";
 		return;
 	}
@@ -350,9 +392,10 @@ bool UI::FlowScene::event(QEvent* e)
 	{
 		auto& x = static_cast<QContextMenuEvent&>(*e);
 		last_event = x.pos();
-		menu.Execute(last_event);
+		menu.Execute(x.globalPos());
+		return true;
 	}
-	return true;
+	return QGraphicsScene::event(e);
 }
 UI::IXNode& UI::FlowScene::InsertNode(std::string_view name)
 {

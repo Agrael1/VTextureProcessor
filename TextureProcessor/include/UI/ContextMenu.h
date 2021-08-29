@@ -32,7 +32,8 @@ private:
 	QVBoxLayout layout;
 	QLineEdit filter;
 	QTreeWidget selection;
-	QTreeWidgetItem* current_group;
+	QTreeWidgetItem* current_group = nullptr;
+public:
+	constexpr static std::string_view skipper = "XXXX";
 };
 
-constexpr std::string_view skipper = "XXXX";

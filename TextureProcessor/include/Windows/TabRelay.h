@@ -23,10 +23,12 @@ namespace UI::Windows
 					setCurrentWidget(w);
 					setTabToolTip(currentIndex(), pstr.c_str());
 					x.first->second->Load();
+					OnCurrentChanged();
 					return (T&)*x.first->second;
 				}
 				auto& x = tabs.at(pstr);
 				setCurrentWidget(x->Widget());
+				OnCurrentChanged();
 				return (T&)*x;
 			}
 		template<class T, class... Args> requires std::derived_from<T, Tab>
@@ -40,7 +42,7 @@ namespace UI::Windows
 			setTabToolTip(currentIndex(), xname.c_str());
 			return (T&)*x.first->second;
 		}
-		void OnCurrentChanged(int index);
+		void OnCurrentChanged(int index = 0);
 		void OnSave()
 		{
 			if (auto x = GetCurrent(); x)x->Save();
