@@ -117,13 +117,14 @@ namespace UI
 			void DrawBackground(QPainter* painter)
 			{
 				constexpr qreal edge_size = 10.0;
+				constexpr qreal offset = PortStyle::port_bbox / 2;
 
-				auto xwidth = geometry().width();
+				auto xwidth = geometry().width() - PortStyle::port_bbox;
 				// path for the caption of this node
 				QPainterPath path_title;
 				path_title.setFillRule(Qt::WindingFill);
-				path_title.addRoundedRect(QRectF(0, 0, xwidth, NodeStyle::title_height), edge_size, edge_size);
-				path_title.addRect(0, NodeStyle::title_height - edge_size, xwidth, edge_size);
+				path_title.addRoundedRect(QRectF(offset, 0, xwidth, NodeStyle::title_height), edge_size, edge_size);
+				path_title.addRect(offset, NodeStyle::title_height - edge_size, xwidth, edge_size);
 				painter->setPen(Qt::NoPen);
 				painter->setBrush(style.Title());
 				painter->drawPath(path_title.simplified());
@@ -132,8 +133,8 @@ namespace UI
 				// path for the content of this node
 				QPainterPath path_content;
 				path_content.setFillRule(Qt::WindingFill);
-				path_content.addRoundedRect(QRectF(0, NodeStyle::title_height, xwidth, geometry().height() - NodeStyle::title_height), edge_size, edge_size);
-				path_content.addRect(0, NodeStyle::title_height, xwidth, edge_size);
+				path_content.addRoundedRect(QRectF(offset, NodeStyle::title_height, xwidth, geometry().height() - NodeStyle::title_height), edge_size, edge_size);
+				path_content.addRect(offset, NodeStyle::title_height, xwidth, edge_size);
 				painter->setPen(Qt::NoPen);
 				painter->setBrush(style.Background());
 				painter->drawPath(path_content.simplified());
@@ -180,7 +181,7 @@ namespace UI
 				for (auto si = 0; si < model.SinksCount(); si++)
 				{
 					painter->setBrush(connections[si] ? style.brSinkUsed : style.brSink);
-					painter->drawEllipse(-PortStyle::diameter / 2, ypos, PortStyle::diameter, PortStyle::diameter);
+					painter->drawEllipse((-PortStyle::diameter + PortStyle::port_bbox) / 2, ypos, PortStyle::diameter, PortStyle::diameter);
 					ypos += pdelta_sink;
 				}
 
@@ -189,7 +190,7 @@ namespace UI
 				// Draw each Source connection point
 				for (const auto& so : model.GetSources())
 				{
-					painter->drawEllipse(geometry().width() - PortStyle::diameter / 2, ypos, PortStyle::diameter, PortStyle::diameter);
+					painter->drawEllipse(geometry().width() - PortStyle::port_bbox + PortStyle::diameter / 2, ypos, PortStyle::diameter, PortStyle::diameter);
 					ypos += pdelta_source;
 				}
 			}
@@ -208,7 +209,7 @@ namespace UI
 
 				setZValue(0.0f);
 				gll->setOrientation(Qt::Vertical);
-				gll->setContentsMargins(NodeStyle::h_offset, NodeStyle::title_height + NodeStyle::item_padding, NodeStyle::h_offset, NodeStyle::item_padding);
+				gll->setContentsMargins(NodeStyle::h_offset + PortStyle::port_bbox / 2, NodeStyle::title_height + NodeStyle::item_padding, NodeStyle::h_offset + PortStyle::port_bbox / 2, NodeStyle::item_padding);
 				gll->setSpacing(NodeStyle::item_padding);
 				ConstructModules();
 				setLayout(gll);

@@ -1,4 +1,5 @@
 #include <UI/NodeModules.h>
+#include <UI/NodeStyle.h>
 #include <QPainter>
 
 
