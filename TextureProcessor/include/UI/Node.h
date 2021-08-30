@@ -48,6 +48,30 @@ namespace UI
 				DrawConnectionPoints(painter);
 				QGraphicsWidget::paint(painter, option, widget);
 			}
+
+			QVariant itemChange(GraphicsItemChange change, const QVariant& value)override
+			{
+				if (change == ItemPositionChange)
+					MoveConnections(value.toPointF());
+
+				return IXNode::itemChange(change, value);
+			}
+			void MoveConnections(QPointF newpos)
+			{
+				auto delta = newpos - pos();
+
+				// Update positions for all Sinks
+				for (auto& s : connections)
+				{
+					if (s) 	s->Move(delta, Port::Sink);
+				}
+				for (auto s : XConnMapper::Get(this))
+				{
+					s->Move(delta, Port::Source);
+				}
+			}
+
+
 			virtual std::unique_ptr<IXNode> Clone(std::string&& name)const override
 			{
 				printf("copy called\n");

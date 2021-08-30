@@ -62,6 +62,8 @@ void Engine::SwitchScene(UI::FlowScene* scene)
 {
 	current = &frames.at(scene);
 	current->bind();
+	auto sz = current->size();
+	con.funcs.glViewport(0, 0, sz.width(), sz.height());
 }
 
 /**
