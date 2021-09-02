@@ -11,6 +11,7 @@
 #include <QJsonArray>
 
 #include <UI/Node.h>
+#include <UI/Connection.h>
 #include <Logic/ShaderNode.h>
 #include <ranges>
 
@@ -123,7 +124,10 @@ void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->setPen(Pdark);
 	painter->drawLines(lines_dark.data(), int(lines_dark.size()));
 }
-
+FlowScene::~FlowScene()
+{
+	;
+}
 /**
  * @brief Event to update properties of Nodes on selection change
  *
@@ -179,7 +183,7 @@ void FlowScene::DeleteSelected()
 	for (QGraphicsItem* item : selectedItems())
 	{
 		// Disconnects object from other scene objects
-		if (auto c = dynamic_cast<XConnection*>(item))
+		if (auto c = dynamic_cast<IXConnection*>(item))
 			c->RemoveForce();
 	}
 
@@ -220,11 +224,11 @@ void FlowScene::ExportAll()
 	{
 		if (name.empty())
 		{
-			name = x->Model().Export();
+			name = x->Export();
 			continue;
 		}
 		// Exports output silently if name already valid
-		x->Model().ExportSilent(generate(name).string());
+		x->ExportSilent(generate(name).string());
 	}
 }
 
@@ -259,8 +263,8 @@ QJsonObject FlowScene::Serialize()
 	{
 		xnodes.append(x.second->Serialize());
 		auto* node = &*(x.second);
-		for (auto* c : XConnMapper::Get(node))
-			conns.append(c->Serialize());
+		for (auto* c : XConnMapper::Get(*node))
+			conns.append(((IXConnection*)c)->Serialize());
 	}
 	sc.insert("Dimensions", xdims);
 	sc.insert("Nodes", xnodes);

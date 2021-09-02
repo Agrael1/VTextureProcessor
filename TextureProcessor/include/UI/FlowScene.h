@@ -18,6 +18,7 @@ namespace UI
 	{
 	public:
 		FlowScene(QObject* parent, Windows::XProperties& props, QSize dims);
+		~FlowScene();
 	public:
 		void DeleteSelected();
 		void Clear();

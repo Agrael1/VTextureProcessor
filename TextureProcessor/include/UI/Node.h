@@ -1,82 +1,79 @@
 #pragma once
 #include <UI/NodeStyle.h>
-#include <UI/Connection.h>
 #include <UI/NodeModules.h>
 #include <UI/PropertyGenerator.h>
+#include <UI/GraphicsLayout.h>
+#include <UI/Port.h>
+#include <UI/Interfaces/INode.h>
 #include <Logic/Node.h>
-#include <Logic/Sink.h>
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <UI/Connection.h>
 
 namespace UI
 {
 	template<class XModel> requires std::derived_from<XModel, ver::Node>
-		class XNode : public IXNode//, public ISerialize
+		class XNode : public IXNode
 		{
 		public:
 			template<class ...Args>
 			XNode(QJsonObject document, std::string_view name, Args&&... e)
-				:gll(nullptr), style(document, name), model(document, std::forward<Args>(e)...)
+				:style(document, name), model(document, std::forward<Args>(e)...)
 			{
 			}
 			XNode(const XNode& in)
 				:style(in.style)
 				, model(in.model)
-				, gll(new QGraphicsLinearLayout)
+				, l_main(new GraphicsLinearLayout(Qt::Orientation::Horizontal))
 			{
-				connections.resize(in.model.SinksCount());
+				l_left.emplace(Qt::Orientation::Vertical);
+				l_central.emplace(Qt::Orientation::Vertical);
+				l_right.emplace(Qt::Orientation::Vertical);
+
+				sinks.reserve(in.model.SinksCount());
+				for (uint8_t i = 0; i < in.model.SinksCount(); i++)
+					sinks.emplace_back(*this, i, model.GetSink(i));
+
+				sources.reserve(in.model.SourcesCount());
+				for (uint8_t i = 0; i < in.model.SourcesCount(); i++)
+					sources.emplace_back(*this, i, model.GetSource(i));
 				Init();
 			}
-		public:
-			QRectF boundingRect() const override
+			~XNode()
 			{
-				// Compensate for pen width
-				return QRectF(
-					-NodeStyle::pen_width / 2.0 - PortStyle::port_bbox,
-					-NodeStyle::pen_width / 2.0,
-					geometry().width() + NodeStyle::pen_width / 2.0 + 2.0 * PortStyle::port_bbox,
-					geometry().height() + NodeStyle::pen_width / 2.0
-				).normalized();
+				XConnMapper::Trim(*this);
 			}
-			void paint(QPainter* painter,
+		public:
+			virtual void paint(QPainter* painter,
 				const QStyleOptionGraphicsItem* option,
 				QWidget* widget = nullptr) override
 			{
 				DrawBackground(painter);
 				DrawCaptionName(painter);
-				DrawConnectionPoints(painter);
-				QGraphicsWidget::paint(painter, option, widget);
-			}
 
-			QVariant itemChange(GraphicsItemChange change, const QVariant& value)override
+				//DrawConnectionPoints(painter);
+				QGraphicsWidget::paint(painter, option, widget);
+				[[unlikely]] if (b_update) {
+					UpdateLayouts();
+					b_update = false;
+				}
+			}
+			virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value)override
 			{
 				if (change == ItemPositionChange)
-					MoveConnections(value.toPointF());
-
+				{
+					auto delta = value.toPointF() - pos();
+					for (auto& x : sinks)x.MoveConnections(delta);
+					for (auto& x : sources)x.MoveConnections(delta);
+				}
 				return IXNode::itemChange(change, value);
 			}
-			void MoveConnections(QPointF newpos)
-			{
-				auto delta = newpos - pos();
-
-				// Update positions for all Sinks
-				for (auto& s : connections)
-				{
-					if (s) 	s->Move(delta, Port::Sink);
-				}
-				for (auto s : XConnMapper::Get(this))
-				{
-					s->Move(delta, Port::Source);
-				}
-			}
-
 
 			virtual std::unique_ptr<IXNode> Clone(std::string&& name)const override
 			{
 				printf("copy called\n");
 				auto x = std::make_unique<XNode>(*this);
-				x->Init();
 				x->model.SetUniqueName(name);
 				return x;
 			}
@@ -95,25 +92,15 @@ namespace UI
 					x.Update();
 				update();
 			}
-		private:
-			void mousePressEvent(QGraphicsSceneMouseEvent* event)override
+			virtual std::string Export()override
 			{
-				auto pos = event->pos();
-				// Detects colision with ports
-				if (pos.y() < NodeStyle::title_height + NodeStyle::item_padding ||
-					pos.y() > geometry().height() - NodeStyle::item_padding ||
-					pos.x() > PortStyle::port_bbox / 2 && pos.x() < geometry().width() - PortStyle::port_bbox / 2)
-					return QGraphicsItem::mousePressEvent(event);
-
-				// Port lookup
-				if (auto port = PortHit(pos); port.first != Port::None)
-				{
-					if (port.first == Port::Sink && connections[port.second])
-						return XConnMapper::AttachTemporary(std::move(connections[port.second]));
-					XConnMapper::MakeTemporary(*this, port.first, port.second);
-				}
+				return model.Export();
 			}
-
+			virtual void ExportSilent(std::string_view in)override
+			{
+				return model.ExportSilent(in);
+			}
+		private:
 			void DrawBackground(QPainter* painter)
 			{
 				constexpr qreal edge_size = 10.0;
@@ -167,33 +154,6 @@ namespace UI
 				f.setBold(false);
 				painter->setFont(f);
 			}
-			void DrawConnectionPoints(QPainter* painter)
-			{
-				auto h = geometry().height();
-				auto pdelta_sink = h / (model.SinksCount() + 1);
-				auto pdelta_source = h / (model.SourcesCount() + 1);
-
-				auto& style = PortStyle::Grayscale;
-
-				painter->setPen(style.port);
-				auto ypos = pdelta_sink;
-				// Draw each Sink connection point
-				for (auto si = 0; si < model.SinksCount(); si++)
-				{
-					painter->setBrush(connections[si] ? style.brSinkUsed : style.brSink);
-					painter->drawEllipse((-PortStyle::diameter + PortStyle::port_bbox) / 2, ypos, PortStyle::diameter, PortStyle::diameter);
-					ypos += pdelta_sink;
-				}
-
-				painter->setBrush(style.brSource);
-				ypos = pdelta_source;
-				// Draw each Source connection point
-				for (const auto& so : model.GetSources())
-				{
-					painter->drawEllipse(geometry().width() - PortStyle::port_bbox + PortStyle::diameter / 2, ypos, PortStyle::diameter, PortStyle::diameter);
-					ypos += pdelta_source;
-				}
-			}
 
 			void Init()
 			{
@@ -204,15 +164,22 @@ namespace UI
 				setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
 
 				setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-
 				setAcceptHoverEvents(true);
-
 				setZValue(0.0f);
-				gll->setOrientation(Qt::Vertical);
-				gll->setContentsMargins(NodeStyle::h_offset + PortStyle::port_bbox / 2, NodeStyle::title_height + NodeStyle::item_padding, NodeStyle::h_offset + PortStyle::port_bbox / 2, NodeStyle::item_padding);
-				gll->setSpacing(NodeStyle::item_padding);
+
+				const auto off_l = sinks.empty() ? PortStyle::port_bbox : 0.0f;
+				const auto off_r = sources.empty() ? PortStyle::port_bbox : 0.0f;
+				for (auto& x : sinks)l_left->addItem(&x);
+				for (auto& x : sources)l_right->addItem(&x);
+
+				l_main->setContentsMargins(off_l, NodeStyle::title_height + NodeStyle::item_padding, off_r, NodeStyle::item_padding);
+				l_central->setSpacing(NodeStyle::item_padding);
 				ConstructModules();
-				setLayout(gll);
+
+				l_main->addItem(std::addressof(*l_left));
+				l_main->addItem(std::addressof(*l_central));
+				l_main->addItem(std::addressof(*l_right));
+				setLayout(l_main);
 				Update();
 			}
 			void ConstructModules()
@@ -220,79 +187,38 @@ namespace UI
 				auto r = model.GetLayout();
 				modules.reserve(r.size());
 				for (const auto& x : r)
-					gll->addItem(&modules.emplace_back(x));
-			}
-			std::pair<Port, uint8_t> PortHit(QPointF point)const
-			{
-				auto h = geometry().height();
-				auto pdelta_sink = h / (model.SinksCount() + 1);
-				auto pdelta_source = h / (model.SourcesCount() + 1);
-
-				if (point.x() < PortStyle::port_bbox)
-				{
-					auto startheight = pdelta_sink;
-					if (point.y() < startheight)return { Port::None, 0 };
-					for (uint8_t si = 0; si < model.SinksCount(); si++, startheight += pdelta_sink)
-					{
-						if (point.y() < startheight + PortStyle::port_bbox)
-						{
-							return { Port::Sink,si };
-						}
-					}
-					return { Port::None, 0 };
-				}
-
-				auto startheight = pdelta_source;
-				if (point.y() < startheight)return { Port::None, 0 };
-				for (uint8_t si = 0; si < model.SourcesCount(); si++, startheight += pdelta_sink)
-				{
-					if (point.y() < startheight + PortStyle::port_bbox)
-						return { Port::Source,si };
-				}
-				return { Port::None, 0 };
-			}
-			virtual ver::Node& Model()noexcept override
-			{
-				return model;
-			}
-			virtual void OnConnect(uint8_t sinkN, IXNode& source, uint8_t sourceN)override
-			{
-				model.GetSink(sinkN).Link(source.Model().GetSource(sourceN));
-				Update();
-			}
-			virtual void OnDisconnect(uint8_t sinkN) override
-			{
-				model.GetSink(sinkN).Unlink();
-				Update();
-			}
-
-			virtual std::pair<Port, uint8_t> PortHitScene(QPointF scene_point)override
-			{
-				return PortHit(mapFromScene(scene_point));
-			}
-			virtual void SetConnection(std::unique_ptr<XConnection>&& in, uint8_t portN)override
-			{
-				assert(portN < model.SinksCount());
-				connections[portN] = std::move(in);
-			}
-			virtual QPointF GetPortPos(Port portTy, uint8_t portN)override
-			{
-				auto h = geometry().height();
-
-				return mapToScene({
-					portTy == Port::Sink ? 0 : geometry().width(),
-					portTy == Port::Sink ? h / (model.SinksCount() + 1) * (portN + 1) + PortStyle::diameter / 2 :
-					(h / (model.SourcesCount() + 1)) * (portN + 1) + PortStyle::diameter / 2 });
+					l_central->addItem(&modules.emplace_back(x));
 			}
 			virtual QJsonObject Serialize()override { return{}; };
 			virtual void Deserialize(QJsonObject)override {};
+
+			void UpdateLayouts()
+			{
+				auto h = l_main->contentsRect().height();
+				auto sink_delta = (h - sinks.size() * PortStyle::port_bbox) / (sinks.size() + 1);
+				auto source_delta = (h - sources.size() * PortStyle::port_bbox) / (sources.size() + 1);
+
+				l_left->setContentsMargins(0.0f, sink_delta, 0.0f, 0.0f);
+				l_left->setSpacing(sink_delta);
+				
+				l_right->setContentsMargins(0.0f, source_delta, 0.0f, 0.0f);
+				l_right->setSpacing(source_delta);
+			}
 		private:
 			NodeStyle style;
 			XModel model;
 
-			QGraphicsLinearLayout* gll;
+			GraphicsLinearLayout* l_main;
+
+			std::vector<Source> sources;
+			std::vector<Sink> sinks;
+
+			std::optional<QGraphicsLinearLayout> l_left;
+			std::optional<QGraphicsLinearLayout> l_central;
+			std::optional<QGraphicsLinearLayout> l_right;
+
 			std::vector<Module> modules;
-			std::vector<std::unique_ptr<XConnection>> connections; //sink holds connection
+			bool b_update = true;
 		};
 }
 

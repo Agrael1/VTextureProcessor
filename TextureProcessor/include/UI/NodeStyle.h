@@ -17,7 +17,7 @@ namespace UI
 		constexpr static const qreal title_height = 20.0;
 		constexpr static const qreal h_offset = 10.0;
 		constexpr static const qreal pen_width = 1.0;
-		constexpr static const qreal item_padding = 20.0;
+		constexpr static const qreal item_padding = 10.0;
 		constexpr static const qreal min_width = 150.0;
 		constexpr static const qreal min_height = 120.0;
 	public:

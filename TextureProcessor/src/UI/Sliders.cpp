@@ -4,7 +4,7 @@
  * @brief Controls for properties and constant buffers
  */
 #include <UI/Sliders.h>
-#include <UI/INode.h>
+#include <UI/Interfaces/INode.h>
 #include <QVector2D>
 
 
