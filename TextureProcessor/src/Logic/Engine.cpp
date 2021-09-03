@@ -55,6 +55,8 @@ void Engine::BindScene(UI::FlowScene* scene, QSize size)
 }
 void Engine::UnbindScene(UI::FlowScene* const scene)
 {
+	if (current == &frames.at(scene))
+		current = nullptr;
 	frames.erase(scene);
 }
 
@@ -92,6 +94,8 @@ QOpenGLTexture& Engine::Empty()
 */
 void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs, bool tile, std::span<std::shared_ptr<QImage>> outputs, ver::dc::Buffer& buffer)
 {
+	if (!current)return;
+
 	Current();
 	shaders.addShader(&ps);
 	shaders.link();
@@ -99,14 +103,17 @@ void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs
 
 	std::vector<std::optional<QOpenGLTexture>> xinputs(inputs.size());
 	for (uint32_t s = 0; const auto & x : inputs)
+	{
 		if (x)xinputs[s].emplace(*x, QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
+		s++;
+	}
 
 	for (uint32_t s = 0; auto & i: xinputs)
 	{
 		if (i)
 		{
-			if (tile)
-				i->setWrapMode(QOpenGLTexture::ClampToEdge);
+			if (tile)i->setWrapMode(QOpenGLTexture::Repeat);
+			else i->setWrapMode(QOpenGLTexture::ClampToEdge);
 			i->bind(s++);
 		}
 		else Empty().bind(s++);
@@ -118,10 +125,6 @@ void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs
 	con.funcs.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	con.funcs.glDrawArrays(GL_TRIANGLES, 0, 3);
 	shaders.removeShader(&ps);
-
-	if (tile)
-		for (auto& i : xinputs)
-			if (i)i->setWrapMode(QOpenGLTexture::Repeat);
 
 	for (int i = 0; auto & o : outputs)
 		*o = current->toImage(false, i++);

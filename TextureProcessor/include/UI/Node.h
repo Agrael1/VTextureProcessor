@@ -42,6 +42,7 @@ namespace UI
 			}
 			~XNode()
 			{
+				b_destroyed = true;
 				XConnMapper::Trim(*this);
 			}
 		public:
@@ -87,6 +88,7 @@ namespace UI
 			}
 			virtual void Update()override
 			{
+				if (b_destroyed)return;
 				model.Update();
 				for (auto& x : modules)
 					x.Update();
@@ -219,6 +221,7 @@ namespace UI
 
 			std::vector<Module> modules;
 			bool b_update = true;
+			bool b_destroyed = false;
 		};
 }
 
