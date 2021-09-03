@@ -5,7 +5,7 @@
  */
 #include <UI/Connection.h>
 #include <UI/Port.h>
-#include <UI/Interfaces/INode.h>
+#include <Interfaces/INode.h>
 
 #include <Logic/Sink.h>
 
@@ -185,7 +185,6 @@ void UI::XConnection::Update()
 {
 	auto& node = SinkNode();
 	node.Update();
-	XConnMapper::UpdateGraph(node);
 }
 
 QJsonObject UI::XConnection::Serialize()

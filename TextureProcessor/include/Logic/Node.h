@@ -8,13 +8,14 @@
 #pragma once
 #include <Logic/PropertyView.h>
 #include <span>
+#include <Interfaces/ISerialize.h>
 
 namespace ver
 {
 	class Sink;
 	class Source;
 
-	class Node
+	class Node : public ISerialize
 	{
 	public:
 		Node() = default;
@@ -41,9 +42,12 @@ namespace ver
 
 		void SetSinkLinkage(std::string_view registeredName, std::string_view to_node, std::string_view source);
 		void SetSinkLinkage(size_t index, std::string_view to_node, std::string_view source);
+
 		virtual PropertyView GetProperties() = 0;
 		virtual std::string Export() = 0;
 		virtual void ExportSilent(std::string_view name) = 0;
+		virtual QJsonObject Serialize()override { return{}; };
+		virtual void Deserialize(QJsonObject)override {};
 	protected:
 		std::vector<std::unique_ptr<Sink>> sinks;
 		std::vector<std::unique_ptr<Source>> sources;

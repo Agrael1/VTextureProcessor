@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <span>
 #include <Logic/PortType.h>
-#include <UI/Interfaces/IConnection.h>
+#include <Interfaces/IConnection.h>
 
 namespace UI
 {

@@ -1,5 +1,5 @@
 #pragma once 
-#include <UI/Interfaces/ISerialize.h>
+#include <Interfaces/ISerialize.h>
 #include <Logic/PortType.h>
 #include <QPointF>
 

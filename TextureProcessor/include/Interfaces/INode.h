@@ -5,7 +5,7 @@
  */
 #pragma once
 #include <QGraphicsWidget>
-#include <UI/Interfaces/ISerialize.h>
+#include <Interfaces/ISerialize.h>
 #include <memory>
 
 namespace UI

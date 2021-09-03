@@ -77,6 +77,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 
 	Asave.setShortcut(QKeySequence{ QKeySequence::StandardKey::Save });
 	Asaveas.setShortcut(QKeySequence{ tr("Ctrl+Shift+S") });
+	Adelet.setShortcut(QKeySequence{ QKeySequence::StandardKey::Delete });
 	Aload.setShortcut(QKeySequence{ QKeySequence::StandardKey::Open });
 
 	setCentralWidget(&*tab);

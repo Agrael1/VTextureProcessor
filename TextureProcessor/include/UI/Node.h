@@ -4,11 +4,12 @@
 #include <UI/PropertyGenerator.h>
 #include <UI/GraphicsLayout.h>
 #include <UI/Port.h>
-#include <UI/Interfaces/INode.h>
+#include <Interfaces/INode.h>
 #include <Logic/Node.h>
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QJsonArray>
 #include <UI/Connection.h>
 
 namespace UI
@@ -175,7 +176,7 @@ namespace UI
 				for (auto& x : sinks)l_left->addItem(&x);
 				for (auto& x : sources)l_right->addItem(&x);
 
-				l_main->setContentsMargins(off_l, NodeStyle::title_height + NodeStyle::item_padding, off_r, NodeStyle::item_padding);
+				l_main->setContentsMargins(off_l, NodeStyle::title_height + PortStyle::port_bbox, off_r, PortStyle::port_bbox);
 				l_central->setSpacing(NodeStyle::item_padding);
 				ConstructModules();
 
@@ -192,7 +193,20 @@ namespace UI
 				for (const auto& x : r)
 					l_central->addItem(&modules.emplace_back(x));
 			}
-			virtual QJsonObject Serialize()override { return{}; };
+
+			virtual QJsonObject Serialize()override 
+			{
+				QJsonObject j;
+				QJsonArray xpos;
+				QJsonObject node = model.Serialize();
+
+				xpos.append(scenePos().x());
+				xpos.append(scenePos().y());
+				node.insert("Position", xpos);
+
+				j.insert(style.StyleName().data(), node);
+				return j;
+			};
 			virtual void Deserialize(QJsonObject)override {};
 
 			void UpdateLayouts()
@@ -203,7 +217,7 @@ namespace UI
 
 				l_left->setContentsMargins(0.0f, sink_delta, 0.0f, 0.0f);
 				l_left->setSpacing(sink_delta);
-				
+
 				l_right->setContentsMargins(0.0f, source_delta, 0.0f, 0.0f);
 				l_right->setSpacing(source_delta);
 			}

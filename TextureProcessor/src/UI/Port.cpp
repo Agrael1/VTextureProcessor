@@ -34,6 +34,13 @@ UI::Sink::Sink(IXNode& parent, uint8_t port_num, ver::Sink& model)
 	:XPort(parent, port_num), model(model)
 {}
 
+void UI::Sink::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+	auto style = PortStyle::Grayscale;
+	painter->setBrush(connection ? style.brSinkUsed : style.brSink);
+	painter->drawEllipse(QPointF{ PortStyle::port_bbox / 2,PortStyle::port_bbox / 2 }, PortStyle::diameter / 2, PortStyle::diameter / 2);
+}
+
 void UI::Sink::MoveConnections(QPointF delta)
 {
 	if (connection)
@@ -45,6 +52,13 @@ void UI::Sink::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	if (connection)
 		return XConnMapper::AttachTemporary(std::move(connection));
 	XConnMapper::MakeTemporary(*this);
+}
+
+void UI::Source::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+	auto style = PortStyle::Grayscale;
+	painter->setBrush(style.brSource);
+	painter->drawEllipse(QPointF{ PortStyle::port_bbox / 2,PortStyle::port_bbox / 2 }, PortStyle::diameter / 2, PortStyle::diameter / 2);
 }
 
 void UI::Source::MoveConnections(QPointF delta)

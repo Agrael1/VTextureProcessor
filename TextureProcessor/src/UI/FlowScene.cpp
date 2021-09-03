@@ -124,10 +124,6 @@ void FlowScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->setPen(Pdark);
 	painter->drawLines(lines_dark.data(), int(lines_dark.size()));
 }
-FlowScene::~FlowScene()
-{
-	;
-}
 /**
  * @brief Event to update properties of Nodes on selection change
  *
@@ -264,7 +260,7 @@ QJsonObject FlowScene::Serialize()
 		xnodes.append(x.second->Serialize());
 		auto* node = &*(x.second);
 		for (auto* c : XConnMapper::Get(*node))
-			conns.append(((IXConnection*)c)->Serialize());
+			conns.append(Query(c).Serialize());
 	}
 	sc.insert("Dimensions", xdims);
 	sc.insert("Nodes", xnodes);
@@ -288,10 +284,10 @@ void FlowScene::Deserialize(QJsonObject xobj)
 	}
 	dims = QSize(arr[0].toInt(), arr[1].toInt());
 
-	//// Nothing to draw if no Nodes
-	//if (!xobj.contains("Nodes")) return;
+	// Nothing to draw if no Nodes
+	if (!xobj.contains("Nodes")) return;
 
-	//bool missing = false;
+	bool missing = false;
 
 	// arr = xobj["Nodes"].toArray();
 	//for (auto ref : arr)

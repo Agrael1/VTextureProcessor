@@ -1,5 +1,5 @@
 #pragma once
-#include <UI/Interfaces/IEditable.h>
+#include <Interfaces/IEditable.h>
 #include <filesystem>
 
 namespace UI::Windows

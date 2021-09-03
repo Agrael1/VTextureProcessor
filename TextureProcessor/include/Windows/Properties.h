@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-#include <UI/Interfaces/INode.h>
+#include <Interfaces/INode.h>
 #include <UI/Updater.h>
 
 namespace UI::Windows

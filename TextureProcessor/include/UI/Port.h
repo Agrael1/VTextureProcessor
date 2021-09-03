@@ -1,7 +1,7 @@
 #pragma once
 #include <QGraphicsItem>
 #include <QGraphicsLayoutItem>
-#include <UI/Interfaces/IConnection.h>
+#include <Interfaces/IConnection.h>
 #include <UI/NodeStyle.h>
 
 
@@ -64,6 +64,7 @@ namespace UI
 		Sink(IXNode& parent, uint8_t port_num, ver::Sink& model);
 		Sink(Sink&& in)noexcept:XPort(std::move(in)),model(in.model), connection(std::move(in.connection)){}
 	public:
+		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 		void MoveConnections(QPointF delta);
 		constexpr virtual Port GetType()const noexcept override
 		{
@@ -85,6 +86,7 @@ namespace UI
 		{}
 		Source(Source&& in)noexcept :XPort(std::move(in)), model(in.model){}
 	public:
+		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 		void MoveConnections(QPointF delta);
 		constexpr virtual Port GetType()const noexcept override
 		{

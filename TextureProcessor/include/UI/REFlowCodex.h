@@ -1,5 +1,5 @@
 #pragma once
-#include <UI/Interfaces/INode.h>
+#include <Interfaces/INode.h>
 
 namespace UI::RE
 {
