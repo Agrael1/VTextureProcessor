@@ -92,6 +92,7 @@ namespace UI
 				model.Update();
 				for (auto& x : modules)
 					x.Update();
+				XConnMapper::UpdateGraph(*this);
 				update();
 			}
 			virtual std::string Export()override
