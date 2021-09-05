@@ -221,7 +221,7 @@ namespace UI
 					setPos(QPointF{ v[0].toDouble(), v[1].toDouble() });
 				}
 				model.Deserialize(in);
-				//Update();
+				Update();
 			}
 
 			void UpdateLayouts()
