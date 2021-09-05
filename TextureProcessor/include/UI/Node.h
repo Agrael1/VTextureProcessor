@@ -39,7 +39,9 @@ namespace UI
 				sources.reserve(in.model.SourcesCount());
 				for (uint8_t i = 0; i < in.model.SourcesCount(); i++)
 					sources.emplace_back(*this, i, model.GetSource(i));
+
 				Init();
+				UpdateLayouts();
 			}
 			~XNode()
 			{
@@ -54,12 +56,7 @@ namespace UI
 				DrawBackground(painter);
 				DrawCaptionName(painter);
 
-				//DrawConnectionPoints(painter);
 				QGraphicsWidget::paint(painter, option, widget);
-				[[unlikely]] if (b_update) {
-					UpdateLayouts();
-					b_update = false;
-				}
 			}
 			virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value)override
 			{
@@ -103,6 +100,14 @@ namespace UI
 			virtual void ExportSilent(std::string_view in)override
 			{
 				return model.ExportSilent(in);
+			}
+			virtual void StartConnection(uint8_t index)override
+			{
+				XConnMapper::MakeTemporary(sources[index]);
+			}
+			virtual void FinishConnection(uint8_t index)override
+			{
+				XConnMapper::ConnectTemporary(sinks[index]);
 			}
 		private:
 			void DrawBackground(QPainter* painter)
@@ -185,6 +190,7 @@ namespace UI
 				l_main->addItem(std::addressof(*l_right));
 				setLayout(l_main);
 				Update();
+				adjustSize();
 			}
 			void ConstructModules()
 			{
@@ -194,7 +200,7 @@ namespace UI
 					l_central->addItem(&modules.emplace_back(x));
 			}
 
-			virtual QJsonObject Serialize()override 
+			virtual QJsonObject Serialize()override
 			{
 				QJsonObject j;
 				QJsonArray xpos;
@@ -206,8 +212,17 @@ namespace UI
 
 				j.insert(style.StyleName().data(), node);
 				return j;
-			};
-			virtual void Deserialize(QJsonObject)override {};
+			}
+			virtual void Deserialize(QJsonObject in)override
+			{
+				if (in.contains("Position"))
+				{
+					auto v = in["Position"].toArray();
+					setPos(QPointF{ v[0].toDouble(), v[1].toDouble() });
+				}
+				model.Deserialize(in);
+				//Update();
+			}
 
 			void UpdateLayouts()
 			{
@@ -220,6 +235,7 @@ namespace UI
 
 				l_right->setContentsMargins(0.0f, source_delta, 0.0f, 0.0f);
 				l_right->setSpacing(source_delta);
+				l_main->activate();
 			}
 		private:
 			NodeStyle style;
@@ -235,7 +251,6 @@ namespace UI
 			std::optional<QGraphicsLinearLayout> l_right;
 
 			std::vector<Module> modules;
-			bool b_update = true;
 			bool b_destroyed = false;
 		};
 }

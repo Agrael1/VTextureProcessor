@@ -44,6 +44,12 @@ namespace UI
 		}
 		void Update();
 
+		virtual void UpdatePosition()override
+		{
+			prepareGeometryChange();
+			sink = rpSink()->CenterScene();
+			source = rpSource()->CenterScene();
+		}
 		virtual QJsonObject Serialize()override;
 		virtual void Deserialize(QJsonObject)override {}
 		void RemoveForce()noexcept;
@@ -57,8 +63,8 @@ namespace UI
 
 		Port Requires()const;
 
-		auto& rpSink() { return connector.second; }
-		auto& rpSource() { return connector.first; }
+		XPort*& rpSink() { return connector.second; }
+		XPort*& rpSource() { return connector.first; }
 		IXNode& SinkNode();
 		IXNode& SourceNode();
 		const IXNode& SinkNode()const;
@@ -398,6 +404,8 @@ void UI::XConnMapper::MakeTemporary(XPort& port)
 }
 void UI::XConnMapper::ConnectTemporary(XPort& port)
 {
+	auto* tmp = Instance().tmp.get();
+	if (!tmp)return;
 	Instance().tmp->ungrabMouse();
 	Instance().tmp->PlaceConnection(port);
 }

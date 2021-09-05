@@ -56,6 +56,12 @@ bool UI::RE::XFlowCodex::contains(std::string_view nodety) const
 	return codex.contains(nodety.data());
 }
 
+void UI::RE::XFlowCodex::SetMaxRef(std::string_view nodety, size_t cnt)
+{
+	auto& r = codex.at(nodety.data());
+	r.refcount = std::max(r.refcount, cnt);
+}
+
 void UI::RE::XFlowCodex::ParseJson(const QJsonDocument& json)
 {
 	QJsonObject topLevelObject = json.object();

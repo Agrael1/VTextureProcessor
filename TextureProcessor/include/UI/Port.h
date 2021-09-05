@@ -66,6 +66,10 @@ namespace UI
 	public:
 		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 		void MoveConnections(QPointF delta);
+		void UpdateConnectionPos()
+		{
+			if (connection)connection->UpdatePosition();
+		}
 		constexpr virtual Port GetType()const noexcept override
 		{
 			return Port::Sink;

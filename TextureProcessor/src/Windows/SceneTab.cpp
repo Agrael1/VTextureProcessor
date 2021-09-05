@@ -76,10 +76,11 @@ void SceneTab::Load()
 
 	QJsonParseError e;
 
-	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e);
+	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e).object();
 	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return; }
-	scene.Deserialize(json.object());
-	Engine::Instance().BindScene(&scene, scene.Dimensions());
+	Engine::Instance().BindScene(&scene, scene.Dimensions(json));
+	SetCurrent();
+	scene.Deserialize(json);
 }
 
 void UI::Windows::SceneTab::SetCurrent() noexcept

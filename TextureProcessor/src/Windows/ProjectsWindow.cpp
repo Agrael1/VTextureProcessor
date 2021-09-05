@@ -411,8 +411,8 @@ void UI::CreatePage::OnFolderChange(bool checked)
 		cfg.GetProjFolder().data(),
 		QFileDialog::ShowDirsOnly
 		| QFileDialog::DontResolveSymlinks);
-
-	pfolder.setText(dir);
+	if(!dir.isEmpty())
+		pfolder.setText(dir);
 }
 
 void UI::CreatePage::OnWidthEChanged()

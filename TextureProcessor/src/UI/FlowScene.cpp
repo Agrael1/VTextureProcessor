@@ -228,6 +228,19 @@ void FlowScene::ExportAll()
 	}
 }
 
+QSize UI::FlowScene::Dimensions(QJsonObject in) const noexcept 
+{
+	if (dims != QSize{}) return dims;
+	if (!in.contains("Dimensions")) return{0,0};
+	QJsonArray arr = in["Dimensions"].toArray();
+	if (arr.count() != 2) {
+		qDebug() << "Bad Dimensions";
+		return{0,0};
+	}
+	dims = QSize(arr[0].toInt(), arr[1].toInt());
+	return dims; 
+}
+
 /**
  * @brief Serializes all objects on canvas to JSON
  *
@@ -276,101 +289,93 @@ QJsonObject FlowScene::Serialize()
  */
 void FlowScene::Deserialize(QJsonObject xobj)
 {
-	if (!xobj.contains("Dimensions")) return;
-	QJsonArray arr = xobj["Dimensions"].toArray();
-	if (arr.count() != 2) {
-		qDebug() << "Bad Dimensions";
-		return;
-	}
-	dims = QSize(arr[0].toInt(), arr[1].toInt());
-
 	// Nothing to draw if no Nodes
 	if (!xobj.contains("Nodes")) return;
 
 	bool missing = false;
 
-	// arr = xobj["Nodes"].toArray();
-	//for (auto ref : arr)
-	//{
-	//	QJsonObject obj = ref.toObject();
+	QJsonArray arr = xobj["Nodes"].toArray();
+	for (auto ref : arr)
+	{
+		QJsonObject obj = ref.toObject();
 
-	//	if (obj.isEmpty())continue;
-	//	auto stype = obj.keys().first();
-	//	auto type = stype.toStdString();
-	//	auto node = obj[stype].toObject();
+		if (obj.isEmpty())continue;
+		auto stype = obj.keys().first();
+		auto type = stype.toStdString();
+		auto node = obj[stype].toObject();
 
-	//	// Skip if Node is not uniquely identifiable
-	//	if (!node.contains("Ref")) continue;
-	//	auto xref = node["Ref"].toInt();
+		// Skip if Node is not uniquely identifiable
+		if (!node.contains("Ref")) continue;
+		auto xref = node["Ref"].toInt();
 
-	//	// Create unique name from Ref and Type
-	//	auto* xnode = TryInsertNode(type);
-	//	if (!xnode) { missing = true; continue; }
+		// Create unique name from Ref and Type
+		auto* xnode = TryInsertNode(type);
+		if (!xnode) { missing = true; continue; }
 
-	//	codex.SetMaxRef(type, xref + 1);
-	//	addItem(xnode);
+		codex.SetMaxRef(type, xref + 1);
+		addItem(xnode);
 
-	//	// Register output
-	//	if (type == "Output")
-	//		outputs.push_back(xnode);
+		// Register output
+		if (type == "Output")
+			outputs.push_back(xnode);
 
-	//	// Load config from JSON into the new Node
-	//	xnode->Deserialize(node);
-	//}
+		// Load config from JSON into the new Node
+		xnode->Deserialize(node);
+	}
 
-	//if (!xobj.contains("Connections")) return;
+	if (!xobj.contains("Connections")) return;
 
-	//QJsonArray conns = xobj["Connections"].toArray();
-	//for (auto c : conns)
-	//{
-	//	auto o = c.toObject();
-	//	// Skip incomplete connections
-	//	if (!(o.contains("Sink") && o.contains("Source"))) continue;
-	//	auto source = o["Source"].toArray();
-	//	UI::IXNode* node = nullptr;
-	//	uint8_t sourceN = 0;
+	QJsonArray conns = xobj["Connections"].toArray();
+	for (auto c : conns)
+	{
+		auto o = c.toObject();
+		// Skip incomplete connections
+		if (!(o.contains("Sink") && o.contains("Source"))) continue;
+		auto source = o["Source"].toArray();
+		UI::IXNode* node = nullptr;
+		uint8_t sourceN = 0;
 
-	//	// Lookup source index
-	//	for (auto v : source)
-	//	{
-	//		if (v.isString())
-	//		{
-	//			auto key = v.toString().toStdString();
-	//			auto xnode = nodes.find(key);
-	//			if (xnode == nodes.end()) break;
-	//			node = xnode->second.get();
-	//			continue;
-	//		}
-	//		sourceN = v.toInt();
-	//	}
+		// Lookup source index
+		for (auto v : source)
+		{
+			if (v.isString())
+			{
+				auto key = v.toString().toStdString();
+				auto xnode = nodes.find(key);
+				if (xnode == nodes.end()) break;
+				node = xnode->second.get();
+				continue;
+			}
+			sourceN = v.toInt();
+		}
 
-	//	if (!node) continue;
-	//	// Similar to manual drag and drop connection
-	//	XConnMapper::MakeTemporary(*node, Port::Source, sourceN);
+		if (!node) continue;
+		// Similar to manual drag and drop connection
+		node->StartConnection(sourceN);
 
-	//	auto sink = o["Sink"].toArray();
-	//	node = nullptr;
-	//	uint8_t sinkN = 0;
-	//	// Lookup sink index
-	//	for (auto v : sink)
-	//	{
-	//		if (v.isString())
-	//		{
-	//			auto key = v.toString().toStdString();
-	//			auto xnode = nodes.find(key);
-	//			if (xnode == nodes.end())break;
-	//			node = xnode->second.operator->();
-	//			continue;
-	//		}
-	//		sinkN = v.toInt();
-	//	}
-	//	if (!node) { XConnMapper::ClearTemporary(); continue; }
-	//	XConnMapper::ConnectTemporary(*node, Port::Sink, sinkN);
-	//}
+		auto sink = o["Sink"].toArray();
+		node = nullptr;
+		uint8_t sinkN = 0;
+		// Lookup sink index
+		for (auto v : sink)
+		{
+			if (v.isString())
+			{
+				auto key = v.toString().toStdString();
+				auto xnode = nodes.find(key);
+				if (xnode == nodes.end())break;
+				node = xnode->second.get();
+				continue;
+			}
+			sinkN = v.toInt();
+		}
+		if (!node) { XConnMapper::ClearTemporary(); continue; }
+		node->FinishConnection(sinkN);
+	}
 
-	//if (missing)
-	//	QMessageBox{ QMessageBox::Warning, "Warning", "Some nodes were missing, because their type was not loaded properly",
-	//	QMessageBox::Ok }.exec();
+	if (missing)
+		QMessageBox{ QMessageBox::Warning, "Warning", "Some nodes were missing, because their type was not loaded properly",
+		QMessageBox::Ok }.exec();
 }
 
 /**

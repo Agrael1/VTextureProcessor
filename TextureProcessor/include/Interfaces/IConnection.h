@@ -9,6 +9,7 @@ namespace UI
 	{
 		virtual ~IXConnection() = default;
 		virtual void Move(QPointF deltapos, Port ty) = 0;
+		virtual void UpdatePosition() = 0;
 		virtual void RemoveForce()noexcept = 0;
 	};
 }

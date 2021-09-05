@@ -10,6 +10,7 @@
 #include <QFileDialog>
 #include <QMenuBar>
 
+#include <Logic/Constants.h>
 #include <Logic/Engine.h>
 
 
@@ -111,7 +112,7 @@ void MainWindow::OnLoad()
 		nullptr,
 		"Open existing project",
 		"",
-		"(*.vtproj);;"
+		ver::proj_filter.data()
 	).toStdString() };
 
 	if (proj_path.empty()) return;
@@ -130,7 +131,7 @@ void MainWindow::OnLoadNode()
 		nullptr,
 		"Open existing node",
 		"nodes",
-		"(*.json);;"
+		ver::node_ext.data()
 	).toStdString() };
 
 	if (node_path.empty()) return;

@@ -66,6 +66,27 @@ namespace ver
 			node.insert("Buffer", buffer);
 			return node;
 		}
+		virtual void Deserialize(QJsonObject in)override
+		{
+			if (in.contains("Buffer"))
+			{
+				auto v = in["Buffer"].toObject();
+				auto keys = v.keys();
+				for (const auto& k : keys)
+				{
+					auto sk = k.toStdString();
+					buf[sk].SetIfExists(v[k].toVariant());
+				}
+			}
+			if (in.contains("Tiling"))
+			{
+				tiling = in["Tiling"].toBool(false);
+			}
+			if (in.contains("Buffer"))
+			{
+				buffer = in["Buffer"].toBool(true);
+			}
+		}
 		virtual void ExportSilent(std::string_view name) {};
 		std::string Export()override { return ""; };
 	private:

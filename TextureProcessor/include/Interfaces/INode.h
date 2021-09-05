@@ -11,6 +11,7 @@
 namespace UI
 {
 	namespace Windows{class XPropertyElement;}
+	class XPort;
 
 	struct NOVTABLE IXNode:public QGraphicsWidget, public ISerialize
 	{
@@ -21,5 +22,7 @@ namespace UI
 		virtual void Update() = 0;
 		virtual std::string Export() = 0;
 		virtual void ExportSilent(std::string_view in) = 0;
+		virtual void StartConnection(uint8_t index) = 0;
+		virtual void FinishConnection(uint8_t index) = 0;
 	};
 }

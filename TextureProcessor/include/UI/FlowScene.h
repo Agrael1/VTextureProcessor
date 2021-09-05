@@ -22,7 +22,7 @@ namespace UI
 		void DeleteSelected();
 		void Clear();
 		void ExportAll();
-		QSize Dimensions()const noexcept { return dims; }
+		QSize Dimensions(QJsonObject)const noexcept;
 
 		virtual QJsonObject Serialize()override;
 		virtual void Deserialize(QJsonObject)override;
@@ -35,7 +35,7 @@ namespace UI
 		void OnSelectionChanged();
 		void OnItemSelected(QTreeWidgetItem* item, int);
 	private:
-		QSize dims;
+		mutable QSize dims;
 		QColor Cbackground;
 		QColor Clight;
 		QColor Cdark;

@@ -32,7 +32,6 @@ namespace UI::RE
 		bool contains(std::string_view nodety)const;
 
 		void SetMaxRef(std::string_view nodety, size_t cnt);
-		size_t AddRef(std::string_view nodety);
 	private:
 		void ParseJson(const QJsonDocument& json);
 	private:
