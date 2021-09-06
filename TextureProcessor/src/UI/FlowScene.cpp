@@ -309,10 +309,8 @@ void FlowScene::Deserialize(QJsonObject xobj)
 		auto xref = node["Ref"].toInt();
 
 		// Create unique name from Ref and Type
-		auto* xnode = TryInsertNode(type);
+		auto* xnode = TryInsertNode(type, xref);
 		if (!xnode) { missing = true; continue; }
-
-		codex.SetMaxRef(type, xref + 1);
 		addItem(xnode);
 
 		// Register output
@@ -385,11 +383,12 @@ void FlowScene::Deserialize(QJsonObject xobj)
  * @param unique_name Name of the new Node (must be unique)
  * @return UI::Node&
  */
-UI::IXNode* FlowScene::TryInsertNode(std::string_view name)
+UI::IXNode* FlowScene::TryInsertNode(std::string_view name, size_t ref)
 {
 	if (!codex.contains(name))
 		return nullptr;
-	return &InsertNode(name);
+	auto x = codex.GetNode(name, ref);
+	return &*nodes.emplace(x->Name(), std::move(x)).first->second;
 }
 bool UI::FlowScene::event(QEvent* e)
 {

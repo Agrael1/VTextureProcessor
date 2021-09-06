@@ -50,15 +50,9 @@ namespace ver
 		}
 		virtual QJsonObject Serialize()override
 		{
-			QJsonObject node;
+			QJsonObject node = Node::Serialize();
 			node.insert("Tiling", tiling);
 			node.insert("BufferState", buffer);
-
-			auto name = GetName();
-			auto unders = name.find_last_of('_');
-			int ref;
-			std::from_chars(name.data() + unders + 1, name.data() + name.size(), ref);
-			node.insert("Ref", ref);
 
 			QJsonObject buffer;
 			for (auto x : buf)
@@ -68,6 +62,7 @@ namespace ver
 		}
 		virtual void Deserialize(QJsonObject in)override
 		{
+			Node::Deserialize(in);
 			if (in.contains("Buffer"))
 			{
 				auto v = in["Buffer"].toObject();
@@ -116,8 +111,8 @@ namespace ver
 		{
 			return {};
 		}
-		std::string Export()override { return ""; };
-		virtual void ExportSilent(std::string_view name) {};
+		std::string Export()override;
+		virtual void ExportSilent(std::string_view name);
 	private:
 		std::shared_ptr<QImage> in;
 		std::shared_ptr<QImage> out;

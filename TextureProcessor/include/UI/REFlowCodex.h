@@ -28,10 +28,9 @@ namespace UI::RE
 				x.second.refcount = 0;
 		}
 
-		std::unique_ptr<IXNode> GetNode(std::string_view nodety)const;
+		std::unique_ptr<UI::IXNode> GetNode(std::string_view nodety)const;
+		std::unique_ptr<UI::IXNode> GetNode(std::string_view nodety, size_t ref) const;
 		bool contains(std::string_view nodety)const;
-
-		void SetMaxRef(std::string_view nodety, size_t cnt);
 	private:
 		void ParseJson(const QJsonDocument& json);
 	private:

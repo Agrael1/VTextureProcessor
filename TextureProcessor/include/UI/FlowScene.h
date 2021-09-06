@@ -29,7 +29,7 @@ namespace UI
 	protected:
 		bool event(QEvent* e)override;
 		UI::IXNode& InsertNode(std::string_view name);
-		UI::IXNode* TryInsertNode(std::string_view name);
+		UI::IXNode* TryInsertNode(std::string_view name, size_t ref);
 		UI::IXNode& CreateNode(std::string_view name);
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
 		void OnSelectionChanged();
