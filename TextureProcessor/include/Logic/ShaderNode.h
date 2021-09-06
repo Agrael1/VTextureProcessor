@@ -109,9 +109,9 @@ namespace ver
 	public:
 		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
 		{
-			return { &inout, 1 };
+			return { &out, 1 };
 		}
-		void Update() {};
+		void Update();
 		PropertyView GetProperties()override
 		{
 			return {};
@@ -119,7 +119,8 @@ namespace ver
 		std::string Export()override { return ""; };
 		virtual void ExportSilent(std::string_view name) {};
 	private:
-		std::shared_ptr<QImage> inout;
+		std::shared_ptr<QImage> in;
+		std::shared_ptr<QImage> out;
 	};
 }
 

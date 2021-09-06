@@ -33,7 +33,9 @@ static inline QColor ReadColor(QJsonObject values, std::string_view varname) noe
         return { rgb[0], rgb[1], rgb[2] };
     }
     // Non-RGB color name ('green', 'red', etc.)
-    return {valueRef.toString()};
+
+    auto s = valueRef.toString();
+    return { s };
 }
 
 /**

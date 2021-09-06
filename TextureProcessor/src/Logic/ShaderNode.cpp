@@ -13,6 +13,8 @@
 
 using namespace ver;
 
+constexpr uint32_t nullcolor = 0;
+
 /**
  * @brief Construct a new Shader Node:: Node Private:: Node Private object
  *
@@ -195,10 +197,19 @@ void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 
 ver::OutputNode::OutputNode(QJsonObject document)
 {
-	RegisterSink(GrayscaleSink::Make("Out", inout));
+	RegisterSink(GrayscaleSink::Make("Out", in));
 }
 
 ver::OutputNode::OutputNode(const OutputNode& in)
 {
-	RegisterSink(GrayscaleSink::Make("Out", inout));
+	out = std::make_shared<QImage>();
+	RegisterSink(GrayscaleSink::Make("Out", this->in));
+}
+
+void ver::OutputNode::Update()
+{
+	if (in)
+		*out = *in;
+	else
+		*out = QImage((const uchar*)(&nullcolor),1,1,QImage::Format::Format_ARGB32);
 }

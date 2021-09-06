@@ -5,6 +5,13 @@
 
 using namespace UI::RE;
 
+constexpr const char* output = R"(
+{
+    "NodeStyle": {
+      "TitleColor": "black",
+      "FontColor": "white"
+    }
+})";
 
 XFlowCodex::XFlowCodex()
 {
@@ -20,6 +27,16 @@ XFlowCodex::XFlowCodex()
 
 	// Scans for all Nodes .json files in the Node directory and loads them
 	QJsonParseError e;
+
+	auto json = QJsonDocument::fromJson(output, &e).object();
+	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); }
+	RefCountPair p = RefCountPair::set<XNode<ver::OutputNode>>(json, "Output");
+
+	// Adds new group to the context menu
+	auto pair = codex.emplace("Output", std::move(p));
+	cats["Output"].emplace_back("Output");
+
+
 	for (auto& p : fs::directory_iterator(ndir))
 	{
 		if (!p.is_regular_file())
