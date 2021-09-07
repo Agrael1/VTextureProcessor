@@ -10,32 +10,12 @@
 #include <QGraphicsView>
 #include <QJsonArray>
 
+#include <UI/SceneEvent.h>
 #include <UI/Node.h>
 #include <UI/Connection.h>
+#include <utils/utils.h>
 #include <Logic/ShaderNode.h>
 #include <ranges>
-
- /**
-  * @brief Generates file name with incremented count if name already exists
-  *
-  * @param p File path
-  * @return std::filesystem::path Final filename
-  */
-std::filesystem::path generate(const std::filesystem::path& p)
-{
-	namespace fs = std::filesystem;
-	std::filesystem::path rp{ p };
-	auto f = rp.filename().replace_extension().string();
-	auto x = rp.extension().string();
-	f += "_";
-	auto v = 0;
-
-	// Increment while file exists
-	while (fs::exists(rp))
-		rp.replace_filename(f + std::to_string(v++) + x);
-
-	return rp;
-}
 
 using namespace UI;
 
@@ -224,7 +204,7 @@ void FlowScene::ExportAll()
 			continue;
 		}
 		// Exports output silently if name already valid
-		x->ExportSilent(generate(name).string());
+		x->ExportSilent(ver::generate(name).string());
 	}
 }
 
@@ -237,8 +217,7 @@ QSize UI::FlowScene::Dimensions(QJsonObject in) const noexcept
 		qDebug() << "Bad Dimensions";
 		return{0,0};
 	}
-	dims = QSize(arr[0].toInt(), arr[1].toInt());
-	return dims; 
+	return dims = QSize(arr[0].toInt(), arr[1].toInt()); 
 }
 
 /**
@@ -390,12 +369,29 @@ UI::IXNode* FlowScene::TryInsertNode(std::string_view name, size_t ref)
 	auto x = codex.GetNode(name, ref);
 	return &*nodes.emplace(x->Name(), std::move(x)).first->second;
 }
+
+UI::IXNode* GetNode(const auto& in)
+{
+	auto r = std::ranges::find_if(in, [](auto* xin) {return dynamic_cast<IXNode*>(xin) != nullptr; });
+	if (r == in.end())
+		return nullptr;
+	return static_cast<IXNode*>(*r);
+}
+
+
 bool UI::FlowScene::event(QEvent* e)
 {
 	if (e->type() == QEvent::ContextMenu)
 	{
-		auto& x = static_cast<QContextMenuEvent&>(*e);
+		auto& x = static_cast<SceneEvent&>(*e);
 		last_event = x.pos();
+
+		if (auto r = GetNode(items(x.scene_pos)); r && r->isSelected())
+		{
+			nodemenu.Execute(r, x.globalPos());
+			return true;
+		}
+
 		menu.Execute(x.globalPos());
 		return true;
 	}

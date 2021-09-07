@@ -82,8 +82,8 @@ namespace ver
 				buffer = in["Buffer"].toBool(true);
 			}
 		}
-		virtual void ExportSilent(std::string_view name) {};
-		std::string Export()override { return ""; };
+		virtual void ExportSilent(std::string_view name)override;
+		virtual std::string Export()override;
 	private:
 		void SetProperties(const QJsonArray& props, QString& scode);
 	private:

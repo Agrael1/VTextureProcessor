@@ -7,6 +7,7 @@
 #include <UI/FlowScene.h>
 #include <QMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
+#include <UI/SceneEvent.h>
 
 using namespace UI;
 
@@ -59,18 +60,7 @@ void FlowView::wheelEvent(QWheelEvent* event)
  */
 void FlowView::contextMenuEvent(QContextMenuEvent* event)
 {
-	QApplication::postEvent(scene(), new QContextMenuEvent(*event));
-	//last_event = event->pos();
-	//if (auto* x = itemAt(event->pos()); x && x->isSelected())
-	//{
-	//	QGraphicsSceneContextMenuEvent e{ QGraphicsSceneContextMenuEvent::GraphicsSceneContextMenu };
-	//	e.setPos(event->pos());
-	//	e.setScreenPos(event->globalPos());
-	//	scene.sendEvent(x, &e);
-	//	return;
-	//}
-	//
-	//menu.Execute(event->globalPos());
+	QApplication::postEvent(scene(), new SceneEvent(*event, mapToScene(event->pos())));
 }
 
 /**

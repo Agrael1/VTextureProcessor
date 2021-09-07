@@ -10,6 +10,7 @@
 #include <Logic/SourcesT.h>
 #include <Logic/SinksT.h>
 #include <Logic/Engine.h>
+#include <utils/utils.h>
 
 using namespace ver;
 
@@ -159,6 +160,21 @@ ShaderNode::ShaderNode(const ShaderNode& other)
 void ver::ShaderNode::Update()
 {
 	Engine::Instance().Render(shader->shader, inputs, tiling, outputs, buf);
+}
+
+void ver::ShaderNode::ExportSilent(std::string_view name) 
+{}
+std::string ver::ShaderNode::Export() 
+{ 
+	auto str = QFileDialog::getSaveFileName(nullptr,
+		"Export As",
+		"",
+		"PNG (*.png);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm);;All files (*.*);;"
+	);
+	if (str.isEmpty())return"";
+
+	std::ranges::for_each(outputs, [&str](auto& in) {in->mirrored().save(str); });
+	return str.toStdString();
 }
 
 /**

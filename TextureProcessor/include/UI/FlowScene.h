@@ -7,6 +7,7 @@
 #include <UI/REFlowCodex.h>
 #include <QGraphicsScene>
 #include <UI/ContextMenu.h>
+#include <UI/NodeMenu.h>
 
 namespace UI
 {
@@ -52,5 +53,6 @@ namespace UI
 
 		QPoint last_event;
 		ContextMenu menu;
+		NodeMenu nodemenu;
 	};
 }

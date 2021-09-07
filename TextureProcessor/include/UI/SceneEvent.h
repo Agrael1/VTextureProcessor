@@ -1,8 +1,9 @@
 #pragma once
-#include <QEvent>
+#include <QContextMenuEvent>
 
-struct SceneEvent : public QEvent
+struct SceneEvent : public QContextMenuEvent
 {
-	SceneEvent(std::filesystem::path&& projPath, QPoint size)
-		:QEvent((QEvent::Type)(QEvent::User + 2)) {}
+	QPointF scene_pos;
+	SceneEvent(const QContextMenuEvent& e, QPointF scene_pos)
+		:QContextMenuEvent(e), scene_pos(scene_pos){}
 };
