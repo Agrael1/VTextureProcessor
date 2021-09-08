@@ -30,7 +30,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	, view("View")
 	, Aclear("Clear")
 	, Aprops("Properties")
-	, Aexport("Export All")
+	, AePort("EPort All")
 	, Asave("Save")
 	, Asaveas("Save As")
 	, Aload("Open Project")
@@ -52,7 +52,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 
 	connect(&Aclear, &QAction::triggered, [this]() { OnClearTriggered(); });
 	connect(&Aprops, &QAction::triggered, [this]() { OnProps(); });
-	connect(&Aexport, &QAction::triggered, [this]() {OnExport(); });
+	connect(&AePort, &QAction::triggered, [this]() {OnEPort(); });
 	connect(&Asave, &QAction::triggered, [this]() {OnSave(); });
 	connect(&Asaveas, &QAction::triggered, [this]() {OnSaveAs(); });
 	connect(&Aload, &QAction::triggered, [this]() {OnLoad(); });
@@ -67,7 +67,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	file.addAction(&Asave);
 	file.addAction(&Asaveas);
 	file.addSeparator();
-	file.addAction(&Aexport);
+	file.addAction(&AePort);
 	windows.addAction(&Aprops);
 
 	nodes.addAction(&Acreaten);
@@ -100,10 +100,10 @@ void MainWindow::OnClearTriggered()
 		cur_scene->Clear();
 }
 
-void MainWindow::OnExport()
+void MainWindow::OnEPort()
 {
 	if (cur_scene)
-		cur_scene->Export();
+		cur_scene->EPort();
 }
 
 void MainWindow::OnLoad()

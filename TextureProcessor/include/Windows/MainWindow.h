@@ -8,9 +8,7 @@
 #include <QMenu>
 
 #include <Windows/Properties.h>
-#include <Windows/REProperties.h>
 #include <Windows/TabRelay.h>
-#include <UI/FlowCodex.h>
 
 
 class MainWindow : public QMainWindow
@@ -25,7 +23,7 @@ public:
 	{
 		xprops.show();
 	}
-	void OnExport();
+	void OnEPort();
 	void OnSave()
 	{
 		tab->OnSave();
@@ -46,7 +44,7 @@ private:
 	QMenu file;
 	QMenu windows;
 	QAction Aclear;
-	QAction Aexport;
+	QAction AePort;
 	QAction Asave;
 	QAction Asaveas;
 	QAction Aload;

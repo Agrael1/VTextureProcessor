@@ -23,20 +23,20 @@ using namespace UI;
 
 namespace UI
 {
-	class XConnection : public QGraphicsItem, public IXConnection
+	class Connection : public QGraphicsItem, public IConnection
 	{
-		friend class XConnMapper;
+		friend class ConnectionMap;
 	private:
-		XConnection(XPort& port);
+		Connection(Port& port);
 	public:
-		~XConnection();
+		~Connection();
 	public:
 		void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
 		QRectF boundingRect()const override;
 	public:
-		void Move(QPointF deltapos, Port ty)override;
+		void Move(QPointF deltapos, PortSide ty)override;
 		void ResetSink()
 		{
 			connector.second = nullptr;
@@ -58,29 +58,29 @@ namespace UI
 		void Init();
 		void mouseMoveEvent(QGraphicsSceneMouseEvent* event)override;
 		void mouseReleaseEvent(QGraphicsSceneMouseEvent* event)override;
-		void PlaceConnection(XPort& port);
-		bool HasCycle(IXNode* with)const noexcept;
+		void PlaceConnection(Port& port);
+		bool HasCycle(INode* with)const noexcept;
 
-		Port Requires()const;
+		PortSide Requires()const;
 
-		XPort*& rpSink() { return connector.second; }
-		XPort*& rpSource() { return connector.first; }
-		IXNode& SinkNode();
-		IXNode& SourceNode();
-		const IXNode& SinkNode()const;
-		const IXNode& SourceNode()const;
+		Port*& rpSink() { return connector.second; }
+		Port*& rpSource() { return connector.first; }
+		INode& SinkNode();
+		INode& SourceNode();
+		const INode& SinkNode()const;
+		const INode& SourceNode()const;
 		void Connect();
 		void Disconnect();
 
 		std::pair<QPointF, QPointF> PointsC1C2()const;
 	private:
-		std::pair<XPort*/*source*/, XPort*/*sink*/> connector{};
+		std::pair<Port*/*source*/, Port*/*sink*/> connector{};
 		bool bFinished = false;
 		QPointF source;
 		QPointF sink;
 	};
 
-	IXConnection& Query(XConnection* in)
+	IConnection& Query(Connection* in)
 	{
 		return *in;
 	}
@@ -100,20 +100,20 @@ std::unique_ptr<TO> static_unique_pointer_cast(std::unique_ptr<FROM>&& old) {
 	return std::unique_ptr<TO>{static_cast<TO*>(old.release())};
 }
 
-static UI::XPort* LocatePort(QGraphicsScene& scene, QPointF pos)noexcept
+static UI::Port* LocatePort(QGraphicsScene& scene, QPointF pos)noexcept
 {
 	auto xitems = scene.items(pos);
 	auto node = [](QGraphicsItem* item)
 	{
-		return (dynamic_cast<UI::XPort*>(item) != nullptr);
+		return (dynamic_cast<UI::Port*>(item) != nullptr);
 	};
 
 	for (auto* i : xitems | std::views::filter(node))
-		return static_cast<UI::XPort*>(i);
+		return static_cast<UI::Port*>(i);
 	return nullptr;
 }
 
-UI::XConnection::XConnection(XPort& port)
+UI::Connection::Connection(Port& port)
 {
 	// Renders the connection between nodes
 	port.scene()->addItem(this);
@@ -121,11 +121,11 @@ UI::XConnection::XConnection(XPort& port)
 	sink = source = port.CenterScene();
 	switch (port.GetType())
 	{
-	case Port::Sink:
+	case PortSide::Sink:
 		// If this node is the connection Sink
 		rpSink() = &port;
 		break;
-	case Port::Source:
+	case PortSide::Source:
 		// If this node is the connection Source
 		rpSource() = &port;
 		break;
@@ -135,14 +135,14 @@ UI::XConnection::XConnection(XPort& port)
 	Init();
 }
 
-UI::XConnection::~XConnection()
+UI::Connection::~Connection()
 {
 	// Only unmaps if the nodes were correctly connected
 	if (bFinished)
-		XConnMapper::Unmap(SourceNode(), *this);
+		ConnectionMap::Unmap(SourceNode(), *this);
 }
 
-void UI::XConnection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void UI::Connection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	painter->setBrush(Qt::NoBrush);
 	// Selects style based on connection status (connected, selected or currently being dragged)
@@ -159,7 +159,7 @@ void UI::XConnection::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 	cubic.cubicTo(c1c2.first, c1c2.second, sink);
 	painter->drawPath(cubic);
 }
-QRectF UI::XConnection::boundingRect() const
+QRectF UI::Connection::boundingRect() const
 {
 	auto points = PointsC1C2();
 	QRectF c1c2Rect = QRectF(points.first, points.second).normalized();
@@ -171,15 +171,15 @@ QRectF UI::XConnection::boundingRect() const
 	commonRect.setBottomRight(commonRect.bottomRight() + 2 * cornerOffset);
 	return commonRect;
 }
-void UI::XConnection::Move(QPointF deltapos, Port ty)
+void UI::Connection::Move(QPointF deltapos, PortSide ty)
 {
 	prepareGeometryChange();
 	switch (ty)
 	{
-	case Port::Sink:
+	case PortSide::Sink:
 		sink += deltapos;
 		break;
-	case Port::Source:
+	case PortSide::Source:
 		source += deltapos;
 		break;
 	default:
@@ -187,13 +187,13 @@ void UI::XConnection::Move(QPointF deltapos, Port ty)
 	}
 }
 
-void UI::XConnection::Update()
+void UI::Connection::Update()
 {
 	auto& node = SinkNode();
 	node.Update();
 }
 
-QJsonObject UI::XConnection::Serialize()
+QJsonObject UI::Connection::Serialize()
 {
 	/*
 	The returned JSON has the following structure:
@@ -219,7 +219,7 @@ QJsonObject UI::XConnection::Serialize()
 	return top;
 }
 
-void UI::XConnection::Init()
+void UI::Connection::Init()
 {
 	// Set Qt properties of the connection
 	setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -230,7 +230,7 @@ void UI::XConnection::Init()
 	setZValue(-1.0);
 }
 
-void UI::XConnection::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+void UI::Connection::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
 	prepareGeometryChange();
 
@@ -241,7 +241,7 @@ void UI::XConnection::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	update();
 	event->accept();
 }
-void UI::XConnection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+void UI::Connection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	ungrabMouse();
 	event->accept();
@@ -252,49 +252,49 @@ void UI::XConnection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	if (port && !HasCycle(&port->Node()) && port->GetType() == Requires())
 		return PlaceConnection(*port);
 
-	if (any(Requires()))XConnMapper::ClearTemporary();
+	if (any(Requires()))ConnectionMap::ClearTemporary();
 }
 
-void UI::XConnection::PlaceConnection(XPort& port)
+void UI::Connection::PlaceConnection(Port& port)
 {
 	prepareGeometryChange();
 
 	// Extrapolates missing Sink or Source
 	switch (Requires())
 	{
-	case Port::Sink:
+	case PortSide::Sink:
 	{
 		rpSink() = &port;
-		static_cast<Sink&>(port).connection = std::move(XConnMapper::DetachTemporary());
+		static_cast<Sink&>(port).connection = std::move(ConnectionMap::DetachTemporary());
 		sink = port.CenterScene();
 		break;
 	}
-	case Port::Source:
+	case PortSide::Source:
 		rpSource() = &port;
-		static_cast<Sink&>(*rpSink()).connection = std::move(XConnMapper::DetachTemporary());
+		static_cast<Sink&>(*rpSink()).connection = std::move(ConnectionMap::DetachTemporary());
 		source = port.CenterScene();
 		break;
 	}
-	XConnMapper::Map(SourceNode(), *this);
+	ConnectionMap::Map(SourceNode(), *this);
 	Connect();
 
 	// Set connection as properly terminated (for cleanup)
 	bFinished = true;
 }
-bool UI::XConnection::HasCycle(IXNode* with) const noexcept
+bool UI::Connection::HasCycle(INode* with) const noexcept
 {
-	std::array<IXNode*, 128> place;
+	std::array<INode*, 128> place;
 	std::array<std::byte, 1024> place2;
-	std::pmr::monotonic_buffer_resource rsrc{ place.data(), place.size()*sizeof(IXNode*) };
+	std::pmr::monotonic_buffer_resource rsrc{ place.data(), place.size()*sizeof(INode*) };
 	std::pmr::monotonic_buffer_resource rsrc2{ place2.data(), place2.size() };
-	std::pmr::vector<const IXNode*> nodes{&rsrc};
-	std::pmr::unordered_set<const IXNode*> visited(&rsrc2);
+	std::pmr::vector<const INode*> nodes{&rsrc};
+	std::pmr::unordered_set<const INode*> visited(&rsrc2);
 
-	auto trans = [this](XConnection* in)->const IXNode& {return in->SinkNode(); };
+	auto trans = [this](Connection* in)->const INode& {return in->SinkNode(); };
 
-	const IXNode* root = nullptr;
-	const IXNode* searched = nullptr;
-	if (Requires() == Port::Sink){
+	const INode* root = nullptr;
+	const INode* searched = nullptr;
+	if (Requires() == PortSide::Sink){
 		root = with;
 		searched = &SourceNode();
 	}
@@ -315,13 +315,13 @@ bool UI::XConnection::HasCycle(IXNode* with) const noexcept
 			if (node == searched)return true;
 			visited.emplace(node);
 		}
-		for (auto& x : XConnMapper::Get(*node) | std::views::transform(trans))
+		for (auto& x : ConnectionMap::Get(*node) | std::views::transform(trans))
 			if (!visited.contains(&x))
 				nodes.push_back(&x);
 	}
 	return false;
 }
-void UI::XConnection::RemoveForce() noexcept
+void UI::Connection::RemoveForce() noexcept
 {
 	if (bFinished)
 	{
@@ -330,7 +330,7 @@ void UI::XConnection::RemoveForce() noexcept
 	}
 }
 
-std::pair<QPointF, QPointF> UI::XConnection::PointsC1C2() const
+std::pair<QPointF, QPointF> UI::Connection::PointsC1C2() const
 {
 	constexpr qreal defaultOffset = 200;
 	qreal xDistance = sink.x() - source.x();
@@ -354,35 +354,35 @@ std::pair<QPointF, QPointF> UI::XConnection::PointsC1C2() const
 	};
 }
 
-Port UI::XConnection::Requires() const
+PortSide UI::Connection::Requires() const
 {
-	if (!connector.first) return Port::Source;
-	if (!connector.second) return Port::Sink;
-	return Port::None;
+	if (!connector.first) return PortSide::Source;
+	if (!connector.second) return PortSide::Sink;
+	return PortSide::None;
 }
-const IXNode& UI::XConnection::SinkNode()const
+const INode& UI::Connection::SinkNode()const
 {
-	return const_cast<XConnection*>(this)->SinkNode();
+	return const_cast<Connection*>(this)->SinkNode();
 }
-const IXNode& UI::XConnection::SourceNode()const 
+const INode& UI::Connection::SourceNode()const 
 {
-	return const_cast<XConnection*>(this)->SourceNode();
+	return const_cast<Connection*>(this)->SourceNode();
 }
-IXNode& UI::XConnection::SinkNode()
+INode& UI::Connection::SinkNode()
 {
 	return rpSink()->Node();
 }
-IXNode& UI::XConnection::SourceNode()
+INode& UI::Connection::SourceNode()
 {
 	return rpSource()->Node();
 }
-void UI::XConnection::Connect()
+void UI::Connection::Connect()
 {
 	auto& xsink = static_cast<Sink&>(*rpSink());
 	xsink.model.Link(static_cast<Source&>(*rpSource()).model);
 	Update();
 }
-void UI::XConnection::Disconnect()
+void UI::Connection::Disconnect()
 {
 	auto& xsink = static_cast<Sink&>(*rpSink());
 	xsink.model.Unlink();
@@ -391,71 +391,71 @@ void UI::XConnection::Disconnect()
 
 
 
-XConnMapper& UI::XConnMapper::Instance()
+ConnectionMap& UI::ConnectionMap::Instance()
 {
-	static XConnMapper mapper;
+	static ConnectionMap mapper;
 	return mapper;
 }
 
-void UI::XConnMapper::MakeTemporary(XPort& port)
+void UI::ConnectionMap::MakeTemporary(Port& port)
 {
-	Instance().tmp.reset(new XConnection{ port });
+	Instance().tmp.reset(new Connection{ port });
 	Instance().tmp->grabMouse();
 }
-void UI::XConnMapper::ConnectTemporary(XPort& port)
+void UI::ConnectionMap::ConnectTemporary(Port& port)
 {
 	auto* tmp = Instance().tmp.get();
 	if (!tmp)return;
 	Instance().tmp->ungrabMouse();
 	Instance().tmp->PlaceConnection(port);
 }
-void UI::XConnMapper::AttachTemporary(std::unique_ptr<IXConnection>&& in)
+void UI::ConnectionMap::AttachTemporary(std::unique_ptr<IConnection>&& in)
 {
 	auto& x = Instance().tmp;
-	x = static_unique_pointer_cast<XConnection>(std::move(in));
+	x = static_unique_pointer_cast<Connection>(std::move(in));
 	Unmap(x->SourceNode(), *x);
 	x->Disconnect();
 	x->ResetSink();
 	x->grabMouse();
 }
-void UI::XConnMapper::ClearTemporary()
+void UI::ConnectionMap::ClearTemporary()
 {
 	Instance().tmp.reset();
 }
-std::unique_ptr<XConnection> UI::XConnMapper::DetachTemporary()
+std::unique_ptr<Connection> UI::ConnectionMap::DetachTemporary()
 {
 	return std::move(Instance().tmp);
 }
-void UI::XConnMapper::UpdateGraph(IXNode& from)
+void UI::ConnectionMap::UpdateGraph(INode& from)
 {
 	for (auto* c : Get(from))
 		c->Update();
 }
 
 
-void UI::XConnMapper::Map(IXNode& n, XConnection& c)
+void UI::ConnectionMap::Map(INode& n, Connection& c)
 {
 	auto& i = Instance();
 	i.map[&n].push_back(&c);
 }
-void UI::XConnMapper::Unmap(IXNode& n, XConnection& c)
+void UI::ConnectionMap::Unmap(INode& n, Connection& c)
 {
 	auto& x = Instance().map.at(&n);
 	auto it = std::find(x.begin(), x.end(), &c);
 	if (it != x.end())x.erase(it);
 }
-void UI::XConnMapper::Trim(IXNode& n)
+void UI::ConnectionMap::Trim(INode& n)
 {
 	auto& x = Instance().map[&n];
 	for (auto* i : x)
 		i->RemoveForce();
 	Instance().map.erase(&n);
 }
-std::span<XConnection*> UI::XConnMapper::Get(const IXNode& n)
+std::span<Connection*> UI::ConnectionMap::Get(const INode& n)
 {
 	return Instance().map[&n];
 }
 
-UI::XConnMapper::~XConnMapper()
+UI::ConnectionMap::~ConnectionMap()
 {
 }

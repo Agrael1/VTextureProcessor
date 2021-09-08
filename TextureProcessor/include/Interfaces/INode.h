@@ -10,18 +10,18 @@
 
 namespace UI
 {
-	namespace Windows{class XPropertyElement;}
-	class XPort;
+	namespace Windows{class PropertyElement;}
+	class Port;
 
-	struct NOVTABLE IXNode:public QGraphicsWidget, public ISerialize
+	struct NOVTABLE INode:public QGraphicsWidget, public ISerialize
 	{
-		virtual ~IXNode() = default;
-		virtual std::unique_ptr<IXNode> Clone(std::string&& name)const = 0;
+		virtual ~INode() = default;
+		virtual std::unique_ptr<INode> Clone(std::string&& name)const = 0;
 		virtual std::string_view Name()const = 0;
-		virtual void UpdateProperties(Windows::XPropertyElement& properties) = 0;
+		virtual void UpdateProperties(Windows::PropertyElement& properties) = 0;
 		virtual void Update() = 0;
-		virtual std::string Export() = 0;
-		virtual void ExportSilent(std::string_view in) = 0;
+		virtual std::string EPort() = 0;
+		virtual void EPortSilent(std::string_view in) = 0;
 		virtual void StartConnection(uint8_t index) = 0;
 		virtual void FinishConnection(uint8_t index) = 0;
 	};

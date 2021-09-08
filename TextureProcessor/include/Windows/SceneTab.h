@@ -29,9 +29,9 @@ namespace UI::Windows
 		{
 			scene.clearSelection();
 		}
-		void Export()
+		void EPort()
 		{
-			scene.ExportAll();
+			scene.EPortAll();
 		}
 	private:
 		FlowScene scene;

@@ -6,10 +6,10 @@ namespace ver
 
 namespace UI
 {
-	struct IXNode;
+	struct INode;
 	namespace Windows
 	{
-		class XPropertyElement;
+		class PropertyElement;
 	}
-	void PlaceProperties(Windows::XPropertyElement& props, ver::Node& node, IXNode& entity);
+	void PlaceProperties(Windows::PropertyElement& props, ver::Node& node, INode& entity);
 }

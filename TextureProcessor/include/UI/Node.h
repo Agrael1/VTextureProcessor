@@ -15,7 +15,7 @@
 namespace UI
 {
 	template<class XModel> requires std::derived_from<XModel, ver::Node>
-		class XNode : public IXNode
+		class XNode : public INode
 		{
 		public:
 			template<class ...Args>
@@ -46,7 +46,7 @@ namespace UI
 			~XNode()
 			{
 				b_destroyed = true;
-				XConnMapper::Trim(*this);
+				ConnectionMap::Trim(*this);
 			}
 		public:
 			virtual void paint(QPainter* painter,
@@ -66,10 +66,10 @@ namespace UI
 					for (auto& x : sinks)x.MoveConnections(delta);
 					for (auto& x : sources)x.MoveConnections(delta);
 				}
-				return IXNode::itemChange(change, value);
+				return INode::itemChange(change, value);
 			}
 
-			virtual std::unique_ptr<IXNode> Clone(std::string&& name)const override
+			virtual std::unique_ptr<INode> Clone(std::string&& name)const override
 			{
 				printf("copy called\n");
 				auto x = std::make_unique<XNode>(*this);
@@ -80,7 +80,7 @@ namespace UI
 			{
 				return model.GetName();
 			}
-			virtual void UpdateProperties(Windows::XPropertyElement& properties) override
+			virtual void UpdateProperties(Windows::PropertyElement& properties) override
 			{
 				PlaceProperties(properties, model, *this);
 			}
@@ -90,24 +90,24 @@ namespace UI
 				model.Update();
 				for (auto& x : modules)
 					x.Update();
-				XConnMapper::UpdateGraph(*this);
+				ConnectionMap::UpdateGraph(*this);
 				update();
 			}
-			virtual std::string Export()override
+			virtual std::string EPort()override
 			{
-				return model.Export();
+				return model.EPort();
 			}
-			virtual void ExportSilent(std::string_view in)override
+			virtual void EPortSilent(std::string_view in)override
 			{
-				return model.ExportSilent(in);
+				return model.EPortSilent(in);
 			}
 			virtual void StartConnection(uint8_t index)override
 			{
-				XConnMapper::MakeTemporary(sources[index]);
+				ConnectionMap::MakeTemporary(sources[index]);
 			}
 			virtual void FinishConnection(uint8_t index)override
 			{
-				XConnMapper::ConnectTemporary(sinks[index]);
+				ConnectionMap::ConnectTemporary(sinks[index]);
 			}
 		private:
 			void DrawBackground(QPainter* painter)

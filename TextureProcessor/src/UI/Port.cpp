@@ -3,35 +3,35 @@
 #include <QPainter>
 #include <ranges>
 
-UI::XPort::XPort(IXNode& parent, uint8_t port_num)
+UI::Port::Port(INode& parent, uint8_t port_num)
 	:parent(parent), port_num(port_num)
 {
 	setGraphicsItem(this);
 }
-UI::XPort::XPort(XPort&& in) noexcept
+UI::Port::Port(Port&& in) noexcept
 	:parent(in.parent)
 	, port_num(in.port_num)
 {
 	setGraphicsItem(this);
 }
 
-QRectF UI::XPort::boundingRect() const
+QRectF UI::Port::boundingRect() const
 {
 	return { 0,0,PortStyle::port_bbox,PortStyle::port_bbox };
 }
 
-void UI::XPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void UI::Port::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	painter->drawEllipse(QPointF{ PortStyle::port_bbox / 2,PortStyle::port_bbox / 2 }, PortStyle::diameter / 2, PortStyle::diameter / 2);
 }
 
-QSizeF UI::XPort::sizeHint(Qt::SizeHint which, const QSizeF& constraint) const
+QSizeF UI::Port::sizeHint(Qt::SizeHint which, const QSizeF& constraint) const
 {
 	return { PortStyle::port_bbox,PortStyle::port_bbox };
 }
 
-UI::Sink::Sink(IXNode& parent, uint8_t port_num, ver::Sink& model)
-	:XPort(parent, port_num), model(model)
+UI::Sink::Sink(INode& parent, uint8_t port_num, ver::Sink& model)
+	:Port(parent, port_num), model(model)
 {}
 
 void UI::Sink::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -44,14 +44,14 @@ void UI::Sink::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 void UI::Sink::MoveConnections(QPointF delta)
 {
 	if (connection)
-		connection->Move(delta, Port::Sink);
+		connection->Move(delta, PortSide::Sink);
 }
 
 void UI::Sink::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
 	if (connection)
-		return XConnMapper::AttachTemporary(std::move(connection));
-	XConnMapper::MakeTemporary(*this);
+		return ConnectionMap::AttachTemporary(std::move(connection));
+	ConnectionMap::MakeTemporary(*this);
 }
 
 void UI::Source::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -63,11 +63,11 @@ void UI::Source::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 
 void UI::Source::MoveConnections(QPointF delta)
 {
-	for (auto& s : XConnMapper::Get(Node()) | std::views::transform([](XConnection* x)->IXConnection& {return Query(x); }))
-		s.Move(delta, Port::Source);
+	for (auto& s : ConnectionMap::Get(Node()) | std::views::transform([](Connection* x)->IConnection& {return Query(x); }))
+		s.Move(delta, PortSide::Source);
 }
 
 void UI::Source::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-	XConnMapper::MakeTemporary(*this);
+	ConnectionMap::MakeTemporary(*this);
 }

@@ -4,15 +4,16 @@
  * @brief Logic behind Node editor canvas
  */
 #include <UI/FlowScene.h>
-#include <Windows/REProperties.h>
+#include <UI/SceneEvent.h>
+#include <UI/Node.h>
+#include <UI/Connection.h>
+
+#include <Windows/Properties.h>
 #include <QMessageBox>
 #include <QPainter>
 #include <QGraphicsView>
 #include <QJsonArray>
 
-#include <UI/SceneEvent.h>
-#include <UI/Node.h>
-#include <UI/Connection.h>
 #include <utils/utils.h>
 #include <Logic/ShaderNode.h>
 #include <ranges>
@@ -113,7 +114,7 @@ void FlowScene::OnSelectionChanged()
 	props.Clear();
 	for (auto* i : selectedItems())
 	{
-		auto* focus = dynamic_cast<IXNode*>(i);
+		auto* focus = dynamic_cast<INode*>(i);
 		if (focus) focus->UpdateProperties(props.MakeElement(*focus, focus->Name()));
 	}
 	props.Show();
@@ -125,7 +126,7 @@ void FlowScene::OnSelectionChanged()
  * @param name Name of the new Node
  * @return UI::Node& Newly created node
  */
-UI::IXNode& FlowScene::CreateNode(std::string_view name)
+UI::INode& FlowScene::CreateNode(std::string_view name)
 {
 	auto& node = InsertNode(name);
 	addItem(&node);
@@ -159,7 +160,7 @@ void FlowScene::DeleteSelected()
 	for (QGraphicsItem* item : selectedItems())
 	{
 		// Disconnects object from other scene objects
-		if (auto c = dynamic_cast<IXConnection*>(item))
+		if (auto c = dynamic_cast<IConnection*>(item))
 			c->RemoveForce();
 	}
 
@@ -173,7 +174,7 @@ void FlowScene::DeleteSelected()
 			nodes.erase(n->Name().data());
 			continue;
 		}
-		if (auto n = dynamic_cast<IXNode*>(item))
+		if (auto n = dynamic_cast<INode*>(item))
 			nodes.erase(n->Name().data());
 	}
 }
@@ -190,21 +191,21 @@ void FlowScene::Clear()
 }
 
 /**
- * @brief Exports all outputs on canvas
+ * @brief EPorts all outputs on canvas
  *
  */
-void FlowScene::ExportAll()
+void FlowScene::EPortAll()
 {
 	std::filesystem::path name;
 	for (auto* x : outputs)
 	{
 		if (name.empty())
 		{
-			name = x->Export();
+			name = x->EPort();
 			continue;
 		}
-		// Exports output silently if name already valid
-		x->ExportSilent(ver::generate(name).string());
+		// EPorts output silently if name already valid
+		x->EPortSilent(ver::generate(name).string());
 	}
 }
 
@@ -251,7 +252,7 @@ QJsonObject FlowScene::Serialize()
 	{
 		xnodes.append(x.second->Serialize());
 		auto* node = &*(x.second);
-		for (auto* c : XConnMapper::Get(*node))
+		for (auto* c : ConnectionMap::Get(*node))
 			conns.append(Query(c).Serialize());
 	}
 	sc.insert("Dimensions", xdims);
@@ -309,7 +310,7 @@ void FlowScene::Deserialize(QJsonObject xobj)
 		// Skip incomplete connections
 		if (!(o.contains("Sink") && o.contains("Source"))) continue;
 		auto source = o["Source"].toArray();
-		UI::IXNode* node = nullptr;
+		UI::INode* node = nullptr;
 		uint8_t sourceN = 0;
 
 		// Lookup source index
@@ -346,7 +347,7 @@ void FlowScene::Deserialize(QJsonObject xobj)
 			}
 			sinkN = v.toInt();
 		}
-		if (!node) { XConnMapper::ClearTemporary(); continue; }
+		if (!node) { ConnectionMap::ClearTemporary(); continue; }
 		node->FinishConnection(sinkN);
 	}
 
@@ -362,7 +363,7 @@ void FlowScene::Deserialize(QJsonObject xobj)
  * @param unique_name Name of the new Node (must be unique)
  * @return UI::Node&
  */
-UI::IXNode* FlowScene::TryInsertNode(std::string_view name, size_t ref)
+UI::INode* FlowScene::TryInsertNode(std::string_view name, size_t ref)
 {
 	if (!codex.contains(name))
 		return nullptr;
@@ -370,12 +371,12 @@ UI::IXNode* FlowScene::TryInsertNode(std::string_view name, size_t ref)
 	return &*nodes.emplace(x->Name(), std::move(x)).first->second;
 }
 
-UI::IXNode* GetNode(const auto& in)
+UI::INode* GetNode(const auto& in)
 {
-	auto r = std::ranges::find_if(in, [](auto* xin) {return dynamic_cast<IXNode*>(xin) != nullptr; });
+	auto r = std::ranges::find_if(in, [](auto* xin) {return dynamic_cast<INode*>(xin) != nullptr; });
 	if (r == in.end())
 		return nullptr;
-	return static_cast<IXNode*>(*r);
+	return static_cast<INode*>(*r);
 }
 
 
@@ -397,7 +398,7 @@ bool UI::FlowScene::event(QEvent* e)
 	}
 	return QGraphicsScene::event(e);
 }
-UI::IXNode& UI::FlowScene::InsertNode(std::string_view name)
+UI::INode& UI::FlowScene::InsertNode(std::string_view name)
 {
 	auto x = codex.GetNode(name);
 	return *nodes.emplace(x->Name(), std::move(x)).first->second;

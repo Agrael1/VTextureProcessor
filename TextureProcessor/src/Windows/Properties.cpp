@@ -1,11 +1,17 @@
-﻿/**
- * @file Properties.cpp
- * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
- * @brief Controls for properties dock window
- */
 #include <Windows/Properties.h>
 
 using namespace UI::Windows;
+
+UI::Windows::XProperties::XProperties(QWidget* parent)
+	:QDockWidget("Properties", parent)
+{
+    setWidget(&dum);
+}
+
+XProperties::Dummy::Dummy() {
+    lay.setAlignment(Qt::AlignTop); setLayout(&lay);
+    setSizePolicy(QSizePolicy{ QSizePolicy::Ignored, QSizePolicy::Preferred });
+}
 
 /**
  * @brief Creates Sub Layout for selected node
@@ -32,49 +38,15 @@ PropertyElement::PropertyElement(PropertyElement&& o)
         lay.addWidget(w.get());
 }
 
-/**
- * @brief Makes Dummy for structured layout
-*/
-Properties::Dummy::Dummy() {
-    lay.setAlignment(Qt::AlignTop); setLayout(&lay);
-    setSizePolicy(QSizePolicy{ QSizePolicy::Ignored, QSizePolicy::Preferred });
-}
-
-/**
- * @brief Dock window constructor
- * @param parent parent to dock onto
-*/
-Properties::Properties(QWidget* parent)
-    :QDockWidget("Properties", parent)
+PropertyElement& UI::Windows::XProperties::MakeElement(INode& parent, std::string_view title)
 {
-    setMinimumWidth(150);
-    setWidget(&dum);
-}
-
-/**
- * @brief Appends layout for node with name
- * @param node layout to grab on
- * @param name name of the node
- * @return reference to newly created object
-*/
-PropertyElement& Properties::AppendProperty(INode& node, std::string_view name)
-{
-    return props.emplace_back(node, name);
-}
-
-/**
- * @brief Moves existing property in vector
- * @param prop previous property
-*/
-void Properties::AppendProperty(PropertyElement&& prop)
-{
-    props.emplace_back(std::move(prop));
+    return props.emplace_back(parent, title);
 }
 
 /**
  * @brief Adds all widgets to dock window
 */
-void Properties::Set()
+void XProperties::Show()
 {
     for (auto& w : props)
         dum.lay.addWidget(&w);
@@ -83,7 +55,7 @@ void Properties::Set()
 /**
  * @brief clears all widgets
 */
-void Properties::Clear()
+void XProperties::Clear()
 {
     for (auto& w : props)
         dum.lay.removeWidget(&w);

@@ -82,8 +82,8 @@ namespace ver
 				buffer = in["Buffer"].toBool(true);
 			}
 		}
-		virtual void ExportSilent(std::string_view name)override;
-		virtual std::string Export()override;
+		virtual void EPortSilent(std::string_view name)override;
+		virtual std::string EPort()override;
 	private:
 		void SetProperties(const QJsonArray& props, QString& scode);
 	private:
@@ -111,8 +111,8 @@ namespace ver
 		{
 			return {};
 		}
-		std::string Export()override;
-		virtual void ExportSilent(std::string_view name);
+		std::string EPort()override;
+		virtual void EPortSilent(std::string_view name);
 	private:
 		std::shared_ptr<QImage> in;
 		std::shared_ptr<QImage> out;

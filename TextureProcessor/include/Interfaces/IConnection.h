@@ -5,10 +5,10 @@
 
 namespace UI
 {
-	struct NOVTABLE IXConnection : public ISerialize
+	struct NOVTABLE IConnection : public ISerialize
 	{
-		virtual ~IXConnection() = default;
-		virtual void Move(QPointF deltapos, Port ty) = 0;
+		virtual ~IConnection() = default;
+		virtual void Move(QPointF deltapos, PortSide ty) = 0;
 		virtual void UpdatePosition() = 0;
 		virtual void RemoveForce()noexcept = 0;
 	};

@@ -19,7 +19,7 @@ namespace UI
 	public:
 		FloatSlider(float& value, float min = 0.0f, float max = 20.0f);
 	public:
-		void SetChangedCallback(IXNode* to)override;
+		void SetChangedCallback(INode* to)override;
 	private:
 		void ValueChanged(int value);
 		void TextEdited(const QString& text);
@@ -37,7 +37,7 @@ namespace UI
 	public:
 		Vec2Slider(QVector2D& value, float min = 0.0f, float max = 20.0f);
 	public:
-		void SetChangedCallback(IXNode* to)override;
+		void SetChangedCallback(INode* to)override;
 	private:
 		QVBoxLayout lay;
 		FloatSlider upper;
@@ -50,7 +50,7 @@ namespace UI
 	public:
 		IntSlider(int& value);
 	public:
-		void SetChangedCallback(IXNode* to)override;
+		void SetChangedCallback(INode* to)override;
 	private:
 		void ValueChanged(int value);
 		void TextEdited(const QString& text);
@@ -67,7 +67,7 @@ namespace UI
 	public:
 		CheckBox(bool& value, const QString& name);
 	public:
-		void SetChangedCallback(IXNode* to)override;
+		void SetChangedCallback(INode* to)override;
 	private:
 		bool& value;
 		QVBoxLayout lay;
@@ -78,7 +78,7 @@ namespace UI
 	public:
 		RefreshCheckBox(bool& value, const QString& name);
 	public:
-		void SetChangedCallback(IXNode* to, Windows::XPropertyElement& self)override;
+		void SetChangedCallback(INode* to, Windows::PropertyElement& self)override;
 	private:
 		bool& value;
 		QVBoxLayout lay;

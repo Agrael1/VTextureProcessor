@@ -13,18 +13,18 @@ namespace ver
 
 namespace UI
 {
-	struct IXNode;
+	struct INode;
 
-	class XPort :public QGraphicsLayoutItem, public QGraphicsItem
+	class Port :public QGraphicsLayoutItem, public QGraphicsItem
 	{
 		static constexpr QPointF center = { PortStyle::port_bbox / 2, PortStyle::port_bbox / 2 };
 	public:
-		XPort(IXNode& parent, uint8_t port_num);
-		XPort(XPort&& in)noexcept;
+		Port(INode& parent, uint8_t port_num);
+		Port(Port&& in)noexcept;
 	public:
-		constexpr virtual Port GetType()const noexcept
+		constexpr virtual PortSide GetType()const noexcept
 		{
-			return Port::None;
+			return PortSide::None;
 		}
 		auto& Node() const noexcept
 		{
@@ -53,16 +53,16 @@ namespace UI
 	protected:
 		virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
 	protected:
-		IXNode& parent;
+		INode& parent;
 		uint8_t port_num;
 	};
 
-	class Sink : public XPort
+	class Sink : public Port
 	{
-		friend class XConnection;
+		friend class Connection;
 	public:
-		Sink(IXNode& parent, uint8_t port_num, ver::Sink& model);
-		Sink(Sink&& in)noexcept:XPort(std::move(in)),model(in.model), connection(std::move(in.connection)){}
+		Sink(INode& parent, uint8_t port_num, ver::Sink& model);
+		Sink(Sink&& in)noexcept:Port(std::move(in)),model(in.model), connection(std::move(in.connection)){}
 	public:
 		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 		void MoveConnections(QPointF delta);
@@ -70,31 +70,31 @@ namespace UI
 		{
 			if (connection)connection->UpdatePosition();
 		}
-		constexpr virtual Port GetType()const noexcept override
+		constexpr virtual PortSide GetType()const noexcept override
 		{
-			return Port::Sink;
+			return PortSide::Sink;
 		}
 	protected:
 		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;
 	private:
-		std::unique_ptr<IXConnection> connection;
+		std::unique_ptr<IConnection> connection;
 		ver::Sink& model;
 	};
 
-	class Source : public XPort
+	class Source : public Port
 	{
-		friend class XConnection;
+		friend class Connection;
 	public:
-		Source(IXNode& parent, uint8_t port_num, ver::Source& model)
-			:XPort(parent, port_num), model(model)
+		Source(INode& parent, uint8_t port_num, ver::Source& model)
+			:Port(parent, port_num), model(model)
 		{}
-		Source(Source&& in)noexcept :XPort(std::move(in)), model(in.model){}
+		Source(Source&& in)noexcept :Port(std::move(in)), model(in.model){}
 	public:
 		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 		void MoveConnections(QPointF delta);
-		constexpr virtual Port GetType()const noexcept override
+		constexpr virtual PortSide GetType()const noexcept override
 		{
-			return Port::Source;
+			return PortSide::Source;
 		}
 	protected:
 		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;

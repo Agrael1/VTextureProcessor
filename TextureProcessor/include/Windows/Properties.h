@@ -1,17 +1,8 @@
-﻿/**
- * @file Properties.h
- * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
- * @brief Controls for properties dock window
- */
 #pragma once
 #include <QDockWidget>
 #include <QGroupBox>
-#include <QBoxLayout>
-#include <memory>
-#include <vector>
-
-#include <Interfaces/INode.h>
 #include <UI/Updater.h>
+#include <vector>
 
 namespace UI::Windows
 {
@@ -25,11 +16,17 @@ namespace UI::Windows
 		W& AppendWidget(Args&&... args)
 		{
 			auto& r = static_cast<W&>(*widgets.emplace_back(std::make_unique<W>(std::forward<Args>(args)...)));
-			if constexpr (std::derived_from<W, Updater>)
-				((Updater&)r).SetChangedCallback(&parent);
+			if constexpr (std::derived_from<W, IUpdater>)
+				((IUpdater&)r).SetChangedCallback(&parent);
+			if constexpr (std::derived_from<W, PropertyUpdater>)
+				((PropertyUpdater&)r).SetChangedCallback(&parent, *this);
 
 			lay.addWidget(&r);
 			return r;
+		}
+		void Clear()noexcept
+		{
+			widgets.clear();
 		}
 	private:
 		INode& parent;
@@ -37,7 +34,7 @@ namespace UI::Windows
 		std::vector<std::unique_ptr<QWidget>> widgets;
 	};
 
-	class Properties : public QDockWidget
+	class XProperties : public QDockWidget
 	{
 		class Dummy :public QWidget
 		{
@@ -47,12 +44,10 @@ namespace UI::Windows
 			QVBoxLayout lay;
 		};
 	public:
-		Properties(QWidget* parent = nullptr);
-
+		XProperties(QWidget* parent = nullptr);
 	public:
-		PropertyElement& AppendProperty(INode& node, std::string_view name);
-		void AppendProperty(PropertyElement&& prop);
-		void Set();
+		PropertyElement& MakeElement(INode& parent, std::string_view title);
+		void Show();
 		void Clear();
 	private:
 		Dummy dum;

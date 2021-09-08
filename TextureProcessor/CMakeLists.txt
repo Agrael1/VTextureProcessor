@@ -45,21 +45,21 @@ add_executable (TextureProcessor
     "include/UI/ContextMenu.h"
     "include/pch.h"
     "src/UI/ContextMenu.cpp"
-    "include/UI/FlowCodex.h"
-    "src/UI/FlowCodex.cpp"
+    
+    
     "include/Logic/SinksT.h"
     "include/Logic/SourcesT.h"
     "include/Logic/Engine.h"
     "src/Logic/Engine.cpp"
     "include/Logic/ShaderNode.h"
     "src/Logic/ShaderNode.cpp"
-    "include/UI/TextureNode.h"
-    "src/UI/TextureNode.cpp"
+    
+    
     "include/Logic/PortType.h"
     "include/UI/Connection.h"
     "src/UI/Connection.cpp"
-    "include/Windows/Properties.h"
-    "src/Windows/Properties.cpp"
+    
+    
     "include/Logic/DynamicConstant.h"
     "src/UI/Sliders.cpp"
     "include/Interfaces/INode.h"
@@ -84,7 +84,7 @@ add_executable (TextureProcessor
     "src/Windows/Tab.cpp"
     "src/Windows/EditorTab.cpp"
     "include/Logic/ApplicationConfig.h"
-    "src/Logic/ApplicationConfig.cpp" "include/utils/utils.h" "src/utils/utils.cpp" "include/Logic/Constants.h" "include/UI/Node.h" "src/UI/Node.cpp" "include/UI/REFlowCodex.h" "src/UI/REFlowCodex.cpp" "include/UI/NodeModules.h" "include/Logic/PropertyView.h" "include/UI/PropertyGenerator.h" "src/UI/PropertyGenerator.cpp" "src/UI/NodeModules.cpp" "include/Windows/REProperties.h" "src/Windows/REProperties.cpp" "include/UI/SceneEvent.h" "include/UI/GraphicsLayout.h" "src/UI/Port.cpp" "include/Interfaces/ISerialize.h" "include/Interfaces/IConnection.h" "include/UI/NodeMenu.h")
+    "src/Logic/ApplicationConfig.cpp" "include/utils/utils.h" "src/utils/utils.cpp" "include/Logic/Constants.h" "include/UI/Node.h" "src/UI/Node.cpp" "include/UI/FlowCodex.h" "src/UI/FlowCodex.cpp" "include/UI/NodeModules.h" "include/Logic/PropertyView.h" "include/UI/PropertyGenerator.h" "src/UI/PropertyGenerator.cpp" "src/UI/NodeModules.cpp" "include/Windows/Properties.h" "src/Windows/Properties.cpp" "include/UI/SceneEvent.h" "include/UI/GraphicsLayout.h" "src/UI/Port.cpp" "include/Interfaces/ISerialize.h" "include/Interfaces/IConnection.h" "include/UI/NodeMenu.h")
 
 target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt5Widgets_INCLUDE_DIRS}")
 target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

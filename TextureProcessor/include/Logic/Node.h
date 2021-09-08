@@ -44,8 +44,8 @@ namespace ver
 		void SetSinkLinkage(size_t index, std::string_view to_node, std::string_view source);
 
 		virtual PropertyView GetProperties() = 0;
-		virtual std::string Export() = 0;
-		virtual void ExportSilent(std::string_view name) = 0;
+		virtual std::string EPort() = 0;
+		virtual void EPortSilent(std::string_view name) = 0;
 		virtual QJsonObject Serialize()override;
 		virtual void Deserialize(QJsonObject in)override {};
 	protected:

@@ -11,38 +11,38 @@
 
 namespace UI
 {
-	struct IXNode;
-	class XPort;
-	class XConnection;
+	struct INode;
+	class Port;
+	class Connection;
 
-	class XConnMapper
+	class ConnectionMap
 	{
 	public:
-		static XConnMapper& Instance();
+		static ConnectionMap& Instance();
 
-		static void MakeTemporary(XPort& port);
-		static void ConnectTemporary(XPort& port);
-		static void AttachTemporary(std::unique_ptr<IXConnection>&& in);
+		static void MakeTemporary(Port& port);
+		static void ConnectTemporary(Port& port);
+		static void AttachTemporary(std::unique_ptr<IConnection>&& in);
 		static void ClearTemporary();
-		static std::unique_ptr<XConnection> DetachTemporary();
+		static std::unique_ptr<Connection> DetachTemporary();
 
-		static void UpdateGraph(IXNode& from);
-		static void Map(IXNode& n, XConnection& c);
-		static void Unmap(IXNode& n, XConnection& c);
-		static void Trim(IXNode& n);
-		static std::span<XConnection*> Get(const IXNode& n);
+		static void UpdateGraph(INode& from);
+		static void Map(INode& n, Connection& c);
+		static void Unmap(INode& n, Connection& c);
+		static void Trim(INode& n);
+		static std::span<Connection*> Get(const INode& n);
 	private:
-		XConnMapper() = default;
-		~XConnMapper();
-		XConnMapper(XConnMapper&) = delete;
-		XConnMapper(XConnMapper&&) = delete;
-		void operator=(XConnMapper&) = delete;
-		void operator=(XConnMapper&&) = delete;
+		ConnectionMap() = default;
+		~ConnectionMap();
+		ConnectionMap(ConnectionMap&) = delete;
+		ConnectionMap(ConnectionMap&&) = delete;
+		void operator=(ConnectionMap&) = delete;
+		void operator=(ConnectionMap&&) = delete;
 	private:
-		std::unordered_map<const IXNode*, std::vector<XConnection*>> map;
-		std::unique_ptr<XConnection> tmp;
+		std::unordered_map<const INode*, std::vector<Connection*>> map;
+		std::unique_ptr<Connection> tmp;
 	};
 
-	IXConnection& Query(XConnection* in);
+	IConnection& Query(Connection* in);
 }
 

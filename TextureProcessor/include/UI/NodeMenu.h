@@ -10,17 +10,17 @@ namespace UI
 		NodeMenu()
 		{
 			menu.addAction("Edit");
-			auto* b = menu.addAction("Export");
-			menu.connect(b, &QAction::triggered, [this](bool) {node->Export(); });
+			auto* b = menu.addAction("EPort");
+			menu.connect(b, &QAction::triggered, [this](bool) {node->EPort(); });
 		}
-		void Execute(IXNode* xnode, QPoint pos)
+		void Execute(INode* xnode, QPoint pos)
 		{
 			node = xnode;
 			menu.popup(pos);
 		}
 
 	private:
-		IXNode* node = nullptr;
+		INode* node = nullptr;
 		QMenu menu;
 	};
 }

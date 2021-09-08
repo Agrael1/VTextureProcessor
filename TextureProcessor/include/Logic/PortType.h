@@ -40,15 +40,15 @@ constexpr std::string_view to_str(PortType p)
 	}
 }
 
-enum class Port :uint8_t
+enum class PortSide :uint8_t
 {
 	None,
 	Sink,
 	Source
 };
-inline bool any(Port p)
+inline bool any(PortSide p)
 {
-	return p != Port::None;
+	return p != PortSide::None;
 }
 inline bool any(PortType p)
 {

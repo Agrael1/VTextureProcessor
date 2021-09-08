@@ -3,11 +3,11 @@
 #include <UI/Sliders.h>
 #include <Logic/Node.h>
 #include <Logic/DynamicConstant.h>
-#include <Windows/REProperties.h>
+#include <Windows/Properties.h>
 
 using namespace UI;
 
-static void PropertyBuffer(Windows::XPropertyElement& elem, const char* name, ver::dc::Buffer& buf)
+static void PropertyBuffer(Windows::PropertyElement& elem, const char* name, ver::dc::Buffer& buf)
 {
 	for (auto ref : buf)
 	{
@@ -40,16 +40,16 @@ static void PropertyBuffer(Windows::XPropertyElement& elem, const char* name, ve
 		}
 	}
 }
-static void PropertyBoolean(Windows::XPropertyElement& elem, const char* name, bool& buf)
+static void PropertyBoolean(Windows::PropertyElement& elem, const char* name, bool& buf)
 {
 	elem.AppendWidget<CheckBox>(buf, name);
 }
-static void PropertyBooleanUpd(Windows::XPropertyElement& elem, const char* name, bool& buf)
+static void PropertyBooleanUpd(Windows::PropertyElement& elem, const char* name, bool& buf)
 {
 	elem.AppendWidget<RefreshCheckBox>(buf, name);
 }
 
-void UI::PlaceProperties(Windows::XPropertyElement& elem, ver::Node& node, IXNode& entity)
+void UI::PlaceProperties(Windows::PropertyElement& elem, ver::Node& node, INode& entity)
 {
 	elem.Clear();
 	auto props = node.GetProperties();

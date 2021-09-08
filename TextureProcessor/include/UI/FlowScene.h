@@ -4,14 +4,15 @@
  * @brief Logic behind Node editor canvas
  */
 #pragma once
-#include <UI/REFlowCodex.h>
-#include <QGraphicsScene>
+#include <UI/FlowCodex.h>
 #include <UI/ContextMenu.h>
 #include <UI/NodeMenu.h>
 
+#include <QGraphicsScene>
+
 namespace UI
 {
-	struct IXNode;
+	struct INode;
 	namespace Windows {
 		class XProperties;
 	}
@@ -22,16 +23,16 @@ namespace UI
 	public:
 		void DeleteSelected();
 		void Clear();
-		void ExportAll();
+		void EPortAll();
 		QSize Dimensions(QJsonObject)const noexcept;
 
 		virtual QJsonObject Serialize()override;
 		virtual void Deserialize(QJsonObject)override;
 	protected:
 		bool event(QEvent* e)override;
-		UI::IXNode& InsertNode(std::string_view name);
-		UI::IXNode* TryInsertNode(std::string_view name, size_t ref);
-		UI::IXNode& CreateNode(std::string_view name);
+		UI::INode& InsertNode(std::string_view name);
+		UI::INode* TryInsertNode(std::string_view name, size_t ref);
+		UI::INode& CreateNode(std::string_view name);
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
 		void OnSelectionChanged();
 		void OnItemSelected(QTreeWidgetItem* item, int);
@@ -46,10 +47,10 @@ namespace UI
 
 		QBrush Bbackground;
 		UI::Windows::XProperties& props;
-		UI::RE::XFlowCodex codex;
+		UI::FlowCodex codex;
 
-		std::unordered_map<std::string, std::unique_ptr<IXNode>> nodes;
-		std::vector<IXNode*> outputs;
+		std::unordered_map<std::string, std::unique_ptr<INode>> nodes;
+		std::vector<INode*> outputs;
 
 		QPoint last_event;
 		ContextMenu menu;
