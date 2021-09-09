@@ -5,7 +5,6 @@
  */
 #pragma once
 #include <QGraphicsView>
-#include <UI/ContextMenu.h>
 
 class QTreeWidgetItem;
 

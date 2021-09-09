@@ -3,24 +3,6 @@
  * @author Ilya Doroshenko (xdoros01)
  * @brief Precompiled header
  */
-//#include <QtGui>
-//#include <QGraphicsItem>
-//#include <QMenuBar>
-//#include <QLineEdit>
-//#include <QBoxLayout>
-//#include <QTreeWidget>
-//#include <QWidgetAction>
-//#include <QHeaderView>
-//#include <QGraphicsScene>
-//#include <QOpenGLContext>
-//#include <QGraphicsSceneMouseEvent>
-//#include <QFileDialog>
-//
-////std
-//#include <memory>
-//#include <span>
-//#include <string>
-//#include <filesystem>
 
 //renewal
 #include <QMainWindow>
@@ -28,11 +10,21 @@
 #include <QTreeWidget>
 #include <QLineEdit>
 #include <QLabel>
+#include <QMenu>
 #include <QBoxLayout>
 #include <QApplication>
 #include <QPushButton>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QGraphicsWidget>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 #include <fstream>
 #include <filesystem>
+#include <span>
+#include <array>
+#include <vector>
+#include <memory>
+#include <unordered_map>

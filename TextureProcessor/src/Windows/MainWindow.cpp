@@ -122,7 +122,7 @@ void MainWindow::OnLoad()
 
 void MainWindow::OnCreateNode()
 {
-	tab->TempTab<EditorTab>("New Node");
+	tab->TempTab<EditorTab>("New Node", xprops);
 }
 
 void MainWindow::OnLoadNode()
@@ -136,7 +136,7 @@ void MainWindow::OnLoadNode()
 
 	if (node_path.empty()) return;
 	node_path = node_path.make_preferred();
-	auto& cs = tab->LoadTab<EditorTab>({ node_path }, node_path.filename().string(), std::move(node_path));
+	auto& cs = tab->LoadTab<EditorTab>({ node_path }, node_path.filename().string(), xprops, std::move(node_path));
 }
 
 void MainWindow::OnViewDelete()

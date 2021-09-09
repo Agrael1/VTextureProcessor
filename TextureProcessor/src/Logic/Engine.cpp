@@ -6,7 +6,6 @@
 
 #include <Logic/Engine.h>
 #include <QOpenGLTexture>
-#include <optional>
 
 std::optional<Engine> Engine::e;
 
