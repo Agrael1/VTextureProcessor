@@ -2,13 +2,13 @@
 
 using namespace UI::Windows;
 
-UI::Windows::XProperties::XProperties(QWidget* parent)
+UI::Windows::Properties::Properties(QWidget* parent)
 	:QDockWidget("Properties", parent)
 {
     setWidget(&dum);
 }
 
-XProperties::Dummy::Dummy() {
+Properties::Dummy::Dummy() {
     lay.setAlignment(Qt::AlignTop); setLayout(&lay);
     setSizePolicy(QSizePolicy{ QSizePolicy::Ignored, QSizePolicy::Preferred });
 }
@@ -38,7 +38,7 @@ PropertyElement::PropertyElement(PropertyElement&& o)
         lay.addWidget(w.get());
 }
 
-PropertyElement& UI::Windows::XProperties::MakeElement(INode& parent, std::string_view title)
+PropertyElement& UI::Windows::Properties::MakeElement(INode& parent, std::string_view title)
 {
     return props.emplace_back(parent, title);
 }
@@ -46,7 +46,7 @@ PropertyElement& UI::Windows::XProperties::MakeElement(INode& parent, std::strin
 /**
  * @brief Adds all widgets to dock window
 */
-void XProperties::Show()
+void Properties::Show()
 {
     for (auto& w : props)
         dum.lay.addWidget(&w);
@@ -55,7 +55,7 @@ void XProperties::Show()
 /**
  * @brief clears all widgets
 */
-void XProperties::Clear()
+void Properties::Clear()
 {
     for (auto& w : props)
         dum.lay.removeWidget(&w);

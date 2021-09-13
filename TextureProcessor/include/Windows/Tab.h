@@ -22,6 +22,10 @@ namespace UI::Windows
 		{
 			return save_path;
 		}
+		virtual void OnChange()noexcept
+		{
+
+		}
 	private:
 		std::filesystem::path save_path;
 	};

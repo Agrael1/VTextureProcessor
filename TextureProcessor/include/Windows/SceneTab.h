@@ -8,7 +8,7 @@ namespace UI::Windows
 	class SceneTab : public Tab
 	{
 	public:
-		SceneTab(XProperties& props, std::filesystem::path&& xproj_path, QSize resolution);
+		SceneTab(Properties& props, std::filesystem::path&& xproj_path, QSize resolution);
 		~SceneTab();
 	public:
 		QWidget* Widget()noexcept override
@@ -19,8 +19,8 @@ namespace UI::Windows
 		void SaveAs()override;
 		void Clear()override;
 		void Load()override;
+		void OnChange()noexcept override;
 
-		void SetCurrent()noexcept;
 		void DeleteSelected()
 		{
 			scene.DeleteSelected();

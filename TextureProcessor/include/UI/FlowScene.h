@@ -14,12 +14,12 @@ namespace UI
 {
 	struct INode;
 	namespace Windows {
-		class XProperties;
+		class Properties;
 	}
 	class FlowScene : public QGraphicsScene, public ISerialize
 	{
 	public:
-		FlowScene(QObject* parent, Windows::XProperties& props, QSize dims);
+		FlowScene(QObject* parent, Windows::Properties& props, QSize dims);
 	public:
 		void DeleteSelected();
 		void Clear();
@@ -46,7 +46,7 @@ namespace UI
 		QPen Pdark;
 
 		QBrush Bbackground;
-		UI::Windows::XProperties& props;
+		UI::Windows::Properties& props;
 		UI::FlowCodex codex;
 
 		std::unordered_map<std::string, std::unique_ptr<INode>> nodes;

@@ -26,7 +26,7 @@ using namespace UI;
  * @param parent
  * @param props
  */
-FlowScene::FlowScene(QObject* parent, Windows::XProperties& props, QSize dims)
+FlowScene::FlowScene(QObject* parent, Windows::Properties& props, QSize dims)
 	:QGraphicsScene(parent)
 	, Cbackground("#393939")
 	, Clight("#2F2F2F")

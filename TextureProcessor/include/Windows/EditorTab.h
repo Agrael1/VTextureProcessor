@@ -11,7 +11,8 @@ namespace UI::Windows
 	{
 		struct SceneDock : public QDockWidget
 		{
-			SceneDock(XProperties& props) :scene(nullptr, props, { 128,128 }), view(&scene) { setWidget(&view); }
+			SceneDock(Properties& props);
+			~SceneDock();
 			FlowScene scene;
 			FlowView view;
 		};
@@ -22,15 +23,15 @@ namespace UI::Windows
 		};
 
 	public:
-		EditorTab(XProperties& props, std::filesystem::path&& p): Tab(std::move(p)), scene(props)
+		EditorTab(Properties& props, std::filesystem::path&& p): Tab(std::move(p)), scene(props)
 		{
-			cw.addDockWidget(Qt::TopDockWidgetArea, &edit);
-			cw.addDockWidget(Qt::BottomDockWidgetArea, &scene);
+			cw.addDockWidget(Qt::LeftDockWidgetArea, &edit);
+			cw.addDockWidget(Qt::RightDockWidgetArea, &scene);
 		}
-		EditorTab(XProperties& props): scene(props)
+		EditorTab(Properties& props): scene(props)
 		{
-			cw.addDockWidget(Qt::TopDockWidgetArea, &edit);
-			cw.addDockWidget(Qt::BottomDockWidgetArea, &scene);
+			cw.addDockWidget(Qt::LeftDockWidgetArea, &edit);
+			cw.addDockWidget(Qt::RightDockWidgetArea, &scene);
 		}
 	public:
 		QWidget* Widget() noexcept override
@@ -41,6 +42,7 @@ namespace UI::Windows
 		void SaveAs() override {};
 		void Clear() override {};
 		void Load() override;
+		void OnChange()noexcept override;
 	private:
 		QMainWindow cw;
 		SceneDock scene;

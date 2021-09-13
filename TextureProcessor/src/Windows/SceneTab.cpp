@@ -9,7 +9,7 @@
 using namespace UI::Windows;
 namespace fs = std::filesystem;
 
-SceneTab::SceneTab(XProperties& props, std::filesystem::path&& xproj_path, QSize resolution)
+SceneTab::SceneTab(Properties& props, std::filesystem::path&& xproj_path, QSize resolution)
 	:Tab(std::move(xproj_path)), scene(nullptr, props, resolution), view(&scene)
 {
 	scene.setSceneRect(-32000, -32000, 64000, 64000);
@@ -79,12 +79,11 @@ void SceneTab::Load()
 	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e).object();
 	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return; }
 	Engine::Instance().BindScene(&scene, scene.Dimensions(json));
-	SetCurrent();
+	OnChange();
 	scene.Deserialize(json);
 }
 
-void UI::Windows::SceneTab::SetCurrent() noexcept
+void UI::Windows::SceneTab::OnChange() noexcept
 {
-	Engine::Instance().SwitchScene(&scene);
+	Engine::SwitchScene(&scene);
 }
-

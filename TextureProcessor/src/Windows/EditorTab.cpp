@@ -1,8 +1,23 @@
 #include <Windows/EditorTab.h>
+#include <Logic/Engine.h>
 #include <fstream>
 #include <iterator>
 
 using namespace UI::Windows;
+
+constexpr QSize EditSize{ 128,128 };
+
+EditorTab::SceneDock::SceneDock(Properties& props)
+	:scene(nullptr, props, EditSize), view(&scene)
+{
+	setWidget(&view);
+	Engine::BindScene(&scene, EditSize);
+}
+
+UI::Windows::EditorTab::SceneDock::~SceneDock()
+{
+	Engine::UnbindScene(&scene);
+}
 
 void EditorTab::Load()
 {
@@ -10,4 +25,9 @@ void EditorTab::Load()
 	//QFile t(Path().string().c_str());
 	//t.open(QIODevice::ReadOnly | QIODevice::Text);
 	//edit.LoadText(t.readAll());
+}
+
+void UI::Windows::EditorTab::OnChange() noexcept
+{
+	Engine::SwitchScene(&scene.scene);
 }

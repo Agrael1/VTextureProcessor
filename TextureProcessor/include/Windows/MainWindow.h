@@ -39,7 +39,7 @@ public:
 	void OnViewClrSel();
 private:
 	std::optional<UI::Windows::TabRelay> tab;
-	UI::Windows::XProperties xprops;
+	UI::Windows::Properties xprops;
 
 	QMenu file;
 	QMenu windows;

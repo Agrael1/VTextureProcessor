@@ -446,7 +446,7 @@ void UI::ConnectionMap::Unmap(INode& n, Connection& c)
 }
 void UI::ConnectionMap::Trim(INode& n)
 {
-	auto x = Instance().map[&n];
+	auto x = std::move(Instance().map[&n]);
 	for (auto* i : x)
 		i->RemoveForce();
 	Instance().map.erase(&n);

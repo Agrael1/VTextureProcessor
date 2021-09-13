@@ -50,21 +50,26 @@ Engine::~Engine() {
 
 void Engine::BindScene(UI::FlowScene* scene, QSize size)
 {
-	frames.emplace(std::piecewise_construct, std::forward_as_tuple(scene), std::forward_as_tuple(size, con.Format()));
+	auto& i = Instance();
+	i.frames.emplace(std::piecewise_construct, 
+		std::forward_as_tuple(scene), 
+		std::forward_as_tuple(size, i.con.Format()));
 }
 void Engine::UnbindScene(UI::FlowScene* const scene)
 {
-	if (current == &frames.at(scene))
-		current = nullptr;
-	frames.erase(scene);
+	auto& i = Instance();
+	if (i.current == &i.frames.at(scene))
+		i.current = nullptr;
+	i.frames.erase(scene);
 }
 
 void Engine::SwitchScene(UI::FlowScene* scene)
 {
-	current = &frames.at(scene);
-	current->bind();
-	auto sz = current->size();
-	con.funcs.glViewport(0, 0, sz.width(), sz.height());
+	auto& i = Instance();
+	i.current = &i.frames.at(scene);
+	i.current->bind();
+	auto sz = i.current->size();
+	i.con.funcs.glViewport(0, 0, sz.width(), sz.height());
 }
 
 /**

@@ -34,7 +34,7 @@ namespace UI::Windows
 		std::vector<std::unique_ptr<QWidget>> widgets;
 	};
 
-	class XProperties : public QDockWidget
+	class Properties : public QDockWidget
 	{
 		class Dummy :public QWidget
 		{
@@ -44,7 +44,7 @@ namespace UI::Windows
 			QVBoxLayout lay;
 		};
 	public:
-		XProperties(QWidget* parent = nullptr);
+		Properties(QWidget* parent = nullptr);
 	public:
 		PropertyElement& MakeElement(INode& parent, std::string_view title);
 		void Show();

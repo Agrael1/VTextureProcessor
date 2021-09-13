@@ -40,6 +40,7 @@ namespace UI::Windows
 			addTab(w, xname.data());
 			setCurrentWidget(w);
 			setTabToolTip(currentIndex(), xname.c_str());
+			OnCurrentChanged();
 			return (T&)*x.first->second;
 		}
 		void OnCurrentChanged(int index = 0);
