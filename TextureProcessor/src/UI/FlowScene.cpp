@@ -191,21 +191,21 @@ void FlowScene::Clear()
 }
 
 /**
- * @brief EPorts all outputs on canvas
+ * @brief Exports all outputs on canvas
  *
  */
-void FlowScene::EPortAll()
+void FlowScene::ExportAll()
 {
 	std::filesystem::path name;
 	for (auto* x : outputs)
 	{
 		if (name.empty())
 		{
-			name = x->EPort();
+			name = x->Export();
 			continue;
 		}
-		// EPorts output silently if name already valid
-		x->EPortSilent(ver::generate(name).string());
+		// Exports output silently if name already valid
+		x->ExportSilent(ver::generate(name).string());
 	}
 }
 

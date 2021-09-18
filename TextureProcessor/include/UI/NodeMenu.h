@@ -10,8 +10,8 @@ namespace UI
 		NodeMenu()
 		{
 			menu.addAction("Edit");
-			auto* b = menu.addAction("EPort");
-			menu.connect(b, &QAction::triggered, [this](bool) {node->EPort(); });
+			auto* b = menu.addAction("Export");
+			menu.connect(b, &QAction::triggered, [this](bool) {node->Export(); });
 		}
 		void Execute(INode* xnode, QPoint pos)
 		{

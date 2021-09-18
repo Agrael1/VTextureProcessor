@@ -22,7 +22,11 @@ namespace UI::Windows
 		{
 			return save_path;
 		}
-		virtual void OnChange()noexcept
+		virtual void OnEnter()noexcept
+		{
+
+		}
+		virtual void OnLeave()noexcept
 		{
 
 		}

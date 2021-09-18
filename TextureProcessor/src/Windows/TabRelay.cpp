@@ -15,10 +15,11 @@ TabRelay::TabRelay(QWidget* parent, SceneTab*& sc)
 
 void TabRelay::OnCurrentChanged(int index)
 {
-	auto* cur = GetCurrent();
-	if (!cur)return;
-	cur_scene = dynamic_cast<SceneTab*>(cur);
-	cur->OnChange();
+	if (prev_tab)prev_tab->OnLeave();
+	prev_tab = GetCurrent();
+	if (!prev_tab)return;
+	cur_scene = dynamic_cast<SceneTab*>(prev_tab);
+	prev_tab->OnEnter();
 }
 
 Tab* TabRelay::GetCurrent()

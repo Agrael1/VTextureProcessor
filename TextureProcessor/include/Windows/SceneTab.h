@@ -19,7 +19,7 @@ namespace UI::Windows
 		void SaveAs()override;
 		void Clear()override;
 		void Load()override;
-		void OnChange()noexcept override;
+		void OnEnter()noexcept override;
 
 		void DeleteSelected()
 		{
@@ -29,9 +29,9 @@ namespace UI::Windows
 		{
 			scene.clearSelection();
 		}
-		void EPort()
+		void Export()
 		{
-			scene.EPortAll();
+			scene.ExportAll();
 		}
 	private:
 		FlowScene scene;

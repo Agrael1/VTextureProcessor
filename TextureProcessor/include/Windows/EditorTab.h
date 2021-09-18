@@ -2,8 +2,12 @@
 #include <Editor/Editor.h>
 #include <UI/FlowScene.h>
 #include <UI/FlowView.h>
+#include <UI/Node.h>
+#include <Logic/ShaderNode.h>
 #include <QDockWidget>
 #include <Windows/Tab.h>
+#include <Windows/TableProp.h>
+#include <Windows/Properties.h>
 
 namespace UI::Windows
 {
@@ -25,13 +29,11 @@ namespace UI::Windows
 	public:
 		EditorTab(Properties& props, std::filesystem::path&& p): Tab(std::move(p)), scene(props)
 		{
-			cw.addDockWidget(Qt::LeftDockWidgetArea, &edit);
-			cw.addDockWidget(Qt::RightDockWidgetArea, &scene);
+			Init(props);
 		}
 		EditorTab(Properties& props): scene(props)
 		{
-			cw.addDockWidget(Qt::LeftDockWidgetArea, &edit);
-			cw.addDockWidget(Qt::RightDockWidgetArea, &scene);
+			Init(props);
 		}
 	public:
 		QWidget* Widget() noexcept override
@@ -42,10 +44,21 @@ namespace UI::Windows
 		void SaveAs() override {};
 		void Clear() override {};
 		void Load() override;
-		void OnChange()noexcept override;
+		void OnEnter()noexcept override;
+		void OnLeave()noexcept override;
 	private:
+		void Init(Properties& props)noexcept
+		{
+			cw.addDockWidget(Qt::LeftDockWidgetArea, &edit);
+			cw.addDockWidget(Qt::RightDockWidgetArea, &scene);
+			((QMainWindow*)props.parentWidget())->addDockWidget(Qt::RightDockWidgetArea, &tp, Qt::Vertical);
+			tp.hide();
+		}
+	private:
+		TableProperties tp;
 		QMainWindow cw;
 		SceneDock scene;
 		EditorDock edit;
+		//UI::XNode<ver::ShaderNode> edited;
 	};
 }

@@ -20,8 +20,8 @@ namespace UI
 		virtual std::string_view Name()const = 0;
 		virtual void UpdateProperties(Windows::PropertyElement& properties) = 0;
 		virtual void Update() = 0;
-		virtual std::string EPort() = 0;
-		virtual void EPortSilent(std::string_view in) = 0;
+		virtual std::string Export() = 0;
+		virtual void ExportSilent(std::string_view in) = 0;
 		virtual void StartConnection(uint8_t index) = 0;
 		virtual void FinishConnection(uint8_t index) = 0;
 	};

@@ -23,7 +23,7 @@ public:
 	{
 		xprops.show();
 	}
-	void OnEPort();
+	void OnExport();
 	void OnSave()
 	{
 		tab->OnSave();

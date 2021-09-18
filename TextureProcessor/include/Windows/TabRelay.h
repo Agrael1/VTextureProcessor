@@ -73,6 +73,7 @@ namespace UI::Windows
 		std::unordered_map<std::string, std::unique_ptr<Tab>> temp_tabs;
 		std::unordered_map<std::string, std::unique_ptr<Tab>> tabs;
 		SceneTab*& cur_scene;
+		Tab* prev_tab = nullptr;
 	};
 }
 

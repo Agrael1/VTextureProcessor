@@ -162,12 +162,12 @@ void ver::ShaderNode::Update()
 	Engine::Instance().Render(shader->shader, inputs, tiling, outputs, buf);
 }
 
-void ver::ShaderNode::EPortSilent(std::string_view name) 
+void ver::ShaderNode::ExportSilent(std::string_view name) 
 {}
-std::string ver::ShaderNode::EPort() 
+std::string ver::ShaderNode::Export() 
 { 
 	auto str = QFileDialog::getSaveFileName(nullptr,
-		"EPort As",
+		"Export As",
 		"",
 		"PNG (*.png);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm);;All files (*.*);;"
 	);
@@ -230,10 +230,10 @@ void ver::OutputNode::Update()
 		*out = QImage((const uchar*)(&nullcolor), 1, 1, QImage::Format::Format_ARGB32);
 }
 
-std::string ver::OutputNode::EPort()
+std::string ver::OutputNode::Export()
 {
 	auto str = QFileDialog::getSaveFileName(nullptr,
-		"EPort As",
+		"Export As",
 		"",
 		"PNG (*.png);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm);;All files (*.*);;"
 	);
@@ -242,7 +242,7 @@ std::string ver::OutputNode::EPort()
 	return str.toStdString();
 }
 
-inline void ver::OutputNode::EPortSilent(std::string_view name)
+inline void ver::OutputNode::ExportSilent(std::string_view name)
 {
 	if (name.empty())return;
 	out->save(name.data());

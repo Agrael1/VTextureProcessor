@@ -30,7 +30,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	, view("View")
 	, Aclear("Clear")
 	, Aprops("Properties")
-	, AePort("EPort All")
+	, AePort("Export All")
 	, Asave("Save")
 	, Asaveas("Save As")
 	, Aload("Open Project")
@@ -52,7 +52,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 
 	connect(&Aclear, &QAction::triggered, [this]() { OnClearTriggered(); });
 	connect(&Aprops, &QAction::triggered, [this]() { OnProps(); });
-	connect(&AePort, &QAction::triggered, [this]() {OnEPort(); });
+	connect(&AePort, &QAction::triggered, [this]() {OnExport(); });
 	connect(&Asave, &QAction::triggered, [this]() {OnSave(); });
 	connect(&Asaveas, &QAction::triggered, [this]() {OnSaveAs(); });
 	connect(&Aload, &QAction::triggered, [this]() {OnLoad(); });
@@ -100,10 +100,10 @@ void MainWindow::OnClearTriggered()
 		cur_scene->Clear();
 }
 
-void MainWindow::OnEPort()
+void MainWindow::OnExport()
 {
 	if (cur_scene)
-		cur_scene->EPort();
+		cur_scene->Export();
 }
 
 void MainWindow::OnLoad()

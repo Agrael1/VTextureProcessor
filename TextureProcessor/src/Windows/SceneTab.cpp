@@ -79,11 +79,11 @@ void SceneTab::Load()
 	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e).object();
 	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return; }
 	Engine::Instance().BindScene(&scene, scene.Dimensions(json));
-	OnChange();
+	OnEnter();
 	scene.Deserialize(json);
 }
 
-void UI::Windows::SceneTab::OnChange() noexcept
+void UI::Windows::SceneTab::OnEnter() noexcept
 {
 	Engine::SwitchScene(&scene);
 }

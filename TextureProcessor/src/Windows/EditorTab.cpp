@@ -27,7 +27,12 @@ void EditorTab::Load()
 	//edit.LoadText(t.readAll());
 }
 
-void UI::Windows::EditorTab::OnChange() noexcept
+void UI::Windows::EditorTab::OnEnter() noexcept
 {
 	Engine::SwitchScene(&scene.scene);
+	tp.show();
+}
+void UI::Windows::EditorTab::OnLeave() noexcept
+{
+	tp.hide();
 }

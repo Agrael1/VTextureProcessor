@@ -93,13 +93,13 @@ namespace UI
 				ConnectionMap::UpdateGraph(*this);
 				update();
 			}
-			virtual std::string EPort()override
+			virtual std::string Export()override
 			{
-				return model.EPort();
+				return model.Export();
 			}
-			virtual void EPortSilent(std::string_view in)override
+			virtual void ExportSilent(std::string_view in)override
 			{
-				return model.EPortSilent(in);
+				return model.ExportSilent(in);
 			}
 			virtual void StartConnection(uint8_t index)override
 			{

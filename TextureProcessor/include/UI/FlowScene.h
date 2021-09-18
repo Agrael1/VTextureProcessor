@@ -23,7 +23,7 @@ namespace UI
 	public:
 		void DeleteSelected();
 		void Clear();
-		void EPortAll();
+		void ExportAll();
 		QSize Dimensions(QJsonObject)const noexcept;
 
 		virtual QJsonObject Serialize()override;
