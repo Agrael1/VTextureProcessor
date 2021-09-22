@@ -1,5 +1,6 @@
 #include <Windows/TabRelay.h>
 #include <Windows/SceneTab.h>
+#include <UI/ProjectEvent.h>
 
 
 using namespace UI::Windows;
@@ -11,6 +12,11 @@ TabRelay::TabRelay(QWidget* parent, SceneTab*& sc)
 	setTabsClosable(true);
 	connect(this, &QTabWidget::tabCloseRequested, this, &TabRelay::OnTabClosed);
 	connect(this, &QTabWidget::currentChanged, this, &TabRelay::OnCurrentChanged);
+}
+
+UI::Windows::TabRelay::~TabRelay()
+{
+	disconnect(this, &QTabWidget::currentChanged, this, &TabRelay::OnCurrentChanged);
 }
 
 void TabRelay::OnCurrentChanged(int index)

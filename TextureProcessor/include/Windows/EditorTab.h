@@ -7,11 +7,10 @@
 #include <QDockWidget>
 #include <Windows/Tab.h>
 #include <Windows/TableProp.h>
-#include <Windows/Properties.h>
 
 namespace UI::Windows
 {
-	class EditorTab : public Tab
+	class EditorTab : public Tab, public QMainWindow
 	{
 		struct SceneDock : public QDockWidget
 		{
@@ -27,18 +26,19 @@ namespace UI::Windows
 		};
 
 	public:
-		EditorTab(Properties& props, std::filesystem::path&& p): Tab(std::move(p)), scene(props)
+		EditorTab(QWidget* tab_relay, Properties& props, std::filesystem::path&& p)
+			: Tab(std::move(p)), scene(props), tp(tab_relay)
 		{
 			Init(props);
 		}
-		EditorTab(Properties& props): scene(props)
+		EditorTab(QWidget* tab_relay, Properties& props) : scene(props), tp(tab_relay)
 		{
 			Init(props);
 		}
 	public:
 		QWidget* Widget() noexcept override
 		{
-			return &cw;
+			return this;
 		}
 		void Save() override {};
 		void SaveAs() override {};
@@ -47,16 +47,10 @@ namespace UI::Windows
 		void OnEnter()noexcept override;
 		void OnLeave()noexcept override;
 	private:
-		void Init(Properties& props)noexcept
-		{
-			cw.addDockWidget(Qt::LeftDockWidgetArea, &edit);
-			cw.addDockWidget(Qt::RightDockWidgetArea, &scene);
-			((QMainWindow*)props.parentWidget())->addDockWidget(Qt::RightDockWidgetArea, &tp, Qt::Vertical);
-			tp.hide();
-		}
+		void Init(Properties& props)noexcept;
+		bool event(QEvent* e)override;
 	private:
 		TableProperties tp;
-		QMainWindow cw;
 		SceneDock scene;
 		EditorDock edit;
 		//UI::XNode<ver::ShaderNode> edited;

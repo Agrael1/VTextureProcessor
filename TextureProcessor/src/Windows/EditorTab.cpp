@@ -1,5 +1,8 @@
 #include <Windows/EditorTab.h>
+#include <Windows/Properties.h>
 #include <Logic/Engine.h>
+#include <UI/ProjectEvent.h>
+
 #include <fstream>
 #include <iterator>
 
@@ -35,4 +38,20 @@ void UI::Windows::EditorTab::OnEnter() noexcept
 void UI::Windows::EditorTab::OnLeave() noexcept
 {
 	tp.hide();
+}
+void UI::Windows::EditorTab::Init(Properties& props) noexcept
+{
+	addDockWidget(Qt::LeftDockWidgetArea, &edit);
+	addDockWidget(Qt::RightDockWidgetArea, &scene);
+	((QMainWindow*)props.parentWidget())->addDockWidget(Qt::RightDockWidgetArea, &tp, Qt::Vertical);
+	tp.hide();
+}
+bool UI::Windows::EditorTab::event(QEvent* e)
+{
+	switch (e->type())
+	{
+	case NameChangedEvent::etype:
+		return true;
+	default:return QMainWindow::event(e);;
+	}
 }

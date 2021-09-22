@@ -10,6 +10,7 @@ namespace UI::Windows
 	{
 	public:
 		TabRelay(QWidget* parent, SceneTab*&);
+		~TabRelay();
 	public:
 		template<class T, class... Args> requires std::derived_from<T, Tab>
 		T& LoadTab(const std::filesystem::path& path, std::string_view name, Args&&... args)
