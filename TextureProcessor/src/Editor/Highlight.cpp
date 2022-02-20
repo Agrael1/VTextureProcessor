@@ -33,6 +33,9 @@ const std::array<QRegularExpression, 92> Highlighter::kwords{
 	QRegularExpression{"\\bstruct\\b"}
 };
 
+
+
+
 Highlighter::Highlighter(QTextDocument* parent)
 	:QSyntaxHighlighter(parent)
 {

@@ -3,6 +3,17 @@
 
 namespace UI
 {
+	class RespondentNode
+	{
+	public:
+		RespondentNode(UI::INode& node_ref, class FlowCodex& codex):node_ref(node_ref), codex(codex){}
+	public:
+		void Rename(std::string_view name);
+	private:
+		UI::INode& node_ref;
+		FlowCodex& codex;
+	};
+
 	class FlowCodex
 	{
 		static constexpr std::string_view NodesDir = "nodes";
@@ -28,6 +39,7 @@ namespace UI
 				x.second.refcount = 0;
 		}
 
+		//RespondentNode MakeEmptyNode();
 		std::unique_ptr<UI::INode> GetNode(std::string_view nodety)const;
 		std::unique_ptr<UI::INode> GetNode(std::string_view nodety, size_t ref) const;
 		bool contains(std::string_view nodety)const;

@@ -34,6 +34,15 @@ namespace ver::dc
 #undef X
 	};
 
+	constexpr const char* x[] =
+	{
+#define X(el) #el,
+		LEAF_ELEMENT_TYPES
+#undef X
+	};
+
+	constexpr auto a = x[size_t(Type::Float)];
+
 	template<Type type>
 	struct Map
 	{
