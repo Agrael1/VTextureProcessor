@@ -174,13 +174,6 @@ constexpr auto kr = kwords_range();
 class LexContext
 {
 public:
-	enum State
-	{
-		Begin,
-		BeginLit,
-		Literal
-	};
-public:
 	LexContext(std::string_view code)
 		:code(code) {}
 public:
@@ -189,8 +182,6 @@ public:
 		char x = prefetch_one();
 		if (!x)return 0;
 		advance_one();
-		xstate = not_lit(x) ? Begin : xstate == Begin ? BeginLit : Literal;
-
 		if (x == '\n') { line++; column = 0; }
 		return x;
 	}
@@ -200,65 +191,45 @@ public:
 		switch (c)
 		{
 		case 'b':
-			if (auto st = stmt_from_subset(0, 1); st)return st;
-			break;
+			return stmt_from_subset(0, 1);
 		case 'c':
 			if (prefetch_one() == 'a')
-				if (auto st = stmt_from_subset(1, 2); st)return st;
+				return stmt_from_subset(1, 2);
 			if (prefetch_one() == 'o')
-				if (auto st = stmt_from_subset(2, 2); st)return st;
+				return stmt_from_subset(2, 2);
 			break;
 		case 'd':
-			if (prefetch_one() == 'o' && term(1))
-			{
-				auto r = offset - 1;
-				advance(statements[5]);
-				return token{ token::type::statement, statements[5], r };
-			}
+			if (prefetch_one() == 'o')
+				return create_advance(statements[5], token::type::statement);
 			if (prefetch_one() == 'e')
-				if (auto st = stmt_from_subset(3, 2); st)return st;
+				return stmt_from_subset(3, 2);
 			if (prefetch_one() == 'i')
-				if (auto st = stmt_from_subset(4, 2); st)return st;
+				return stmt_from_subset(4, 2);
 			break;
 		case 'e':
-			if (auto st = stmt_from_subset(6, 1); st)return st;
-			break;
+			return stmt_from_subset(6, 1);
 		case 'f':
-			if (auto st = stmt_from_subset(7, 1); st)return st;
-			break;
+			return stmt_from_subset(7, 1);
 		case 'i':
 			if (prefetch_one() == 'f' && term(2))
-			{
-				auto r = offset - 1;
-				advance(statements[8]);
-				return token{ token::type::statement, statements[8], r };
-			}
+				return create_advance(statements[8], token::type::statement);
 			if (prefetch_one() == 'n')
 			{
-				if (term(1))
-				{
-					auto r = offset - 1;
-					advance(statements[9]);
-					return token{ token::type::statement, statements[9], r };
-				}
-				if (auto st = stmt_from_subset(10, 2); st)return st;
+				if (auto st = create_advance(statements[9], token::type::statement))
+					return st;
+				return stmt_from_subset(10, 2);
 			}
 			break;
 		case 'l':
-			if (auto st = stmt_from_subset(11, 1); st)return st;
-			break;
+			return stmt_from_subset(11, 1);
 		case 'o':
-			if (auto st = stmt_from_subset(12, 1); st)return st;
-			break;
+			return stmt_from_subset(12, 1);
 		case 'r':
-			if (auto st = stmt_from_subset(13, 1); st)return st;
-			break;
+			return stmt_from_subset(13, 1);
 		case 's':
-			if (auto st = stmt_from_subset(14, 1); st)return st;
-			break;
+			return stmt_from_subset(14, 1);
 		case 'w':
-			if (auto st = stmt_from_subset(15, 1); st)return st;
-			break;
+			return stmt_from_subset(15, 1);
 		default:
 			break;
 		}
@@ -266,6 +237,27 @@ public:
 	}
 	std::optional<token> try_get_kw(char c)
 	{
+		if (std::ranges::find(kr, c) == kr.end())return{};
+		switch (c)
+		{
+		case 'a':
+			return kw_from_subset(0, 1);
+		case 'b':
+			if (prefetch_one() == 'o')
+				return kw_from_subset(1, 2);
+			if (code.substr(0, 3) != kwords[3].substr(1, 3)||!(c = prefetch_n(3)))
+				return {};
+			if (c > '1' && c < '5')
+				return create_advance(kwords[c - '1' + 2], token::type::keyword);
+		case 'c':
+			return kw_from_subset(6, 1);
+		case 'd':
+			if (prefetch_one() == 'o')
+				return kw_from_subset(18, 2);
+		default:
+			break;
+		}
+
 		return {};
 	}
 	std::optional<token> try_get_ident(char c)
@@ -278,33 +270,52 @@ public:
 	bool empty()const noexcept {
 		return code.empty() || !code[0];
 	}
-	bool state()const noexcept {
-		return xstate;
-	}
 	static bool not_lit(char c) {
 		return !isalnum(c) && c != '_';
 	}
 private:
-	char prefetch_one()noexcept
+	char prefetch_one()const noexcept
 	{
 		if (empty())return 0;
 		return code[0];
 	}
+	char prefetch_n(size_t n)const noexcept
+	{
+		if (empty() || code.length() <= n)return 0;
+		return code[n];
+	}
 	bool term(size_t length)const noexcept {
 		return code.length() <= (length) || not_lit(code[length]);
 	}
-	std::optional<token> stmt_from_subset(size_t stateN, size_t xoffset)
+
+	std::optional<token> stmt_from_subset(size_t stateN, size_t xoffset) {
+		return from_subset(xoffset, statements[stateN], token::type::statement);
+	}
+	std::optional<token> kw_from_subset(size_t stateN, size_t xoffset) {
+		return from_subset(xoffset, kwords[stateN], token::type::keyword);
+	}
+	std::optional<token> from_subset(size_t xoffset, std::string_view xst, token::type tt)
 	{
-		auto xst = statements[stateN];
 		auto cmpw = xst.substr(xoffset);
 		if (cmpw == code.substr(xoffset - 1, cmpw.length()) && term(xst.length() - 1))
 		{
 			auto r = offset - 1;
 			advance(xst);
-			return token{ token::type::statement, xst, r };
+			return token{ tt, xst, r };
 		}
 		return{};
 	}
+	std::optional<token> create_advance(std::string_view sw, token::type tt)
+	{
+		if (term(sw.length() - 1))
+		{
+			auto r = offset - 1;
+			advance(sw);
+			return token{ tt, sw, r };
+		}
+		return {};
+	}
+
 	void advance(std::string_view sw)
 	{
 		auto l = sw.length() - 1; //without 1 byte
@@ -314,13 +325,12 @@ private:
 	}
 	void advance_one()
 	{
-		offset ++;
-		line ++;
+		offset++;
+		line++;
 		code = code.substr(1);
 	}
 
 private:
-	State xstate = Begin;
 	size_t line = 0;
 	size_t column = 0;
 	size_t offset = 0;
