@@ -1,5 +1,6 @@
 #include <Editor/Highlight.h>
 #include <QRegularExpression>
+#include <Editor/Lexer.h>
 
 const std::array<QRegularExpression, 16> Highlighter::statements{
 	QRegularExpression{"\\bbreak\\b"}, QRegularExpression{"\\bcontinue\\b"}, QRegularExpression{"\\bdo\\b"}, QRegularExpression{"\\bfor\\b"}, QRegularExpression{"\\bwhile\\b"}, QRegularExpression{"\\bswitch\\b"}, QRegularExpression{"\\bcase\\b"}, QRegularExpression{"\\bdefault\\b"},
@@ -39,13 +40,19 @@ const std::array<QRegularExpression, 92> Highlighter::kwords{
 Highlighter::Highlighter(QTextDocument* parent)
 	:QSyntaxHighlighter(parent)
 {
-	kwd.setForeground({ "#569cd6" });
-	stmt.setForeground({ "#d8a0df" });
+	formats[0].setForeground({"#569cd6"});
+	formats[1].setForeground({"#d8a0df"});
 }
 
 void Highlighter::highlightBlock(const QString& text)
 {
-	for (const auto& rule : kwords) 
+	auto s = text.toStdString();
+	for (auto& i : GetToken(s))
+	{
+		if(i.index() <= 1)setFormat(i.offset, i.length(), formats[i.index()]);
+	}
+
+	/*for (const auto& rule : kwords) 
 	{
 		QRegularExpressionMatchIterator matchIterator = rule.globalMatch(text);
 		while (matchIterator.hasNext()) {
@@ -60,5 +67,5 @@ void Highlighter::highlightBlock(const QString& text)
 			QRegularExpressionMatch match = matchIterator.next();
 			setFormat(match.capturedStart(), match.capturedLength(), stmt);
 		}
-	}
+	}*/
 }

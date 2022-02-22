@@ -27,7 +27,7 @@ namespace ver {
 
             void unhandled_exception() noexcept {}
             void return_void() noexcept {}
-            T* value()const noexcept { return xvalue; }
+            const T* value()const noexcept { return xvalue; }
 
             template <class U>
             void await_transform(U&& _Whatever) {
