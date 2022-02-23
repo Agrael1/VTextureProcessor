@@ -3,283 +3,180 @@
 #include <optional>
 #include <format>
 
-
-constexpr std::array<std::string_view, 16> statements{
-	"break",
-	"case",
-	"continue",
-	"default",
-	"discard",
-	"do",
-	"else",
-	"for",
-	"if",
-	"in",
-	"inout",
-	"layout",
-	"out",
-	"return",
-	"switch",
-	"while"
-};
-constexpr std::array<std::string_view, 92> kwords{
-	"attribute",
-	"bool",
-	"bvec2",
-	"bvec3",
-	"bvec4",
-	"const",
-	"dmat2",
-	"dmat2x2",
-	"dmat2x3",
-	"dmat2x4",
-	"dmat3",
-	"dmat3x2",
-	"dmat3x3",
-	"dmat3x4",
-	"dmat4",
-	"dmat4x2",
-	"dmat4x3",
-	"dmat4x4",
-	"double",
-	"dvec2",
-	"dvec3",
-	"dvec4",
-	"false",
-	"float",
-	"int",
-	"isampler1D",
-	"isampler1DArray",
-	"isampler2D",
-	"isampler2DArray",
-	"isampler2DMS",
-	"isampler2DMSArray",
-	"isampler2DRect",
-	"isampler3D",
-	"isamplerBuffer",
-	"isamplerCube",
-	"isamplerCubeArray",
-	"ivec2",
-	"ivec3",
-	"ivec4",
-	"mat2",
-	"mat2x2",
-	"mat2x3",
-	"mat2x4",
-	"mat3",
-	"mat3x2",
-	"mat3x3",
-	"mat3x4",
-	"mat4",
-	"mat4x2",
-	"mat4x3",
-	"mat4x4",
-	"sampler1D",
-	"sampler1DArray",
-	"sampler1DArrayShadow",
-	"sampler1DShadow",
-	"sampler2D",
-	"sampler2DArray",
-	"sampler2DArrayShadow",
-	"sampler2DMS",
-	"sampler2DMSArray",
-	"sampler2DRect",
-	"sampler2DRectShadow",
-	"sampler2DShadow",
-	"sampler3D",
-	"samplerBuffer",
-	"samplerCube",
-	"samplerCubeArray",
-	"samplerCubeArrayShadow",
-	"samplerCubeShadow",
-	"struct",
-	"uint",
-	"true",
-	"uniform",
-	"usampler1D",
-	"usampler1DArray",
-	"usampler2D",
-	"usampler2DArray",
-	"usampler2DMS",
-	"usampler2DMSArray",
-	"usampler2DRect",
-	"usampler3D",
-	"usamplerBuffer",
-	"usamplerCube",
-	"usamplerCubeArray",
-	"uvec2",
-	"uvec3",
-	"uvec4",
-	"varying",
-	"vec2",
-	"vec3",
-	"vec4",
-	"void",
-};
-
-
-consteval auto statements_range_i2()
-{
-	std::vector<char> a{};
-	size_t i = 0;
-	char c = 0;
-
-	for (auto x : statements) {
-		char r = x[0];
-		if (c != r)
-			a.push_back(r);
-		c = r;
-	}
-	return a;
-}
-consteval auto statements_range()
-{
-	std::array<char, statements_range_i2().size()> vsz{};
-	auto v = statements_range_i2();
-	size_t a = 0;
-	for (auto& i : vsz)
-		i = v[a++];
-	return vsz;
-}
-consteval auto kwords_range_i2()
-{
-	std::vector<char> a{};
-	size_t i = 0;
-	char c = 0;
-
-	for (auto x : kwords) {
-		char r = x[0];
-		if (c != r)
-			a.push_back(r);
-		c = r;
-	}
-	return a;
-}
-consteval auto kwords_range()
-{
-	std::array<char, kwords_range_i2().size()> vsz{};
-	auto v = kwords_range_i2();
-	size_t a = 0;
-	for (auto& i : vsz)
-		i = v[a++];
-	return vsz;
-}
-
-constexpr auto sr = statements_range();
-constexpr auto kr = kwords_range();
-
-
-
-
 class LexContext
 {
+	static constexpr auto sr = statements_range();
+	static constexpr auto kr = kwords_range();
+
 public:
-	LexContext(std::string_view code)
+	LexContext(std::wstring_view code)
 		:code(code) {}
 public:
-	char fetch_one()noexcept
+	wchar_t fetch_one()noexcept
 	{
-		char x = prefetch_one();
+		wchar_t x = prefetch_one();
 		if (!x)return 0;
 		advance_one();
 		if (x == '\n') { line++; column = 0; }
 		return x;
 	}
-	std::optional<token> try_get_statement(char c)
+	std::optional<token> try_get_statement(wchar_t c)
 	{
 		if (std::ranges::find(sr, c) == sr.end())return{};
 		switch (c)
 		{
 		case 'b':
-			return stmt_from_subset(0, 1);
+			return stmt_from_subset(s_break);
 		case 'c':
-			if (prefetch_one() == 'a')
-				return stmt_from_subset(1, 2);
-			if (prefetch_one() == 'o')
-				return stmt_from_subset(2, 2);
+			c = prefetch_one();
+			if (c == 'a')
+				return stmt_from_subset(s_case, 2);
+			if (c == 'o')
+				return stmt_from_subset(s_continue, 2);
 			break;
 		case 'd':
-			if (prefetch_one() == 'o')
-				return create_advance(statements[5], token::type::statement);
-			if (prefetch_one() == 'e')
-				return stmt_from_subset(3, 2);
-			if (prefetch_one() == 'i')
-				return stmt_from_subset(4, 2);
+			c = prefetch_one();
+			if (c == 'o')
+				return create_advance(statements[s_do], token::type::statement);
+			if (c == 'e')
+				return stmt_from_subset(s_default, 2);
+			if (c == 'i')
+				return stmt_from_subset(s_discard, 2);
 			break;
 		case 'e':
-			return stmt_from_subset(6, 1);
+			return stmt_from_subset(s_else);
 		case 'f':
-			return stmt_from_subset(7, 1);
+			return stmt_from_subset(s_for);
 		case 'i':
-			if (prefetch_one() == 'f' && term(2))
-				return create_advance(statements[8], token::type::statement);
-			if (prefetch_one() == 'n')
+			c = prefetch_one();
+			if (c == 'f')
+				return create_advance(statements[s_if], token::type::statement);
+			if (c == 'n')
 			{
-				if (auto st = create_advance(statements[9], token::type::statement))
+				if (auto st = create_advance(statements[s_in], token::type::statement))
 					return st;
-				return stmt_from_subset(10, 2);
+				return stmt_from_subset(s_inout, 2);
 			}
 			break;
 		case 'l':
-			return stmt_from_subset(11, 1);
+			return stmt_from_subset(s_layout);
 		case 'o':
-			return stmt_from_subset(12, 1);
+			return stmt_from_subset(s_out);
 		case 'r':
-			return stmt_from_subset(13, 1);
+			return stmt_from_subset(s_return);
 		case 's':
-			return stmt_from_subset(14, 1);
+			return stmt_from_subset(s_switch);
 		case 'w':
-			return stmt_from_subset(15, 1);
+			return stmt_from_subset(s_while);
 		default:
 			break;
 		}
 		return{};
 	}
-	std::optional<token> try_get_kw(char c)
+	std::optional<token> try_get_kw(wchar_t c)
 	{
 		if (std::ranges::find(kr, c) == kr.end())return{};
 		switch (c)
 		{
-		case 'a':
-			return kw_from_subset(0, 1);
-		case 'b':
-			if (prefetch_one() == 'o')
-				return kw_from_subset(1, 2);
-			if (code.substr(0, 3) != kwords[3].substr(1, 3)||!(c = prefetch_n(3)))
-				return {};
-			if (c > '1' && c < '5')
-				return create_advance(kwords[c - '1' + 2], token::type::keyword);
-		case 'c':
-			return kw_from_subset(6, 1);
-		case 'd':
-			if (prefetch_one() == 'o')
-				return kw_from_subset(18, 2);
+		case L'a':
+			return kw_from_subset(k_attribute);
+		case L'b':
+			switch (prefetch_one())
+			{
+			case 'o':return kw_from_subset(k_bool, 2);
+			case 'v':return try_create_vec(k_bvec2);
+			default:return{};
+			}
+		case L'c':
+			return kw_from_subset(k_const);
+		case L'd':
+			switch (prefetch_one())
+			{
+			case 'o':return kw_from_subset(k_double, 2);
+			case 'm':return try_create_mat(k_dmat2);
+			case 'v':return try_create_vec(k_dvec2);
+			default:return{};
+			}
+		case 'f':
+			c = prefetch_one();
+			if (c == L'a')
+				return kw_from_subset(k_false, 2);
+			if (c == L'l')
+				return kw_from_subset(k_float, 2);
+			break;
+		case 'i':
+			switch (prefetch_one())
+			{
+			case 'n':return kw_from_subset(k_int, 2);
+			case 's':return try_create_isampler(k_isampler1D);
+			case 'v':return try_create_vec(k_ivec2);
+			default:return{};
+			}
+		case 'm':
+			return try_create_mat(k_mat2, 1);
+		case 'u':
+			switch (prefetch_one())
+			{
+			case 'i':return kw_from_subset(k_uint, 2);
+			case 's':return try_create_isampler(k_usampler1D);
+			case 'n':return kw_from_subset(k_uniform, 2);
+			case 'v':return try_create_vec(k_uvec2);
+			default:return{};
+			}
+		case 's':
+			switch (prefetch_one())
+			{
+			case 'a':return{};//sampler
+			case 't':return kw_from_subset(k_struct, 2);
+			default:return{};
+			}
+		case 't':
+			return kw_from_subset(k_true);
+		case 'v':
+			switch (prefetch_one())
+			{
+			case 'a':return kw_from_subset(k_varying, 2);
+			case 'e':return try_create_vec(k_vec2, 1);
+			case 'o':return kw_from_subset(k_void, 2);
+			default:return{};
+			}
 		default:
 			break;
 		}
 
 		return {};
 	}
-	std::optional<token> try_get_ident(char c)
+	std::optional<token> try_get_ident(wchar_t c)
 	{
 		size_t roffset = offset - 1;
-		const char* av = code.data() - 1;
+		const wchar_t* av = code.data() - 1;
 		while (!not_lit(prefetch_one()))fetch_one();
-		return token{ .xtype = token::type::identifier, .value = {av, offset - roffset},.offset = roffset };
+		return token{ .xtype = token::type::identifier, .offset = roffset, .value = {av, offset - roffset} };
+	}
+	token make_comment()
+	{
+		size_t roffset = offset - 2;
+		const wchar_t* av = code.data() - 2;
+		wchar_t c = fetch_one();
+
+		while (c != '\n' && c != '\0')
+			c = fetch_one();
+
+		return token{ .xtype = token::type::comment, .offset = roffset, .value = {av, offset - roffset} };
 	}
 	bool empty()const noexcept {
 		return code.empty() || !code[0];
 	}
-	static bool not_lit(char c) {
-		return !isalnum(c) && c != '_';
+	static bool not_lit(wchar_t c) {
+		return !iswalnum(c) && c != L'_';
 	}
 private:
-	char prefetch_one()const noexcept
+	wchar_t prefetch_one()const noexcept
 	{
 		if (empty())return 0;
 		return code[0];
 	}
-	char prefetch_n(size_t n)const noexcept
+	wchar_t prefetch_n(size_t n)const noexcept
 	{
 		if (empty() || code.length() <= n)return 0;
 		return code[n];
@@ -288,35 +185,98 @@ private:
 		return code.length() <= (length) || not_lit(code[length]);
 	}
 
-	std::optional<token> stmt_from_subset(size_t stateN, size_t xoffset) {
+	std::optional<token> stmt_from_subset(size_t stateN, size_t xoffset = 1) {
 		return from_subset(xoffset, statements[stateN], token::type::statement);
 	}
-	std::optional<token> kw_from_subset(size_t stateN, size_t xoffset) {
+	std::optional<token> kw_from_subset(size_t stateN, size_t xoffset = 1) {
 		return from_subset(xoffset, kwords[stateN], token::type::keyword);
 	}
-	std::optional<token> from_subset(size_t xoffset, std::string_view xst, token::type tt)
+	std::optional<token> from_subset(size_t xoffset, std::wstring_view xst, token::type tt)
 	{
 		auto cmpw = xst.substr(xoffset);
-		if (cmpw == code.substr(xoffset - 1, cmpw.length()) && term(xst.length() - 1))
-		{
-			auto r = offset - 1;
-			advance(xst);
-			return token{ tt, xst, r };
-		}
+		if (cmpw == code.substr(xoffset - 1, cmpw.length()))
+			return create_advance(xst, tt);
 		return{};
 	}
-	std::optional<token> create_advance(std::string_view sw, token::type tt)
+	std::optional<token> create_advance(std::wstring_view sw, token::type tt)
 	{
 		if (term(sw.length() - 1))
 		{
 			auto r = offset - 1;
 			advance(sw);
-			return token{ tt, sw, r };
+			return token{ tt, r, sw };
 		}
 		return {};
 	}
-
-	void advance(std::string_view sw)
+	std::optional<token> try_create_vec(e_kwd vec, size_t offset = 0)
+	{
+		if (code.substr(0, 3 - offset) == L"vec" + offset)
+		{
+			wchar_t c = prefetch_n(3 - offset);//2 3 4
+			if (!(c > L'1' && c < L'5'))return{};
+			return create_advance(kwords[c - L'2' + vec], token::type::keyword);
+		}
+		return {};
+	}
+	std::optional<token> try_create_mat(e_kwd mat, size_t offset = 0)
+	{
+		auto roffset = 3 - offset;
+		if (code.substr(0, roffset) == L"mat" + offset)
+		{
+			wchar_t c = prefetch_n(roffset);
+			if (!(c > L'1' && c < L'5'))return{};
+			auto it = std::span<const std::wstring_view>(kwords.begin() + (c - L'2') * 4 + mat, 4);
+			c = prefetch_n(roffset + 1);
+			if (not_lit(c))return create_advance(it[0], token::type::keyword);
+			if (c != L'x')return{};
+			c = prefetch_n(roffset + 2);
+			if (!(c > L'1' && c < L'5'))return{};
+			return create_advance(it[c - L'1'], token::type::keyword);
+		}
+		return {};
+	}
+	std::optional<token> try_create_isampler(e_kwd smpl)
+	{
+		if (code.substr(0, 7) == L"sampler") //sampler
+		{
+			wchar_t c = prefetch_n(7);
+			switch (c)
+			{
+			case 'B':
+				return kw_from_subset(smpl + 8, 7);
+			case 'C':
+				if (code.substr(7, 4) != kwords[k_isamplerCube].substr(8, 4))
+					return{}; // Cube
+				if (prefetch_n(11) == 'A')
+					return kw_from_subset(smpl + 10, 11);
+				return create_advance(kwords[smpl + 9], token::type::keyword);
+			case '1':
+				if (prefetch_n(8) != 'D')return{};
+				if (prefetch_n(9) == 'A')
+					return kw_from_subset(smpl + 1, 9);
+				return create_advance(kwords[smpl], token::type::keyword);
+			case '2':
+				if (prefetch_n(8) != 'D')return{};
+				if (prefetch_n(9) == 'A')
+					return kw_from_subset(smpl + 3, 9);
+				if (code.substr(9, 2) == L"MS")
+				{
+					if (prefetch_n(11) == 'A')
+						return kw_from_subset(smpl + 5, 12);
+					return create_advance(kwords[smpl + 4], token::type::keyword);
+				}
+				if (prefetch_n(9) == 'R')
+					return kw_from_subset(smpl + 6, 9);
+				return create_advance(kwords[smpl + 2], token::type::keyword);
+			case '3':
+				return kw_from_subset(smpl + 7, 8);
+			default:
+				return{};
+			}
+		}
+		return {};
+	}
+	void advance(std::wstring_view sw)
 	{
 		auto l = sw.length() - 1; //without 1 byte
 		offset += l;
@@ -335,20 +295,36 @@ private:
 	size_t column = 0;
 	size_t offset = 0;
 
-	std::string_view code;
+	std::wstring_view code;
 };
 
 
 
-ver::generator<token> GetToken(std::string_view code)
+ver::generator<token> GetToken(std::wstring_view code)
 {
 	LexContext lex{ code };
 
 	while (!lex.empty())
 	{
-		char c = lex.fetch_one();
-		if (isdigit(c))
+		wchar_t c = lex.fetch_one();
+		if (iswdigit(c))
 			continue;
+
+		switch (c)
+		{
+		case '/':
+			switch (lex.fetch_one())
+			{
+			case '/':
+				co_yield lex.make_comment();
+				continue;
+			default:
+				break;
+			}
+		default:
+			break;
+		}
+
 		if (LexContext::not_lit(c))
 			continue;
 		if (auto st = lex.try_get_statement(c); st)
@@ -370,7 +346,7 @@ ver::generator<token> GetToken(std::string_view code)
 }
 
 
-std::string token::to_string() const noexcept
+std::wstring token::to_string() const noexcept
 {
-	return std::format("token {}\nvalue: {}\noffset: {}\n", type_s[size_t(xtype)], value, offset);
+	return std::format(L"token {}\nvalue: {}\noffset: {}\n", type_s[size_t(xtype)], value, offset);
 }

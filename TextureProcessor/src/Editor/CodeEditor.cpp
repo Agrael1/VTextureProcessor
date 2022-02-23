@@ -42,7 +42,7 @@ void CodeEditor::resizeEvent(QResizeEvent* e)
 void CodeEditor::wheelEvent(QWheelEvent* event)
 {
 	if (!(qApp->keyboardModifiers() & Qt::ControlModifier))
-		return;
+		return QPlainTextEdit::wheelEvent(event);
 }
 void CodeEditor::highlightLine()
 {

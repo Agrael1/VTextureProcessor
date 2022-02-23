@@ -1,9 +1,12 @@
 #pragma once
 #include <utils/Promises.h>
+#include <Editor/Language.h>
+
 
 #define ENUM_LEX()\
 	X(keyword)\
 	X(statement)\
+	X(comment)\
 	X(property)\
 	X(identifier)\
 	X(other)
@@ -11,8 +14,8 @@
 
 struct token
 {
-	static constexpr std::string_view type_s[] {
-#define X(a) #a, 
+	static constexpr std::wstring_view type_s[] {
+#define X(a) L#a, 
 		ENUM_LEX()
 #undef X
 	};
@@ -22,9 +25,8 @@ struct token
 		ENUM_LEX()
 #undef X
 	}xtype;
-
-	std::string_view value;
 	size_t offset;
+	std::wstring_view value;
 
 	size_t length()const noexcept
 	{
@@ -34,9 +36,13 @@ struct token
 	{
 		return size_t(xtype);
 	}
-	std::string to_string()const noexcept;
+	bool is_struct()const noexcept
+	{
+		return xtype == type::keyword && value == L"struct";
+	}
+	std::wstring to_string()const noexcept;
 };
 
-ver::generator<token> GetToken(std::string_view code);
+ver::generator<token> GetToken(std::wstring_view code);
 
 #undef ENUM_LEX
