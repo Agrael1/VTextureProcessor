@@ -53,24 +53,7 @@ namespace UI::Windows
 		{
 			if (auto x = GetCurrent(); x)x->SaveAs();
 		}
-		void OnTabClosed(int prev_i)
-		{
-			auto key = tabToolTip(prev_i).toStdString();
-			if (auto it = temp_tabs.find(key); it != temp_tabs.end())
-			{
-				if (it->second.get() == prev_tab)
-					prev_tab = nullptr;
-				temp_tabs.erase(it);
-				return;
-			}
-			if (auto it = tabs.find(key); it != tabs.end())
-			{
-				if (it->second.get() == prev_tab)
-					prev_tab = nullptr;
-				tabs.erase(it);
-				return;
-			}
-		}
+		void OnTabClosed(int prev_i);
 	private:
 		Tab* GetCurrent();
 		std::string UKeyTemp(std::string_view pattern);

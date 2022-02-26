@@ -12,6 +12,7 @@
 
 #include <Logic/Constants.h>
 #include <Logic/Engine.h>
+#include <UI/ProjectEvent.h>
 
 
 namespace fs = std::filesystem;
@@ -28,16 +29,6 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	, windows("Windows")
 	, nodes("Nodes")
 	, view("View")
-	, Aclear("Clear")
-	, Aprops("Properties")
-	, AePort("Export All")
-	, Asave("Save")
-	, Asaveas("Save As")
-	, Aload("Open Project")
-	, Acreaten("Create Node")
-	, Aloadn("Load Existing")
-	, Adelet("Delete Selected")
-	, Aclrselect("Clear Selection")
 {
 	Engine::Instance();
 	resize(width, height);
@@ -49,43 +40,27 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	mb.addMenu(&nodes);
 	mb.addMenu(&windows);
 
-
-	connect(&Aclear, &QAction::triggered, [this]() { OnClearTriggered(); });
-	connect(&Aprops, &QAction::triggered, [this]() { OnProps(); });
-	connect(&AePort, &QAction::triggered, [this]() {OnExport(); });
-	connect(&Asave, &QAction::triggered, [this]() {OnSave(); });
-	connect(&Asaveas, &QAction::triggered, [this]() {OnSaveAs(); });
-	connect(&Aload, &QAction::triggered, [this]() {OnLoad(); });
-	connect(&Acreaten, &QAction::triggered, [this]() {OnCreateNode(); });
-	connect(&Aloadn, &QAction::triggered, [this]() {OnLoadNode(); });
-
-	connect(&Adelet, &QAction::triggered, [this]() {OnViewDelete(); });
-	connect(&Aclrselect, &QAction::triggered, [this]() {OnViewClrSel(); });
-
-	file.addAction(&Aclear);
-	file.addAction(&Aload);
-	file.addAction(&Asave);
-	file.addAction(&Asaveas);
+	file.addAction("Clear", [this]() { OnClearTriggered(); });
+	file.addAction("Load", [this]() { OnLoad(); });
+	file.addAction("Save", [this]() {tab->OnSave(); }, { QKeySequence::StandardKey::Save });
+	file.addAction("Save As", [this]() {tab->OnSaveAs(); }, { tr("Ctrl+Shift+S") });
 	file.addSeparator();
-	file.addAction(&AePort);
-	windows.addAction(&Aprops);
+	file.addAction("Export", [this]() {OnExport(); });
 
-	nodes.addAction(&Acreaten);
-	nodes.addAction(&Aloadn);
+	windows.addAction("Properties", [this]() { OnProps(); });
 
-	view.addAction(&Adelet);
-	view.addAction(&Aclrselect);
+	nodes.addAction("Create", [this]() {OnCreateNode(); }, { QKeySequence::StandardKey::New });
+	nodes.addAction("Load", [this]() {OnLoadNode(); }, { QKeySequence::StandardKey::Open });
 
-	Asave.setShortcut(QKeySequence{ QKeySequence::StandardKey::Save });
-	Asaveas.setShortcut(QKeySequence{ tr("Ctrl+Shift+S") });
-	Adelet.setShortcut(QKeySequence{ QKeySequence::StandardKey::Delete });
-	Aload.setShortcut(QKeySequence{ QKeySequence::StandardKey::Open });
+	view.addAction("Delete", [this]() {OnViewDelete(); }, { QKeySequence::StandardKey::Delete });
+	view.addAction("Clear Selection", [this]() {OnViewClrSel(); });
+
 
 	setCentralWidget(&*tab);
-	addDockWidget(Qt::RightDockWidgetArea, &xprops);
-	resizeDocks({ &xprops }, { 250 }, Qt::Horizontal);
-	
-	tab->LoadTab<SceneTab>({ xprojPath }, xprojPath.filename().string(), xprops, std::move(xprojPath), resolution);
+	addDockWidget(Qt::RightDockWidgetArea, &property_dock);
+	resizeDocks({ &property_dock }, { 250 }, Qt::Horizontal);
+
+	tab->LoadTab<SceneTab>({ xprojPath }, xprojPath.filename().string(), property_dock, std::move(xprojPath), resolution);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -117,12 +92,12 @@ void MainWindow::OnLoad()
 
 	if (proj_path.empty()) return;
 	proj_path = proj_path.make_preferred();
-	auto& cs = tab->LoadTab<SceneTab>({ proj_path }, proj_path.filename().string(), xprops, std::move(proj_path), QSize(256, 256));
+	auto& cs = tab->LoadTab<SceneTab>({ proj_path }, proj_path.filename().string(), property_dock, std::move(proj_path), QSize(256, 256));
 }
 
 void MainWindow::OnCreateNode()
 {
-	tab->TempTab<EditorTab>("New Node", &tab.value(), xprops);
+	tab->TempTab<EditorTab>("New Node", &tab.value(), property_dock);
 }
 
 void MainWindow::OnLoadNode()
@@ -136,7 +111,7 @@ void MainWindow::OnLoadNode()
 
 	if (node_path.empty()) return;
 	node_path = node_path.make_preferred();
-	auto& cs = tab->LoadTab<EditorTab>({ node_path }, node_path.filename().string(), &tab.value(), xprops, std::move(node_path));
+	auto& cs = tab->LoadTab<EditorTab>({ node_path }, node_path.filename().string(), &tab.value(), property_dock, std::move(node_path));
 }
 
 void MainWindow::OnViewDelete()

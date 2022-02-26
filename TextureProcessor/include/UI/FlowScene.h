@@ -24,6 +24,7 @@ namespace UI
 		void DeleteSelected();
 		void Clear();
 		void ExportAll();
+		void OnSelectionChanged();
 		QSize Dimensions(QJsonObject)const noexcept;
 
 		virtual QJsonObject Serialize()override;
@@ -34,7 +35,6 @@ namespace UI
 		UI::INode* TryInsertNode(std::string_view name, size_t ref);
 		UI::INode& CreateNode(std::string_view name);
 		void drawBackground(QPainter* painter, const QRectF& rect) override;
-		void OnSelectionChanged();
 		void OnItemSelected(QTreeWidgetItem* item, int);
 	private:
 		mutable QSize dims;

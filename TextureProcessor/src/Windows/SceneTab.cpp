@@ -86,4 +86,5 @@ void SceneTab::Load()
 void UI::Windows::SceneTab::OnEnter() noexcept
 {
 	Engine::SwitchScene(&scene);
+	scene.OnSelectionChanged();
 }

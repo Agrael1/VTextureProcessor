@@ -1,7 +1,6 @@
 #pragma once
 #include <QSyntaxHighlighter>
 #include <array>
-#include <unordered_set>
 
 
 class Highlighter : public QSyntaxHighlighter

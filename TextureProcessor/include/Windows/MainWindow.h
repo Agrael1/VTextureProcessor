@@ -21,17 +21,9 @@ public:
 	void OnClearTriggered();
 	void OnProps()
 	{
-		xprops.show();
+		property_dock.show();
 	}
 	void OnExport();
-	void OnSave()
-	{
-		tab->OnSave();
-	}
-	void OnSaveAs()
-	{
-		tab->OnSaveAs();
-	}
 	void OnLoad();
 	void OnCreateNode();
 	void OnLoadNode();
@@ -39,23 +31,11 @@ public:
 	void OnViewClrSel();
 private:
 	std::optional<UI::Windows::TabRelay> tab;
-	UI::Windows::Properties xprops;
+	UI::Windows::Properties property_dock;
 
 	QMenu file;
 	QMenu windows;
-	QAction Aclear;
-	QAction AePort;
-	QAction Asave;
-	QAction Asaveas;
-	QAction Aload;
-	QAction Aprops;
-
 	QMenu nodes;
-	QAction Acreaten;
-	QAction Aloadn;
-
 	QMenu view;
-	QAction Adelet;
-	QAction Aclrselect;
 	UI::Windows::SceneTab* cur_scene = nullptr;
 };

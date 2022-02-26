@@ -34,6 +34,7 @@ void UI::Windows::EditorTab::OnEnter() noexcept
 {
 	Engine::SwitchScene(&scene.scene);
 	tp.show();
+	scene.scene.OnSelectionChanged();
 }
 void UI::Windows::EditorTab::OnLeave() noexcept
 {
