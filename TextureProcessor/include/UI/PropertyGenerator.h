@@ -11,5 +11,5 @@ namespace UI
 	{
 		class PropertyElement;
 	}
-	void PlaceProperties(Windows::PropertyElement& props, ver::Node& node, INode& entity);
+	void PlaceProperties(Windows::PropertyElement& props, ver::Node& node);
 }

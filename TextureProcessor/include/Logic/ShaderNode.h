@@ -11,6 +11,10 @@
 
 class Engine;
 
+namespace UI::Windows {
+	class PropertyElement;
+}
+
 namespace ver
 {
 	class ShaderNode : public Node
@@ -31,13 +35,13 @@ namespace ver
 		ShaderNode(QJsonObject document);
 		ShaderNode(const ShaderNode& other);
 	public:
-		void Update();
 		dc::Buffer& GetBuffer() { return buf; }
 		bool& Tiling() { return tiling; }
 		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
 		{
 			return outputs;
 		}
+		void Update()override;
 		PropertyView GetProperties()override
 		{
 			PropertyView pv;

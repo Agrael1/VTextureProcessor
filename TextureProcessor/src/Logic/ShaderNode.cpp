@@ -12,6 +12,8 @@
 #include <Logic/Engine.h>
 #include <utils/utils.h>
 
+#include <Windows/Properties.h>
+
 using namespace ver;
 
 constexpr uint32_t nullcolor = 0;

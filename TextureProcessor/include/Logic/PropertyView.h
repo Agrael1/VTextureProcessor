@@ -105,13 +105,6 @@ namespace ver
 		using prop_ref = unique_variant_tg;
 		using view_t = std::pair<arg_v, prop_ref>;
 	public:
-		//template<arg_v...v>
-		//static PropertyView Make(typename DescMap<v.first>::tied_t&... ref)
-		//{
-		//	PropertyView pv;
-		//	(pv.refs.push_back(TieProp<v>(ref)),...);
-		//	return pv;
-		//}
 		template<arg_v v>
 		void TieProp(typename DescMap<v.first>::tied_t& ref)
 		{

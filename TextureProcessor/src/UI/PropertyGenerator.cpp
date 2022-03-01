@@ -49,7 +49,7 @@ static void PropertyBooleanUpd(Windows::PropertyElement& elem, const char* name,
 	elem.AppendWidget<RefreshCheckBox>(buf, name);
 }
 
-void UI::PlaceProperties(Windows::PropertyElement& elem, ver::Node& node, INode& entity)
+void UI::PlaceProperties(Windows::PropertyElement& elem, ver::Node& node)
 {
 	elem.Clear();
 	auto props = node.GetProperties();
