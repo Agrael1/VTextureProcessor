@@ -37,11 +37,13 @@ void UI::NodeUI::DrawBackground(QPainter* painter)
 	constexpr qreal offset = PortStyle::port_bbox / 2;
 
 	auto xwidth = geometry().width() - PortStyle::port_bbox;
+	auto xheight = Header().height() + Header().fontMetrics().height() / 2;
+
 	// path for the caption of this node
 	QPainterPath path_title;
 	path_title.setFillRule(Qt::WindingFill);
-	path_title.addRoundedRect(QRectF(offset, 0, xwidth, NodeStyle::title_height), edge_size, edge_size);
-	path_title.addRect(offset, NodeStyle::title_height - edge_size, xwidth, edge_size);
+	path_title.addRoundedRect(QRectF(offset, 0, xwidth, xheight), edge_size, edge_size);
+	path_title.addRect(offset, xheight - edge_size, xwidth, edge_size);
 	painter->setPen(Qt::NoPen);
 	painter->setBrush(style->Title());
 	painter->drawPath(path_title.simplified());
@@ -50,8 +52,8 @@ void UI::NodeUI::DrawBackground(QPainter* painter)
 	// path for the content of this node
 	QPainterPath path_content;
 	path_content.setFillRule(Qt::WindingFill);
-	path_content.addRoundedRect(QRectF(offset, NodeStyle::title_height, xwidth, geometry().height() - NodeStyle::title_height), edge_size, edge_size);
-	path_content.addRect(offset, NodeStyle::title_height, xwidth, edge_size);
+	path_content.addRoundedRect(QRectF(offset, xheight, xwidth, geometry().height() - xheight), edge_size, edge_size);
+	path_content.addRect(offset, xheight, xwidth, edge_size);
 	painter->setPen(Qt::NoPen);
 	painter->setBrush(style->Background());
 	painter->drawPath(path_content.simplified());
@@ -89,6 +91,7 @@ void UI::NodeUI::Init()
 	xlab->setPalette(p);
 	xlab->setStyleSheet("QLabel {background: transparent; }");
 	xlab->setAlignment(Qt::AlignCenter);
+	xlab->setWordWrap(true);
 	proxy->setWidget(xlab);
 
 	l_left.emplace(Qt::Orientation::Vertical);
@@ -113,7 +116,7 @@ void UI::NodeUI::Init()
 	l_main->setContentsMargins(off_l, 3.0f, off_r, PortStyle::port_bbox);
 	l_central->setSpacing(NodeStyle::item_padding);
 	l_central->addItem(proxy.get());
-	l_central->setItemSpacing(0, NodeStyle::title_height);
+	l_central->setItemSpacing(0, 2*NodeStyle::item_padding);
 	ConstructModules();
 
 	l_main->addItem(std::addressof(*l_left));
@@ -138,10 +141,10 @@ void UI::NodeUI::UpdateLayouts()
 	auto sink_delta = (h - sinks.size() * PortStyle::port_bbox) / (sinks.size() + 1);
 	auto source_delta = (h - sources.size() * PortStyle::port_bbox) / (sources.size() + 1);
 
-	l_left->setContentsMargins(0.0f, sink_delta + NodeStyle::title_height * (sinks.size() > 0), 0.0f, 0.0f);
+	l_left->setContentsMargins(0.0f, sink_delta + 2 * NodeStyle::item_padding * (sinks.size() > 0), 0.0f, 0.0f);
 	l_left->setSpacing(sink_delta);
 
-	l_right->setContentsMargins(0.0f, source_delta + NodeStyle::title_height * (sources.size() > 0), 0.0f, 0.0f);
+	l_right->setContentsMargins(0.0f, source_delta + 2 * NodeStyle::item_padding * (sources.size() > 0), 0.0f, 0.0f);
 	l_right->setSpacing(source_delta);
 	l_main->activate();
 }
