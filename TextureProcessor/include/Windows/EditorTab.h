@@ -2,11 +2,11 @@
 #include <Editor/Editor.h>
 #include <UI/FlowScene.h>
 #include <UI/FlowView.h>
-#include <UI/Node.h>
-#include <Logic/ShaderNode.h>
-#include <QDockWidget>
 #include <Windows/Tab.h>
 #include <Windows/TableProp.h>
+#include <QDockWidget>
+
+#include <UI/DynamicNode.h>
 
 namespace UI::Windows
 {
@@ -26,14 +26,16 @@ namespace UI::Windows
 		};
 
 	public:
-		EditorTab(QWidget* tab_relay, Properties& props, std::filesystem::path&& p)
-			: Tab(std::move(p)), scene(props), tp(tab_relay)
+		EditorTab(Properties& props, std::filesystem::path&& p)
+			: Tab(std::move(p)), scene(props), tp(this)
 		{
 			Init(props);
 		}
-		EditorTab(QWidget* tab_relay, Properties& props) : scene(props), tp(tab_relay)
+		EditorTab(Properties& props) : scene(props), tp(this)
 		{
 			Init(props);
+			tp.SetName("Node");
+			scene.scene.addItem(&edited);
 		}
 	public:
 		QWidget* Widget() noexcept override
@@ -53,6 +55,6 @@ namespace UI::Windows
 		TableProperties tp;
 		SceneDock scene;
 		EditorDock edit;
-		//UI::XNode<ver::ShaderNode> edited;
+		UI::DynamicNode edited;
 	};
 }

@@ -52,7 +52,8 @@ bool UI::Windows::EditorTab::event(QEvent* e)
 	switch (e->type())
 	{
 	case NameChangedEvent::etype:
+		edited.Rename(((NameChangedEvent*)e)->name);
 		return true;
-	default:return QMainWindow::event(e);;
+	default:return QMainWindow::event(e);
 	}
 }

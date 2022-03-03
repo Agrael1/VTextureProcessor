@@ -45,7 +45,7 @@ static inline QColor ReadColor(QJsonObject values, std::string_view varname) noe
  * @param name Name of the Node style
  */
 NodeStyle::NodeStyle(QJsonObject document, std::string_view name)
-    :styleName(name)
+    :styleName(name.data())
 {
 	QJsonValueRef nodeStyleValues = document["NodeStyle"];
 	QJsonObject obj = nodeStyleValues.toObject();

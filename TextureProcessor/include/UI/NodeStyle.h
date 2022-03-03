@@ -27,7 +27,9 @@ namespace UI
 		auto Background()const noexcept { return brBackground; }
 		auto Title()const noexcept { return brTitle; }
 		auto FontColor()const noexcept { return font_color; }
-		std::string_view StyleName()const noexcept {return styleName;}
+		void SetFontColor(QColor c)noexcept { font_color = c; }
+		const QString& StyleName()const noexcept {return styleName;}
+		void SetStyleName(const QString& name)noexcept { styleName = name; }
 	private:
 		struct
 		{
@@ -37,7 +39,7 @@ namespace UI
 		QBrush brTitle{ "#E3212121" };
 		QBrush brBackground{ "#E31a1a1a" };
 		QColor font_color{ "#7FFFFFFF" };
-		std::string styleName;
+		QString styleName;
 	};
 
 	struct PortStyle

@@ -10,7 +10,7 @@ namespace UI
 	public:
 		~GraphicsLinearLayout()override
 		{
-			for (std::ptrdiff_t i = count() - 1; i >= 0; removeAt(i), i--);
+			for (std::ptrdiff_t i = count() - 1; i >= 0; removeAt(i--));
 		}
 	};
 }

@@ -97,7 +97,7 @@ void MainWindow::OnLoad()
 
 void MainWindow::OnCreateNode()
 {
-	tab->TempTab<EditorTab>("New Node", &tab.value(), property_dock);
+	tab->TempTab<EditorTab>("New Node", property_dock);
 }
 
 void MainWindow::OnLoadNode()
@@ -106,12 +106,12 @@ void MainWindow::OnLoadNode()
 		nullptr,
 		"Open existing node",
 		"nodes",
-		ver::node_ext.data()
+		ver::node_filter.data()
 	).toStdString() };
 
 	if (node_path.empty()) return;
 	node_path = node_path.make_preferred();
-	auto& cs = tab->LoadTab<EditorTab>({ node_path }, node_path.filename().string(), &tab.value(), property_dock, std::move(node_path));
+	auto& cs = tab->LoadTab<EditorTab>({ node_path }, node_path.filename().string(), property_dock, std::move(node_path));
 }
 
 void MainWindow::OnViewDelete()

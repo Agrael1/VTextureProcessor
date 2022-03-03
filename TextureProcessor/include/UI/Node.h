@@ -1,10 +1,11 @@
 #pragma once
-#include <UI/NodeStyle.h>
 #include <UI/GraphicsLayout.h>
 #include <UI/NodeModules.h>
 #include <UI/Port.h>
 #include <Interfaces/INode.h>
 #include <Logic/Node.h>
+#include <UI/PropertyHandler.h>
+#include <UI/PropertyGenerator.h>
 
 
 namespace UI
@@ -15,8 +16,7 @@ namespace UI
 	class NodeUI : public INode
 	{
 	public:
-		NodeUI(QJsonObject document, std::string_view name)
-			:style(document, name) {}
+		NodeUI(QJsonObject document, std::string_view name);
 		NodeUI(const NodeUI& in);
 		~NodeUI();
 	public:
@@ -24,12 +24,12 @@ namespace UI
 			const QStyleOptionGraphicsItem* option,
 			QWidget* widget = nullptr) override;
 		void DrawBackground(QPainter* painter);
-		void DrawCaptionName(QPainter* painter);
 		virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value)override;
 	protected:
 		void Init();
 		void ConstructModules();
 		void UpdateLayouts();
+		QLabel& Header();
 	protected:
 		const ver::Node& GetModel()const noexcept
 		{
@@ -41,14 +41,13 @@ namespace UI
 		virtual void Deserialize(QJsonObject in)override;
 
 		virtual std::string_view Name()const override;
-		virtual void UpdateProperties(Windows::PropertyElement& properties) override;
 		virtual void Update()override;
 		virtual std::string Export()override;
 		virtual void ExportSilent(std::string_view in)override;
 		virtual void StartConnection(uint8_t index)override;
 		virtual void FinishConnection(uint8_t index)override;
 	protected:
-		NodeStyle style;
+		std::shared_ptr<NodeStyle> style;
 		GraphicsLinearLayout* l_main = nullptr;
 
 		std::vector<Source> sources;
@@ -59,6 +58,7 @@ namespace UI
 		std::optional<QGraphicsLinearLayout> l_right;
 
 		std::vector<Module> modules;
+		std::unique_ptr<QGraphicsProxyWidget> proxy;
 		bool b_destroyed = false;
 	};
 
@@ -92,6 +92,12 @@ namespace UI
 		virtual ver::Node& GetModel() noexcept override
 		{
 			return model;
+		}
+		virtual void UpdateProperties(Windows::PropertyElement& properties) override
+		{
+			if constexpr (has_property_handler<XModel>)
+				return XModel::property_handler::ConstructProperties(properties, model);
+			PlaceProperties(properties, model);
 		}
 	private:
 		XModel model;

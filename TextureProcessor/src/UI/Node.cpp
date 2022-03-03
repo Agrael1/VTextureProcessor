@@ -1,18 +1,20 @@
 #include <UI/Node.h>
 #include <UI/Connection.h>
-#include <UI/PropertyGenerator.h>
+#include <UI/NodeStyle.h>
 #include <QPainter>
+#include <QGraphicsProxyWidget>
+
 
 using namespace UI;
+
+
+UI::NodeUI::NodeUI(QJsonObject document, std::string_view name)
+	:style(std::make_shared<NodeStyle>(document, name)) {}
 
 UI::NodeUI::NodeUI(const NodeUI& in)
 	:style(in.style)
 	, l_main(new GraphicsLinearLayout(Qt::Orientation::Horizontal))
 {
-	l_left.emplace(Qt::Orientation::Vertical);
-	l_central.emplace(Qt::Orientation::Vertical);
-	l_right.emplace(Qt::Orientation::Vertical);
-
 	sinks.reserve(in.GetModel().SinksCount());
 	sources.reserve(in.GetModel().SourcesCount());
 }
@@ -26,8 +28,6 @@ UI::NodeUI::~NodeUI()
 void UI::NodeUI::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	DrawBackground(painter);
-	DrawCaptionName(painter);
-
 	QGraphicsWidget::paint(painter, option, widget);
 }
 
@@ -43,7 +43,7 @@ void UI::NodeUI::DrawBackground(QPainter* painter)
 	path_title.addRoundedRect(QRectF(offset, 0, xwidth, NodeStyle::title_height), edge_size, edge_size);
 	path_title.addRect(offset, NodeStyle::title_height - edge_size, xwidth, edge_size);
 	painter->setPen(Qt::NoPen);
-	painter->setBrush(style.Title());
+	painter->setBrush(style->Title());
 	painter->drawPath(path_title.simplified());
 
 
@@ -53,7 +53,7 @@ void UI::NodeUI::DrawBackground(QPainter* painter)
 	path_content.addRoundedRect(QRectF(offset, NodeStyle::title_height, xwidth, geometry().height() - NodeStyle::title_height), edge_size, edge_size);
 	path_content.addRect(offset, NodeStyle::title_height, xwidth, edge_size);
 	painter->setPen(Qt::NoPen);
-	painter->setBrush(style.Background());
+	painter->setBrush(style->Background());
 	painter->drawPath(path_content.simplified());
 
 	if (isSelected()) {
@@ -64,26 +64,6 @@ void UI::NodeUI::DrawBackground(QPainter* painter)
 	}
 	painter->setBrush(Qt::BrushStyle::NoBrush);
 	painter->drawPath((path_title + path_content).simplified());
-}
-
-void UI::NodeUI::DrawCaptionName(QPainter* painter)
-{
-	QString name{ style.StyleName().data() };
-	QFont f = painter->font();
-	f.setBold(true);
-
-	QFontMetrics metrics(f);
-	auto rect = metrics.boundingRect(name);
-
-	QPointF position((geometry().width() - rect.width()) / 2.0,
-		(NodeStyle::title_height - rect.height() / 2.0));
-
-	painter->setFont(f);
-	painter->setPen(style.FontColor());
-	painter->drawText(position, name);
-
-	f.setBold(false);
-	painter->setFont(f);
 }
 
 QVariant UI::NodeUI::itemChange(GraphicsItemChange change, const QVariant& value)
@@ -99,6 +79,22 @@ QVariant UI::NodeUI::itemChange(GraphicsItemChange change, const QVariant& value
 
 void UI::NodeUI::Init()
 {
+	proxy = std::make_unique<QGraphicsProxyWidget>();
+	auto xlab = new QLabel(style->StyleName());
+	QFont a{}; a.setBold(true);
+	QPalette p;
+	p.setColor(xlab->foregroundRole(), style->FontColor());
+	xlab->setFont(a);
+	xlab->setAutoFillBackground(true);
+	xlab->setPalette(p);
+	xlab->setStyleSheet("QLabel {background: transparent; }");
+	xlab->setAlignment(Qt::AlignCenter);
+	proxy->setWidget(xlab);
+
+	l_left.emplace(Qt::Orientation::Vertical);
+	l_central.emplace(Qt::Orientation::Vertical);
+	l_right.emplace(Qt::Orientation::Vertical);
+
 	setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);
 	setFlag(QGraphicsItem::ItemIsMovable, true);
 	setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -114,8 +110,10 @@ void UI::NodeUI::Init()
 	for (auto& x : sinks)l_left->addItem(&x);
 	for (auto& x : sources)l_right->addItem(&x);
 
-	l_main->setContentsMargins(off_l, NodeStyle::title_height + PortStyle::port_bbox, off_r, PortStyle::port_bbox);
+	l_main->setContentsMargins(off_l, 3.0f, off_r, PortStyle::port_bbox);
 	l_central->setSpacing(NodeStyle::item_padding);
+	l_central->addItem(proxy.get());
+	l_central->setItemSpacing(0, NodeStyle::title_height);
 	ConstructModules();
 
 	l_main->addItem(std::addressof(*l_left));
@@ -140,12 +138,17 @@ void UI::NodeUI::UpdateLayouts()
 	auto sink_delta = (h - sinks.size() * PortStyle::port_bbox) / (sinks.size() + 1);
 	auto source_delta = (h - sources.size() * PortStyle::port_bbox) / (sources.size() + 1);
 
-	l_left->setContentsMargins(0.0f, sink_delta, 0.0f, 0.0f);
+	l_left->setContentsMargins(0.0f, sink_delta + NodeStyle::title_height * (sinks.size() > 0), 0.0f, 0.0f);
 	l_left->setSpacing(sink_delta);
 
-	l_right->setContentsMargins(0.0f, source_delta, 0.0f, 0.0f);
+	l_right->setContentsMargins(0.0f, source_delta + NodeStyle::title_height * (sources.size() > 0), 0.0f, 0.0f);
 	l_right->setSpacing(source_delta);
 	l_main->activate();
+}
+
+QLabel& UI::NodeUI::Header()
+{
+	return *static_cast<QLabel*>(proxy->widget());
 }
 
 QJsonObject UI::NodeUI::Serialize()
@@ -158,7 +161,7 @@ QJsonObject UI::NodeUI::Serialize()
 	xpos.append(scenePos().y());
 	node.insert("Position", xpos);
 
-	j.insert(style.StyleName().data(), node);
+	j.insert(style->StyleName(), node);
 	return j;
 }
 
@@ -176,11 +179,6 @@ void UI::NodeUI::Deserialize(QJsonObject in)
 std::string_view UI::NodeUI::Name() const
 {
 	return GetModel().GetName();
-}
-
-void UI::NodeUI::UpdateProperties(Windows::PropertyElement& properties)
-{
-	PlaceProperties(properties, GetModel());
 }
 
 void UI::NodeUI::Update()
