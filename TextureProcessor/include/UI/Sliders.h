@@ -17,7 +17,7 @@ namespace UI
 	class FloatSlider : public IUpdater
 	{
 	public:
-		FloatSlider(float& value, float min = 0.0f, float max = 20.0f);
+		FloatSlider(float& value, QWidget* parent = nullptr);
 	public:
 		void SetChangedCallback(INode* to)override;
 	private:
@@ -35,7 +35,7 @@ namespace UI
 	class Vec2Slider : public IUpdater
 	{
 	public:
-		Vec2Slider(QVector2D& value, float min = 0.0f, float max = 20.0f);
+		Vec2Slider(QVector2D& value, QWidget* parent = nullptr);
 	public:
 		void SetChangedCallback(INode* to)override;
 	private:
@@ -48,7 +48,7 @@ namespace UI
 	class IntSlider : public IUpdater
 	{
 	public:
-		IntSlider(int& value);
+		IntSlider(int& value, QWidget* parent = nullptr);
 	public:
 		void SetChangedCallback(INode* to)override;
 	private:
@@ -65,7 +65,7 @@ namespace UI
 	class CheckBox : public IUpdater
 	{
 	public:
-		CheckBox(bool& value, const QString& name);
+		CheckBox(bool& value, const QString& name, QWidget* parent = nullptr);
 	public:
 		void SetChangedCallback(INode* to)override;
 	private:
@@ -73,6 +73,7 @@ namespace UI
 		QVBoxLayout lay;
 		QCheckBox box;
 	};
+
 	class RefreshCheckBox : public PropertyUpdater
 	{
 	public:

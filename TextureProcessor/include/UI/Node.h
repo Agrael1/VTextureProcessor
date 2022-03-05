@@ -99,7 +99,7 @@ namespace UI
 				return XModel::property_handler::ConstructProperties(properties, model);
 			PlaceProperties(properties, model);
 		}
-	private:
+	protected:
 		XModel model;
 	};
 }

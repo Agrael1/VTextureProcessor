@@ -17,10 +17,16 @@ namespace UI
 	template<bool changes = true>
 	struct Updater : public QWidget
 	{
+		Updater(QWidget* parent = nullptr):QWidget(parent){};
 		virtual void SetChangedCallback(INode* to, Windows::PropertyElement& self) = 0;
 	};
 	template<> struct Updater<false> : public QWidget
 	{
+		Updater(QWidget* parent = nullptr) :QWidget(parent) {};
+		~Updater()
+		{
+			printf("destroyed");
+		}
 		virtual void SetChangedCallback(INode* to) = 0;
 	};
 	using IUpdater = Updater<false>;

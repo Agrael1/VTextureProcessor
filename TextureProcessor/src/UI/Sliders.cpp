@@ -17,8 +17,8 @@ using namespace UI;
  * @param min Minimum value
  * @param max Maximum value
  */
-FloatSlider::FloatSlider(float& value, float min, float max)
-	:slider(Qt::Horizontal), value(value), valid(min, max, 2)
+FloatSlider::FloatSlider(float& value, QWidget* parent)
+	:slider(Qt::Horizontal), value(value), valid(-20,20,2), Updater(parent)
 {
 	dpi = (value * 2) / 100.0f;
 
@@ -97,8 +97,8 @@ void FloatSlider::SetChangedCallback(INode* to)
  * @param min Minimum vector value
  * @param max Maximum vector value
  */
-Vec2Slider::Vec2Slider(QVector2D& value, float min, float max)
-	:value(value), upper(value[0], min, max), lower(value[1], min, max)
+Vec2Slider::Vec2Slider(QVector2D& value, QWidget* parent)
+	:value(value), upper(value[0]), lower(value[1]) , Updater(parent)
 {
 	lay.setAlignment(Qt::AlignmentFlag::AlignTop);
 	setLayout(&lay);
@@ -126,8 +126,8 @@ void Vec2Slider::SetChangedCallback(INode* to)
  * @param min Minimum value
  * @param max Maximum value
  */
-IntSlider::IntSlider(int& value)
-	:slider(Qt::Horizontal), value(value), valid(0, 20)
+IntSlider::IntSlider(int& value, QWidget* parent)
+	:slider(Qt::Horizontal), value(value), valid(0, 20), Updater(parent)
 {
 	setLayout(&lay);
 	text.setValidator(&valid);
@@ -197,8 +197,8 @@ void IntSlider::SetChangedCallback(INode* to)
  * @param value ref to changed value
  * @param name Label to go with
 */
-CheckBox::CheckBox(bool& value, const QString& name)
-	:value(value), box(name)
+CheckBox::CheckBox(bool& value, const QString& name, QWidget* parent)
+	:value(value), box(name), Updater(parent)
 {
 	box.setChecked(value);
 	lay.addWidget(&box);
