@@ -22,8 +22,10 @@ namespace UI
 	public:
 		PropertyContainer(ver::ShaderNode& model);
 	public:
+		void MakeProps();
 		void AddEmpty();
 		void ClearEmpty();
+
 		//ver::dc::ElementRef PlaceNewProperty(ver::dc::Type t);
 	private:
 		ver::ShaderNode& model;
@@ -35,6 +37,6 @@ namespace UI
 		QToolButton new_prop;
 		QListWidget props;
 
-		std::vector<QListWidgetItem> added;
+		std::vector<std::unique_ptr<QListWidgetItem>> added;
 	};
 }

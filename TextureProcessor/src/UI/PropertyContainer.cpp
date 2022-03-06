@@ -87,6 +87,48 @@ private:
 	QLabel cname;
 	QLineEdit cname_line;
 };
+class Box : public QWidget
+{
+public:
+	Box(QWidget* parent)
+		:QWidget(parent)
+	{
+		setLayout(&vl);
+	}
+	void MakeProp(ver::dc::ElementRef ref)
+	{
+		auto t = ref.GetType();
+		using namespace UI;
+		switch (t)
+		{
+		case ver::dc::Type::Float:
+			vl.addWidget(new QLabel(ref.GetName().data(), this));
+			vl.addWidget(new FloatSlider{ (float&)ref, this });
+			break;
+		case ver::dc::Type::Float2:
+			vl.addWidget(new QLabel(ref.GetName().data(), this));
+			vl.addWidget(new Vec2Slider{ (QVector2D&)ref, this });
+			break;
+		case ver::dc::Type::Float3:
+			break;
+		case ver::dc::Type::Float4:
+			break;
+		case ver::dc::Type::Matrix:
+			break;
+		case ver::dc::Type::Bool:
+			vl.addWidget(new CheckBox{ (bool&)ref,ref.GetName().data(), this });
+			break;
+		case ver::dc::Type::Integer:
+			vl.addWidget(new QLabel(ref.GetName().data(), this));
+			vl.addWidget(new IntSlider{ (int&)ref, this });
+			break;
+		default:
+			break;
+		}
+	}
+private:
+	QVBoxLayout vl;
+};
 
 const QRegularExpression Adder::varname{ "^[_a-z]\\w*$" };
 
@@ -107,19 +149,37 @@ UI::PropertyContainer::PropertyContainer(ver::ShaderNode& model)
 	vl.addWidget(&props);
 	setLayout(&vl);
 
+	MakeProps();
+
 	props.setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
 	props.setDragDropMode(QAbstractItemView::InternalMove);
 	props.setDragEnabled(true);
 }
 
+void UI::PropertyContainer::MakeProps()
+{
+	for (auto i : model.GetBuffer())
+	{
+		auto& r = *added.emplace_back(std::make_unique<QListWidgetItem>());
+
+		auto* x = new Box(this); //is removed with list
+		x->MakeProp(i);
+
+		r.setSizeHint(x->sizeHint());
+		props.addItem(&r);
+		props.setItemWidget(&r, x);
+
+	}
+}
+
 void UI::PropertyContainer::AddEmpty()
 {
-	auto& r = added.emplace_back();
+	//auto& r = added.emplace_back();
 
-	auto* x = new Adder(this); //is removed with list
-	r.setSizeHint(x->sizeHint());
-	props.addItem(&r);
-	props.setItemWidget(&r, x);
+	//auto* x = new Adder(this); //is removed with list
+	//r.setSizeHint(x->sizeHint());
+	//props.addItem(&r);
+	//props.setItemWidget(&r, x);
 }
 
 void UI::PropertyContainer::ClearEmpty()
