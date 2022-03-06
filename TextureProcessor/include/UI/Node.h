@@ -70,6 +70,8 @@ namespace UI
 		template<class ...Args>
 		XNode(QJsonObject document, std::string_view name, Args&&... e)
 			:NodeUI(document, name), model(document, std::forward<Args>(e)...) {}
+		explicit XNode(std::pair<QJsonObject, std::string> pair)
+			: NodeUI(pair.first, pair.second), model(pair.first) {}
 		XNode(const XNode& in)
 			:NodeUI(in), model(in.model)
 		{

@@ -60,7 +60,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	addDockWidget(Qt::RightDockWidgetArea, &property_dock);
 	resizeDocks({ &property_dock }, { 250 }, Qt::Horizontal);
 
-	tab->LoadTab<SceneTab>({ xprojPath }, xprojPath.filename().string(), property_dock, std::move(xprojPath), resolution);
+	tab->LoadTab<SceneTab>(std::move(xprojPath) , xprojPath.filename().string(), property_dock, resolution);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -92,7 +92,7 @@ void MainWindow::OnLoad()
 
 	if (proj_path.empty()) return;
 	proj_path = proj_path.make_preferred();
-	auto& cs = tab->LoadTab<SceneTab>({ proj_path }, proj_path.filename().string(), property_dock, std::move(proj_path), QSize(256, 256));
+	auto& cs = tab->LoadTab<SceneTab>(std::move(proj_path), proj_path.filename().string(), property_dock, QSize(256, 256));
 }
 
 void MainWindow::OnCreateNode()
@@ -111,7 +111,7 @@ void MainWindow::OnLoadNode()
 
 	if (node_path.empty()) return;
 	node_path = node_path.make_preferred();
-	auto& cs = tab->LoadTab<EditorTab>({ node_path }, node_path.filename().string(), property_dock, std::move(node_path));
+	auto& cs = tab->LoadTab<EditorTab>(std::move(node_path), node_path.filename().string(), property_dock);
 }
 
 void MainWindow::OnViewDelete()

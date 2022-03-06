@@ -25,7 +25,7 @@ namespace UI
 		Updater(QWidget* parent = nullptr) :QWidget(parent) {};
 		~Updater()
 		{
-			printf("destroyed");
+			//printf("destroyed");
 		}
 		virtual void SetChangedCallback(INode* to) = 0;
 	};

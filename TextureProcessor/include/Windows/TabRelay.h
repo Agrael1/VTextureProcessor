@@ -13,12 +13,12 @@ namespace UI::Windows
 		~TabRelay();
 	public:
 		template<class T, class... Args> requires std::derived_from<T, Tab>
-		T& LoadTab(const std::filesystem::path& path, std::string_view name, Args&&... args)
+		T& LoadTab(std::filesystem::path&& path, std::string_view name, Args&&... args)
 			{
 				auto pstr = path.string();
 				if (!tabs.contains(pstr))
 				{
-					auto x = tabs.emplace(pstr, std::make_unique<T>(std::forward<Args>(args)...));
+					auto x = tabs.emplace(pstr, std::make_unique<T>(std::move(path), std::forward<Args>(args)...));
 					auto* w = x.first->second->Widget();
 					addTab(w, name.data());
 					setCurrentWidget(w);
@@ -36,7 +36,7 @@ namespace UI::Windows
 		T& TempTab(std::string_view name, Args&&... args)
 		{
 			auto xname = UKeyTemp(name);
-			auto x = temp_tabs.emplace(xname, std::make_unique<T>(std::forward<Args>(args)...));
+			auto x = temp_tabs.emplace(xname, std::make_unique<T>("", std::forward<Args>(args)...));
 			auto* w = x.first->second->Widget();
 			addTab(w, xname.data());
 			setCurrentWidget(w);

@@ -26,15 +26,12 @@ namespace UI::Windows
 		};
 
 	public:
-		EditorTab(Properties& props, std::filesystem::path&& p)
-			: Tab(std::move(p)), scene(props), tp(this)
+		EditorTab(std::filesystem::path&& p, Properties& props)
+			:Tab(std::move(p)), scene(props), tp(this), edited(Path())
 		{
 			Init(props);
-		}
-		EditorTab(Properties& props) : scene(props), tp(this)
-		{
-			Init(props);
-			tp.SetName("Node");
+			auto& x = edited.StyleName();
+			tp.SetName(x.isEmpty()?"Node":x);
 			scene.scene.addItem(&edited);
 		}
 	public:

@@ -8,7 +8,7 @@
 
 namespace ver
 {
-	class DynamicNode;
+	class ShaderNode;
 }
 
 namespace UI
@@ -20,13 +20,14 @@ namespace UI
 	class PropertyContainer : public QWidget
 	{
 	public:
-		PropertyContainer(ver::DynamicNode& model);
+		PropertyContainer(ver::ShaderNode& model);
 	public:
 		void AddEmpty();
 		void ClearEmpty();
-		ver::dc::ElementRef PlaceNewProperty(ver::dc::Type t);
+		//ver::dc::ElementRef PlaceNewProperty(ver::dc::Type t);
 	private:
-		ver::DynamicNode& model;
+		ver::ShaderNode& model;
+		ver::dc::Buffer dum;
 	private:
 		QVBoxLayout vl;
 		QHBoxLayout hl;
@@ -34,6 +35,6 @@ namespace UI
 		QToolButton new_prop;
 		QListWidget props;
 
-		std::unique_ptr<QListWidgetItem> added;
+		std::vector<QListWidgetItem> added;
 	};
 }

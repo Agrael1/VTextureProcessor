@@ -49,6 +49,7 @@ NodeStyle::NodeStyle(QJsonObject document, std::string_view name)
 {
 	QJsonValueRef nodeStyleValues = document["NodeStyle"];
 	QJsonObject obj = nodeStyleValues.toObject();
+    if (obj.empty())return;
 
     brTitle.setColor(ReadColor(obj, "TitleColor"));
     font_color = ReadColor(obj, "FontColor");

@@ -92,7 +92,7 @@ const QRegularExpression Adder::varname{ "^[_a-z]\\w*$" };
 
 
 
-UI::PropertyContainer::PropertyContainer(ver::DynamicNode& model)
+UI::PropertyContainer::PropertyContainer(ver::ShaderNode& model)
 	:model(model), heading("Edited Node:")
 {
 	new_prop.setMinimumSize(24, 24);
@@ -114,21 +114,20 @@ UI::PropertyContainer::PropertyContainer(ver::DynamicNode& model)
 
 void UI::PropertyContainer::AddEmpty()
 {
-	if (added)return;
-	added = std::make_unique<QListWidgetItem>();
+	auto& r = added.emplace_back();
 
 	auto* x = new Adder(this); //is removed with list
-	added->setSizeHint(x->sizeHint());
-	props.addItem(added.get());
-	props.setItemWidget(added.get(), x);
+	r.setSizeHint(x->sizeHint());
+	props.addItem(&r);
+	props.setItemWidget(&r, x);
 }
 
 void UI::PropertyContainer::ClearEmpty()
 {
-	added = nullptr;
-}
-
-ver::dc::ElementRef UI::PropertyContainer::PlaceNewProperty(ver::dc::Type t)
-{
 	
 }
+
+//ver::dc::ElementRef UI::PropertyContainer::PlaceNewProperty(ver::dc::Type t)
+//{
+//	
+//}

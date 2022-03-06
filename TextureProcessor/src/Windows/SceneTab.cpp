@@ -9,8 +9,8 @@
 using namespace UI::Windows;
 namespace fs = std::filesystem;
 
-SceneTab::SceneTab(Properties& props, std::filesystem::path&& xproj_path, QSize resolution)
-	:Tab(std::move(xproj_path)), scene(nullptr, props, resolution), view(&scene)
+SceneTab::SceneTab(std::filesystem::path&& p, Properties& props, QSize resolution)
+	:Tab(std::move(p)), scene(nullptr, props, resolution), view(&scene)
 {
 	scene.setSceneRect(-32000, -32000, 64000, 64000);
 	if (resolution != QSize{})Save();

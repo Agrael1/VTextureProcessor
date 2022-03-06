@@ -37,7 +37,7 @@ namespace UI
 		}boundary;
 		QBrush brTitle{ "#E3212121" };
 		QBrush brBackground{ "#E31a1a1a" };
-		QColor font_color{ "#7FFFFFFF" };
+		QColor font_color{ Qt::white };
 		QString styleName;
 	};
 
