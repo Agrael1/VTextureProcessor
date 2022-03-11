@@ -24,13 +24,16 @@ public:
 		open_cbr,
 		close_cbr,
 
+		semicolon,
+
 		other,
 	}xtype;
 	size_t offset;
+	size_t line;
 	std::wstring_view value;
 public:
-	token(type xtype, size_t offset, std::wstring_view value = L"")
-		:xtype(xtype), offset(offset), value(value) {}
+	token(type xtype, size_t offset, size_t line = 0, std::wstring_view value = L"")
+		:xtype(xtype), offset(offset), value(value), line(line) {}
 public:
 	size_t length()const noexcept
 	{

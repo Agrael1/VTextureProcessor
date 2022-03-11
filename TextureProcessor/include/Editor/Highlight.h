@@ -1,28 +1,23 @@
 #pragma once
 #include <QSyntaxHighlighter>
 #include <array>
-#include <unordered_map>
+#include <unordered_set>
+#include <Editor/TypeInfo.h>
 
 
 class Highlighter : public QSyntaxHighlighter
 {
 public:
-	enum Format
-	{
-		statements,
-		kwords,
-		comment,
-		user_type,
-		size
-	};
-public:
 	Highlighter(QTextDocument* parent);
 public:
 	void highlightBlock(const QString& text)override;
-	void SetTypeInfo(std::unordered_map<std::wstring, size_t> types);
+	void SetTypeInfo(std::unordered_set<std::wstring> types);
+	void SetFuncInfo(std::unordered_map<std::wstring, size_t> xfuncs);
 private:
 	void Parse(std::wstring_view part);
 private:
-	std::array<QTextCharFormat, size> formats;
-	std::unordered_map<std::wstring, size_t> types;
+	std::array<QTextCharFormat, ver::detail::Format::size> formats;
+
+	std::unordered_set<std::wstring> types;
+	std::unordered_map<std::wstring, size_t> funcs;
 };

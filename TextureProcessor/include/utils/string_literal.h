@@ -27,6 +27,10 @@ namespace ver
 		{
 			return traits_type::length(value);
 		}
+		constexpr auto length()const noexcept
+		{
+			return traits_type::length(value);
+		}
 		constexpr const value_type* c_str()const noexcept
 		{
 			return &value[0];
@@ -37,6 +41,10 @@ namespace ver
 				static_assert(i > N, "Index out of bounds");
 			return value[i];
 		}
+		constexpr value_type& operator[](size_t i)noexcept
+		{
+			return value[i];
+		}
 
 		value_type value[N]{};
 	};
@@ -45,21 +53,26 @@ namespace ver
 	template<size_t N>struct string_literal :basic_string_literal<char, N>
 	{
 		constexpr string_literal(const char(&str)[N]) :basic_string_literal<char, N>(str) {};
+		using basic_string_literal<char, N>::basic_string_literal;
 	};
 	template<size_t N>struct wstring_literal :basic_string_literal<wchar_t, N>
 	{
 		constexpr wstring_literal(const wchar_t(&str)[N]) :basic_string_literal<wchar_t, N>(str) {};
+		using basic_string_literal<wchar_t, N>::basic_string_literal;
 	};
 	template<size_t N>struct u8string_literal :basic_string_literal<char8_t, N>
 	{
 		constexpr u8string_literal(const char8_t(&str)[N]) :basic_string_literal<char8_t, N>(str) {};
+		using basic_string_literal<char8_t, N>::basic_string_literal;
 	};
 	template<size_t N>struct u16string_literal :basic_string_literal<char16_t, N>
 	{
 		constexpr u16string_literal(const char16_t(&str)[N]) :basic_string_literal<char16_t, N>(str) {};
+		using basic_string_literal<char16_t, N>::basic_string_literal;
 	};
 	template<size_t N>struct u32string_literal :basic_string_literal<char32_t, N>
 	{
 		constexpr u32string_literal(const char32_t(&str)[N]) :basic_string_literal<char32_t, N>(str) {};
+		using basic_string_literal<char32_t, N>::basic_string_literal;
 	};
 }

@@ -69,6 +69,7 @@ void UI::Windows::EditorTab::Compile()
 	p.Parse(code);
 
 	edit.edit.SetTypeInfo(p.GetTypesInfo());
+	edit.edit.SetFuncInfo(p.GetFuncsInfo());
 }
 void UI::Windows::EditorTab::Request(UI::Request rq)
 {

@@ -17,7 +17,6 @@ public:
 		wchar_t x = prefetch_one();
 		if (!x)return 0;
 		advance_one();
-		if (x == '\n') { line++; column = 0; }
 		return x;
 	}
 	std::optional<token> try_get_statement(wchar_t c)
@@ -151,7 +150,7 @@ public:
 		size_t roffset = offset - 1;
 		const wchar_t* av = code.data() - 1;
 		while (!not_lit(prefetch_one()))fetch_one();
-		return token{ token::type::identifier, roffset, {av, offset - roffset} };
+		return token{ token::type::identifier, roffset, line, {av, offset - roffset} };
 	}
 	token make_comment()
 	{
@@ -162,7 +161,7 @@ public:
 		while (c != '\n' && c != '\0')
 			c = fetch_one();
 
-		return token{ token::type::comment, roffset, {av, offset - roffset} };
+		return token{ token::type::comment, roffset, line, {av, offset - roffset} };
 	}
 	bool empty()const noexcept {
 		return code.empty() || !code[0];
@@ -208,7 +207,7 @@ private:
 		{
 			auto r = offset - 1;
 			advance(sw);
-			return token{ tt, r, sw };
+			return token{ tt, r, line, sw };
 		}
 		return {};
 	}
@@ -284,13 +283,14 @@ private:
 	{
 		auto l = sw.length() - 1; //without 1 byte
 		offset += l;
-		line += l;
+		column+=l;
+		if (code[l-1] == '\n') { line++; column = 0; }
 		code = code.substr(l);
 	}
 	void advance_one()
 	{
-		offset++;
-		line++;
+		offset++; column++;
+		if (code[0] == '\n') { line++; column = 0; }
 		code = code.substr(1);
 	}
 
@@ -332,6 +332,8 @@ static std::optional<token> GetTokenLoop(LexContext& lex)
 			return token{ token::type::open_cbr, lex.Offset() - 1 };
 		case '}':
 			return token{ token::type::close_cbr, lex.Offset() - 1 };
+		case ';':
+			return token{ token::type::semicolon, lex.Offset() - 1 };
 		default:
 			break;
 		}

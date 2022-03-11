@@ -4,30 +4,59 @@
 
 bool NodeParser::Parse(std::wstring_view code)
 {
-	size_t start_offset = 0;
-	size_t end_offset = 0;
-	size_t block = 0;
-
-	auto gen = GetToken(code);
 	using enum token::type;
 
-	for (auto& i : gen)
+	auto gen = GetToken(code);
+	size_t block = 0;
+
+	while (auto x = GetTokenInternal(gen))
 	{
-		block += i.xtype == open_cbr;
-		block -= i.xtype == close_cbr;
+		if (x->is_struct())
+		{
+			if ((x = GetTokenInternal(gen)) && x->xtype == identifier)
+				types.emplace(x->value);
+			continue;
+		}
 
-		if (i.is_struct())
-			if (auto x = gen.begin(); x != gen.end() && x->xtype == identifier)
-				types.emplace(x->value, Highlighter::Format::user_type);
+		if (x->xtype == keyword || types.contains(std::wstring{ x->value }))
+			if(!block)TryParseFunction(gen);
 
-
-
-		if (i.xtype == keyword || types.contains(std::wstring{ i.value }))
-			if (auto x = gen.begin(); x != gen.end() && x->xtype == identifier) // var or func
-				;//types.emplace(x->value);
-
-		if (gen.finished())
-			break;
+		block += x->xtype == open_cbr;
+		block -= x->xtype == close_cbr;
 	}
 	return true;
+}
+
+std::optional<token> NodeParser::GetTokenInternal(ver::generator<token>& gen) 
+{
+	if (!tokens.empty())
+	{
+		auto r = std::move(tokens.front());
+		tokens.erase(tokens.begin());
+		return r;
+	}
+	if (gen.finished())return {};
+	auto r = gen.begin();
+	if (r == gen.end())return {};
+	return *r;
+}
+
+void NodeParser::TryParseFunction(ver::generator<token>& gen)
+{
+	auto x = GetTokenInternal(gen);
+	if (!x)return;
+	if (x->xtype != token::type::identifier){
+		tokens.push_back(*x);
+		return;
+	}
+	auto y = GetTokenInternal(gen);
+	if (!y)return;
+	if (y->xtype != token::type::open_br)
+	{
+		tokens.push_back(*x);
+		tokens.push_back(*y);
+		return;
+	}
+
+	funcs.emplace(x->value, x->line);
 }
