@@ -90,7 +90,10 @@ namespace ver {
             if (handle) 
                 handle.destroy();
         }
-
+        bool finished()const
+        {
+            return !handle || handle.done();
+        }
     private:
         std::coroutine_handle<promise_type> handle = nullptr;
     };

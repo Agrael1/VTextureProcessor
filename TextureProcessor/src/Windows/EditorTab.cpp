@@ -2,6 +2,7 @@
 #include <Windows/Properties.h>
 #include <Logic/Engine.h>
 #include <UI/ProjectEvent.h>
+#include <Editor/NodeParser.h>
 
 #include <fstream>
 #include <iterator>
@@ -56,4 +57,21 @@ bool UI::Windows::EditorTab::event(QEvent* e)
 		return true;
 	default:return QMainWindow::event(e);
 	}
+}
+
+
+void UI::Windows::EditorTab::Compile()
+{
+	auto code = edit.edit.GetText().toStdWString();
+	if (code.empty())return;
+
+	NodeParser p;
+	p.Parse(code);
+
+	edit.edit.SetTypeInfo(p.GetTypesInfo());
+}
+void UI::Windows::EditorTab::Request(UI::Request rq)
+{
+	if (rq == Request::Compile)
+		return Compile();
 }

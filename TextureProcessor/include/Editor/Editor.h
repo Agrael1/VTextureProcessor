@@ -1,18 +1,11 @@
 #pragma once
 #include <Editor/Highlight.h>
 #include <Editor/CodeEditor.h>
-#include <QPlainTextEdit>
 #include <QComboBox>
 #include <QBoxLayout>
 #include <QScrollBar>
+#include <QToolBar>
 
-
-
-struct FontSizeController : public QComboBox
-{
-	uint16_t font_percent = 100;
-	QIntValidator value_range;
-};
 
 class Editor : public QWidget
 {
@@ -22,6 +15,14 @@ public:
 	Editor();
 public:
 	void LoadText(const QString& in);
+	QString GetText()const noexcept
+	{
+		return code.toPlainText();
+	}
+	void SetTypeInfo(std::unordered_map<std::wstring, size_t> types)
+	{
+		hl.SetTypeInfo(std::move(types));
+	}
 protected:
 	void wheelEvent(QWheelEvent* event);
 private:
@@ -29,7 +30,6 @@ private:
 	void SelectFontSize(const QString&);
 private:
 	QVBoxLayout vl;
-	QTextEdit texter;
 	CodeEditor code;
 	Highlighter hl;
 

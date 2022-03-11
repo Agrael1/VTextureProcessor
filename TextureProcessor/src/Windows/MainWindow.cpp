@@ -60,6 +60,10 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	addDockWidget(Qt::RightDockWidgetArea, &property_dock);
 	resizeDocks({ &property_dock }, { 250 }, Qt::Horizontal);
 
+	auto& toolbar = *addToolBar("");
+	toolbar.setIconSize({ 16,16 });
+	toolbar.addAction(QIcon(":/build.png"), "Compile", [this]() {tab->RequestActive(UI::Request::Compile); });
+
 	tab->LoadTab<SceneTab>(std::move(xprojPath) , xprojPath.filename().string(), property_dock, resolution);
 }
 

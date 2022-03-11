@@ -3,13 +3,17 @@
 
 #include <QBoxLayout>
 #include <QToolButton>
-#include <QListWidget>
+#include <QListView>
+
+#include <unordered_map>
 
 
 namespace ver
 {
 	class ShaderNode;
 }
+class Box;
+class Adder;
 
 namespace UI
 {
@@ -25,7 +29,7 @@ namespace UI
 		void MakeProps();
 		void AddEmpty();
 		void ClearEmpty();
-
+		void Modify(Box* box);
 		//ver::dc::ElementRef PlaceNewProperty(ver::dc::Type t);
 	private:
 		ver::ShaderNode& model;
@@ -35,8 +39,9 @@ namespace UI
 		QHBoxLayout hl;
 		QLabel heading;
 		QToolButton new_prop;
-		QListWidget props;
+		//QListView props;
 
-		std::vector<std::unique_ptr<QListWidgetItem>> added;
+		//std::unordered_map<Box*, std::unique_ptr<QListWidgetItem>> old;
+		//std::unordered_map<Adder*, std::unique_ptr<QListWidgetItem>> added;
 	};
 }

@@ -1,13 +1,15 @@
 #pragma once
-#include <memory>
+#include <string>
+#include <unordered_set>
 
-struct INode;
 
 class NodeParser
 {
 public:
-	//std::unique_ptr<INode> FromGLSL(std::string_view shader);
-
+	bool Parse(std::wstring_view code);
+	auto GetTypesInfo(){return std::move(types);}
 private:
 
+private:
+	std::unordered_map<std::wstring, size_t> types;
 };

@@ -151,7 +151,7 @@ public:
 		size_t roffset = offset - 1;
 		const wchar_t* av = code.data() - 1;
 		while (!not_lit(prefetch_one()))fetch_one();
-		return token{ .xtype = token::type::identifier, .offset = roffset, .value = {av, offset - roffset} };
+		return token{ token::type::identifier, roffset, {av, offset - roffset} };
 	}
 	token make_comment()
 	{
@@ -162,13 +162,17 @@ public:
 		while (c != '\n' && c != '\0')
 			c = fetch_one();
 
-		return token{ .xtype = token::type::comment, .offset = roffset, .value = {av, offset - roffset} };
+		return token{ token::type::comment, roffset, {av, offset - roffset} };
 	}
 	bool empty()const noexcept {
 		return code.empty() || !code[0];
 	}
 	static bool not_lit(wchar_t c) {
 		return !iswalnum(c) && c != L'_';
+	}
+	auto Offset()const noexcept
+	{
+		return offset;
 	}
 private:
 	wchar_t prefetch_one()const noexcept
@@ -299,11 +303,8 @@ private:
 };
 
 
-
-ver::generator<token> GetToken(std::wstring_view code)
+static std::optional<token> GetTokenLoop(LexContext& lex)
 {
-	LexContext lex{ code };
-
 	while (!lex.empty())
 	{
 		wchar_t c = lex.fetch_one();
@@ -315,12 +316,22 @@ ver::generator<token> GetToken(std::wstring_view code)
 		case '/':
 			switch (lex.fetch_one())
 			{
-			case '/':
-				co_yield lex.make_comment();
-				continue;
-			default:
-				break;
+			case '/': return lex.make_comment();
+			default: break;
 			}
+			continue;
+		case '[':
+			return token{token::type::open_sq, lex.Offset() - 1};
+		case ']':
+			return token{token::type::close_sq, lex.Offset() - 1};
+		case '(':
+			return token{ token::type::open_br, lex.Offset() - 1 };
+		case ')':
+			return token{ token::type::close_br, lex.Offset() - 1 };
+		case '{':
+			return token{ token::type::open_cbr, lex.Offset() - 1 };
+		case '}':
+			return token{ token::type::close_cbr, lex.Offset() - 1 };
 		default:
 			break;
 		}
@@ -328,25 +339,18 @@ ver::generator<token> GetToken(std::wstring_view code)
 		if (LexContext::not_lit(c))
 			continue;
 		if (auto st = lex.try_get_statement(c); st)
-		{
-			co_yield *st;
-			continue;
-		}
+			return *st;
 		if (auto st = lex.try_get_kw(c); st)
-		{
-			co_yield *st;
-			continue;
-		}
+			return *st;
 		if (auto st = lex.try_get_ident(c); st)
-		{
-			co_yield *st;
-			continue;
-		}
+			return *st;
 	}
+	return{};
 }
-
-
-std::wstring token::to_string() const noexcept
+ver::generator<token> GetToken(std::wstring_view code)
 {
-	return std::format(L"token {}\nvalue: {}\noffset: {}\n", type_s[size_t(xtype)], value, offset);
+	LexContext lex{ code }; std::optional<token> st;
+	while (st = GetTokenLoop(lex))
+		co_yield *st;
 }
+

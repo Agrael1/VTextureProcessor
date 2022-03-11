@@ -45,9 +45,13 @@ namespace UI::Windows
 		void Load() override;
 		void OnEnter()noexcept override;
 		void OnLeave()noexcept override;
+
+		void Request(UI::Request rq)override;
 	private:
 		void Init(Properties& props)noexcept;
 		bool event(QEvent* e)override;
+
+		void Compile();
 	private:
 		TableProperties tp;
 		SceneDock scene;

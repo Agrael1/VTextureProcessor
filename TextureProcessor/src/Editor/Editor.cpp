@@ -37,7 +37,9 @@ Editor::Editor()
 
 	vl.addWidget(&code);
 	vl.addLayout(&sbar);
+	vl.setContentsMargins(0, 0, 0, 0);
 	vl.setSpacing(0);
+
 	setLayout(&vl);
 }
 

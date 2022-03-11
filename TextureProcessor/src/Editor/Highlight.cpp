@@ -8,9 +8,10 @@ const QRegularExpression endExpression("\\*/");
 Highlighter::Highlighter(QTextDocument* parent)
 	:QSyntaxHighlighter(parent)
 {
-	formats[0].setForeground({ "#569cd6" }); //statements
-	formats[1].setForeground({ "#d8a0df" }); //kwords
-	formats[2].setForeground({ "#56a64a" }); //comment
+	formats[statements].setForeground({ "#569cd6" });
+	formats[kwords].setForeground({ "#d8a0df" });
+	formats[comment].setForeground({ "#56a64a" });
+	formats[user_type].setForeground({ "#4ec9b0" });
 }
 
 void Highlighter::highlightBlock(const QString& text)
@@ -28,7 +29,7 @@ void Highlighter::highlightBlock(const QString& text)
 		endIndex = text.indexOf(endExpression, startIndex, &endMatch);
 		int commentLength = 0;
 
-		if (endIndex == -1) 
+		if (endIndex == -1)
 		{
 			setCurrentBlockState(1); // full transitive block
 			commentLength = text.length() - startIndex;
@@ -46,11 +47,20 @@ void Highlighter::highlightBlock(const QString& text)
 	Parse(std::wstring_view(text.toStdWString()).substr(endIndex));
 }
 
+void Highlighter::SetTypeInfo(std::unordered_map<std::wstring, size_t> xtypes)
+{
+	types = std::move(xtypes);
+	rehighlight();
+}
+
 void Highlighter::Parse(std::wstring_view part)
 {
 	for (auto& i : GetToken(part))
 	{
 		if (i.index() <= 2)
 			setFormat(i.offset, i.length(), formats[i.index()]);
+		if (i.xtype == token::type::identifier)
+			if(auto x = types.find({ i.value.data(), i.value.size() }); x!=types.end())
+			setFormat(i.offset, i.length(), formats[x->second]);
 	}
 }

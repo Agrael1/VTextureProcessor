@@ -3,31 +3,35 @@
 #include <Editor/Language.h>
 
 
-#define ENUM_LEX()\
-	X(keyword)\
-	X(statement)\
-	X(comment)\
-	X(property)\
-	X(identifier)\
-	X(other)
-
 
 struct token
 {
-	static constexpr std::wstring_view type_s[] {
-#define X(a) L#a, 
-		ENUM_LEX()
-#undef X
-	};
+public:
 	enum class type
 	{
-#define X(a) a, 
-		ENUM_LEX()
-#undef X
+		keyword,
+		statement,
+		comment,
+		property,
+		identifier,
+
+		open_sq,
+		close_sq,
+
+		open_br,
+		close_br,
+
+		open_cbr,
+		close_cbr,
+
+		other,
 	}xtype;
 	size_t offset;
 	std::wstring_view value;
-
+public:
+	token(type xtype, size_t offset, std::wstring_view value = L"")
+		:xtype(xtype), offset(offset), value(value) {}
+public:
 	size_t length()const noexcept
 	{
 		return value.length();
@@ -40,7 +44,6 @@ struct token
 	{
 		return xtype == type::keyword && value == L"struct";
 	}
-	std::wstring to_string()const noexcept;
 };
 
 ver::generator<token> GetToken(std::wstring_view code);

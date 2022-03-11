@@ -54,6 +54,11 @@ namespace UI::Windows
 			if (auto x = GetCurrent(); x)x->SaveAs();
 		}
 		void OnTabClosed(int prev_i);
+		void RequestActive(Request rq)
+		{
+			auto* tab = GetCurrent();
+			if (tab)tab->Request(rq);
+		}
 	private:
 		Tab* GetCurrent();
 		std::string UKeyTemp(std::string_view pattern);

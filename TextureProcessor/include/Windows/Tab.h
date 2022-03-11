@@ -1,5 +1,6 @@
 #pragma once
 #include <Interfaces/IEditable.h>
+#include <UI/Requests.h>
 #include <filesystem>
 
 namespace UI::Windows
@@ -27,6 +28,10 @@ namespace UI::Windows
 
 		}
 		virtual void OnLeave()noexcept
+		{
+
+		}
+		virtual void Request(Request rq)
 		{
 
 		}
