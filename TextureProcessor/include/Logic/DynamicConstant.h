@@ -153,7 +153,24 @@ namespace ver::dc
 			else if (signature == "int")
 				type = Type::Integer;
 			else type = Type::Empty;
-			assert(type != Type::Empty);
+		}
+		constexpr LayoutElement(std::wstring_view signature)noexcept
+		{
+			if (signature == L"float")
+				type = Type::Float;
+			else if (signature == L"vec2")
+				type = Type::Float2;
+			else if (signature == L"vec3")
+				type = Type::Float3;
+			else if (signature == L"vec4")
+				type = Type::Float4;
+			else if (signature == L"mat4")
+				type = Type::Matrix;
+			else if (signature == L"bool")
+				type = Type::Bool;
+			else if (signature == L"int")
+				type = Type::Integer;
+			else type = Type::Empty;
 		}
 	public:
 		constexpr Type Get()const noexcept

@@ -10,6 +10,7 @@ namespace ver::detail
 		user_type,
 		variable,
 		function,
+		str_lit,
 		size
 	};
 }

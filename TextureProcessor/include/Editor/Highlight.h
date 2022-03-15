@@ -14,7 +14,7 @@ public:
 	void SetTypeInfo(std::unordered_set<std::wstring> types);
 	void SetFuncInfo(std::unordered_map<std::wstring, size_t> xfuncs);
 private:
-	void Parse(std::wstring_view part);
+	void Parse(std::wstring_view part, size_t offset = 0);
 private:
 	std::array<QTextCharFormat, ver::detail::Format::size> formats;
 

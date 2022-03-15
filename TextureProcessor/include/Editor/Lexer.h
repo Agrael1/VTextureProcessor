@@ -11,9 +11,10 @@ public:
 	{
 		keyword,
 		statement,
-		comment,
-		property,
 		identifier,
+		macro_stmt,
+		str_literal,
+		macro,
 
 		open_sq,
 		close_sq,
@@ -21,10 +22,13 @@ public:
 		open_br,
 		close_br,
 
-		open_cbr,
-		close_cbr,
+		open_cbr, //{
+		close_cbr,//}
 
 		semicolon,
+		comma,
+		_operator,
+		eq,
 
 		other,
 	}xtype;
@@ -49,6 +53,6 @@ public:
 	}
 };
 
-ver::generator<token> GetToken(std::wstring_view code);
+ver::generator<token> GetToken(std::wstring_view code , size_t offset = 0);
 
 #undef ENUM_LEX

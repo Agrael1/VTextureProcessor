@@ -65,8 +65,8 @@ void UI::Windows::EditorTab::Compile()
 	auto code = edit.edit.GetText().toStdWString();
 	if (code.empty())return;
 
-	NodeParser p;
-	p.Parse(code);
+	NodeParser p(code);
+	p.Parse();
 
 	edit.edit.SetTypeInfo(p.GetTypesInfo());
 	edit.edit.SetFuncInfo(p.GetFuncsInfo());

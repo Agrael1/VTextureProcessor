@@ -70,6 +70,7 @@
 	X(mat4x2)\
 	X(mat4x3)\
 	X(mat4x4)\
+	X(property)\
 	X(sampler1D)\
 	X(sampler1DArray)\
 	X(sampler1DArrayShadow)\
@@ -112,77 +113,32 @@
 	X(vec4)\
 	X(void)
 
-enum e_stmt
+enum class e_stmt
 {
 #define X(a) s_##a,
 	STATEMENT_ENUM()
 #undef X
+	count
 };
-enum e_kwd
+enum class e_kwd
 {
 #define X(a) k_##a,
 	KEYWORD_ENUM()
 #undef X
+	count
 };
 
-constexpr std::array<std::wstring_view, 16> statements{
+constexpr std::array<std::wstring_view, size_t(e_stmt::count)> statements{
 #define X(a) L#a,
 	STATEMENT_ENUM()
 #undef X
 };
-constexpr std::array<std::wstring_view, 92> kwords{
+constexpr std::array<std::wstring_view, size_t(e_kwd::count)> kwords{
 #define X(a) L#a,
 	KEYWORD_ENUM()
 #undef X
 };
 
-
-consteval auto statements_range_i2()
-{
-	std::vector<wchar_t> a{};
-	size_t i = 0;
-	wchar_t c = 0;
-
-	for (auto x : statements) {
-		wchar_t r = x[0];
-		if (c != r)
-			a.push_back(r);
-		c = r;
-	}
-	return a;
-}
-consteval auto statements_range()
-{
-	std::array<wchar_t, statements_range_i2().size()> vsz{};
-	auto v = statements_range_i2();
-	size_t a = 0;
-	for (auto& i : vsz)
-		i = v[a++];
-	return vsz;
-}
-consteval auto kwords_range_i2()
-{
-	std::vector<wchar_t> a{};
-	size_t i = 0;
-	wchar_t c = 0;
-
-	for (auto x : kwords) {
-		wchar_t r = x[0];
-		if (c != r)
-			a.push_back(r);
-		c = r;
-	}
-	return a;
-}
-consteval auto kwords_range()
-{
-	std::array<wchar_t, kwords_range_i2().size()> vsz{};
-	auto v = kwords_range_i2();
-	size_t a = 0;
-	for (auto& i : vsz)
-		i = v[a++];
-	return vsz;
-}
 
 #undef STATEMENT_ENUM
 #undef KEYWORD_ENUM

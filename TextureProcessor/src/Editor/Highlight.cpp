@@ -17,30 +17,48 @@
 
 const QRegularExpression startExpression("/\\*");
 const QRegularExpression endExpression("\\*/");
+const QRegularExpression single_line("//");
+const QRegularExpression dbl_quotes("\"");
 
 constexpr auto var_c = ver::rgb_to_hex(156, 220, 254);
 constexpr auto fun_c = ver::rgb_to_hex(220, 220, 170);
+constexpr auto str_lit_c = ver::rgb_to_hex(214, 157, 133);
 
 Highlighter::Highlighter(QTextDocument* parent)
 	:QSyntaxHighlighter(parent)
 {
 	using enum ver::detail::Format;
-	formats[statements].setForeground({ "#569cd6" });
-	formats[kwords].setForeground({ "#d8a0df" });
+	formats[kwords].setForeground({ "#569cd6" });
+	formats[statements].setForeground({ "#d8a0df" });
 	formats[comment].setForeground({ "#56a64a" });
 	formats[user_type].setForeground({ "#4ec9b0" });
 	formats[variable].setForeground({ var_c.c_str() });
 	formats[function].setForeground({ fun_c.c_str() });
+	formats[str_lit].setForeground({ str_lit_c.c_str() });
 }
 
 void Highlighter::highlightBlock(const QString& text)
 {
 	setCurrentBlockState(0);
+	auto xtext = text.toStdWString();
+	auto view = std::wstring_view(xtext);
 
-	int startIndex = 0;
+	int startIndex = text.indexOf(single_line);
+	if (startIndex >= 0)
+	{
+		setFormat(startIndex, text.length() - startIndex, formats[ver::detail::Format::comment]);
+		view.remove_suffix(text.length() - startIndex);
+	}	
+	
+	startIndex = 0;
 	int endIndex = 0;
 	if (previousBlockState() != 1)
+	{
 		startIndex = text.indexOf(startExpression); //if not =-1
+		Parse(view.substr(0, startIndex));
+	}
+
+
 
 	while (startIndex >= 0)
 	{
@@ -61,9 +79,11 @@ void Highlighter::highlightBlock(const QString& text)
 		setFormat(startIndex, commentLength, formats[2]);
 		startIndex = text.indexOf(startExpression,
 			startIndex + commentLength);
-		Parse(std::wstring_view(text.toStdWString()).substr(endIndex, startIndex));
+		Parse(view.substr(endIndex, startIndex), endIndex);
 	}
-	Parse(std::wstring_view(text.toStdWString()).substr(endIndex));
+	Parse(view.substr(endIndex), endIndex);
+
+
 }
 
 void Highlighter::SetTypeInfo(std::unordered_set<std::wstring> xtypes)
@@ -78,12 +98,25 @@ void Highlighter::SetFuncInfo(std::unordered_map<std::wstring, size_t> xfuncs)
 	rehighlight();
 }
 
-void Highlighter::Parse(std::wstring_view part)
+void Highlighter::Parse(std::wstring_view part, size_t offset)
 {
-	for (auto& i : GetToken(part))
+	using enum token::type;
+	for (auto& i : GetToken(part, offset))
 	{
-		if (i.index() <= 2)
-			setFormat(i.offset, i.length(), formats[i.index()]);
+		switch (i.xtype)
+		{
+		case str_literal:
+			setFormat(i.offset, i.length(), formats[ver::detail::Format::str_lit]);
+			continue;
+		case keyword:
+			setFormat(i.offset, i.length(), formats[ver::detail::Format::kwords]);
+			continue;
+		case statement:
+			setFormat(i.offset, i.length(), formats[ver::detail::Format::statements]);
+			continue;
+		default:
+			break;
+		}
 
 		if (i.xtype == token::type::identifier)
 		{
