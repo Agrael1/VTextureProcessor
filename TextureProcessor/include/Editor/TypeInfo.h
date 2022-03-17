@@ -11,6 +11,8 @@ namespace ver::detail
 		variable,
 		function,
 		str_lit,
+		macro_lit,
+		define,
 		size
 	};
 }

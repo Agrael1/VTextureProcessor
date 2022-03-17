@@ -34,11 +34,17 @@ bool NodeParser::Parse()
 		if (x->xtype == keyword || types.contains(std::wstring{ x->value }))
 			if(!block)TryParseFunction();
 
+		if (x->xtype == macro_stmt)
+		{
+			auto r = GetTokenInternal();
+			if (!r)break;
+			if (r->xtype == identifier && x->line == r->line)
+				macros.emplace(r->value);
+		}
 
 		block += x->xtype == open_cbr;
 		block -= x->xtype == close_cbr;
 	}
-
 
 	return true;
 }

@@ -3,6 +3,7 @@
 #include <optional>
 #include <format>
 
+constexpr std::wstring_view m_define{ L"#define" };
 
 ///**/void "sdasdwd" //
 ///*
@@ -198,7 +199,12 @@ public:
 
 		return token{ token::type::str_literal, roffset, line, {av, last + 1} };
 	}
-
+	std::optional<token> try_get_define()
+	{
+		if (code.substr(0, m_define.length() - 1) == m_define.substr(1))
+			return create_advance(m_define, token::type::macro_stmt);
+		return{};
+	}
 
 	static bool not_lit(wchar_t c) {
 		return !iswalnum(c) && c != L'_';
@@ -388,7 +394,7 @@ static std::optional<token> GetTokenLoop(LexContext& lex)
 		case '\"':
 			return lex.try_get_strlit();
 		case '#':
-
+			return lex.try_get_define();
 		default:
 			break;
 		}

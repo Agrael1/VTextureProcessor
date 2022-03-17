@@ -23,6 +23,8 @@ const QRegularExpression dbl_quotes("\"");
 constexpr auto var_c = ver::rgb_to_hex(156, 220, 254);
 constexpr auto fun_c = ver::rgb_to_hex(220, 220, 170);
 constexpr auto str_lit_c = ver::rgb_to_hex(214, 157, 133);
+constexpr auto macro_lit_c = ver::rgb_to_hex(190, 183, 255);
+constexpr auto define_c = ver::rgb_to_hex(154, 154, 154);
 
 Highlighter::Highlighter(QTextDocument* parent)
 	:QSyntaxHighlighter(parent)
@@ -35,6 +37,8 @@ Highlighter::Highlighter(QTextDocument* parent)
 	formats[variable].setForeground({ var_c.c_str() });
 	formats[function].setForeground({ fun_c.c_str() });
 	formats[str_lit].setForeground({ str_lit_c.c_str() });
+	formats[define].setForeground({ define_c.c_str() });
+	formats[macro_lit].setForeground({ macro_lit_c.c_str() });
 }
 
 void Highlighter::highlightBlock(const QString& text)
@@ -86,45 +90,49 @@ void Highlighter::highlightBlock(const QString& text)
 
 }
 
-void Highlighter::SetTypeInfo(std::unordered_set<std::wstring> xtypes)
+void Highlighter::SetInfo(
+	std::unordered_set<std::wstring> xtypes, 
+	std::unordered_set<std::wstring> xmacros, 
+	std::unordered_map<std::wstring, size_t> xfuncs)
 {
 	types = std::move(xtypes);
-	rehighlight();
-}
-
-void Highlighter::SetFuncInfo(std::unordered_map<std::wstring, size_t> xfuncs)
-{
+	macros = std::move(xmacros);
 	funcs = std::move(xfuncs);
+
 	rehighlight();
 }
 
 void Highlighter::Parse(std::wstring_view part, size_t offset)
 {
 	using enum token::type;
+	
 	for (auto& i : GetToken(part, offset))
 	{
 		switch (i.xtype)
 		{
 		case str_literal:
 			setFormat(i.offset, i.length(), formats[ver::detail::Format::str_lit]);
-			continue;
+			break;
 		case keyword:
 			setFormat(i.offset, i.length(), formats[ver::detail::Format::kwords]);
-			continue;
+			break;
 		case statement:
 			setFormat(i.offset, i.length(), formats[ver::detail::Format::statements]);
-			continue;
-		default:
 			break;
-		}
-
-		if (i.xtype == token::type::identifier)
-		{
+		case macro_stmt:
+			setFormat(i.offset, i.length(), formats[ver::detail::Format::define]);
+			break;
+		case identifier:
+			if (macros.contains({ i.value.data(), i.value.size() }))
+				setFormat(i.offset, i.length(), formats[ver::detail::Format::macro_lit]);
 			if (types.contains({ i.value.data(), i.value.size() }))
 				setFormat(i.offset, i.length(), formats[ver::detail::Format::user_type]);
 			if (auto x = funcs.find({ i.value.data(), i.value.size() }); x != funcs.end()
 				&& x->second == currentBlock().blockNumber())
 				setFormat(i.offset, i.length(), formats[ver::detail::Format::function]);
+			break;
+		default:
+			break;
 		}
 	}
 }

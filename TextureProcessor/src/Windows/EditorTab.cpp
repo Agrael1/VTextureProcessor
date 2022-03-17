@@ -68,8 +68,7 @@ void UI::Windows::EditorTab::Compile()
 	NodeParser p(code);
 	p.Parse();
 
-	edit.edit.SetTypeInfo(p.GetTypesInfo());
-	edit.edit.SetFuncInfo(p.GetFuncsInfo());
+	edit.edit.SetInfo(p.GetTypesInfo(), p.GetMacrosInfo(), p.GetFuncsInfo());
 }
 void UI::Windows::EditorTab::Request(UI::Request rq)
 {

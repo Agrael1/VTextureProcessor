@@ -10,7 +10,7 @@ namespace ver
 	template<ver::string_literal ext>
 	consteval auto filter_p()
 	{
-		return _ncat<"(*", ext, ");;">();
+		return _ncat<_tl("(*"), ext, _tl(");;")>();
 	}
 	template<ver::string_literal f>
 	consteval auto config()

@@ -1,13 +1,9 @@
 #pragma once
 #include <utils/string_literal.h>
-#define BOOST_STATIC_STRING_STANDALONE
-#include <boost/static_string/static_string.hpp>
 
 
 namespace ver
 {
-	namespace sts = boost::static_strings;
-
 	template<size_t N>
 	consteval auto _tl(const char(&str)[N])
 	{
@@ -18,7 +14,7 @@ namespace ver
 	consteval auto _ncat()
 	{
 		constexpr auto l = ((args.length()) + ...);
-		sts::static_string<l> a;
+		ver::string_literal<l> a;
 		(a.append(args.c_str()), ...);
 		return a;
 	}
@@ -39,26 +35,26 @@ namespace ver
 		return l;
 	}
 
-	template<std::integral auto value>
+
+	template<std::integral auto value, size_t l = IntLength(value)>
 	constexpr auto int2str()
 	{
-		constexpr auto l = IntLength(value);
 		auto xvalue = value;
 		ver::string_literal<l> str;
 
-		if (value == 0)
+		if constexpr (value == 0)
 		{
 			str[0] = '0';
-			return sts::static_string<l>(str.c_str());
+			return str;
 		}
 		if (value < 0)
 		{
 			str[0] = '-';
 			xvalue = -xvalue;
 		}
-		for (auto end = int(str.length() - 1); end >= 0; end--, xvalue /= 10)
+		for (auto end = int(l-1); end >= 0; end--, xvalue /= 10)
 			str[end] = "0123456789"[xvalue % 10];
-		return sts::static_string<l>(str.c_str());
+		return str;
 	}
 
 

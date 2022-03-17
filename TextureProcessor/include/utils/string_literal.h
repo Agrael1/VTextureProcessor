@@ -13,6 +13,7 @@ namespace ver
 		using traits_type = _Traits;
 		using value_type = _CharTy;
 		using pointer_type = _CharTy*;
+		using const_pointer = const value_type*;
 
 	public:
 		constexpr basic_string_literal(const value_type(&str)[N]) {
@@ -31,7 +32,11 @@ namespace ver
 		{
 			return traits_type::length(value);
 		}
-		constexpr const value_type* c_str()const noexcept
+		constexpr const_pointer c_str()const noexcept
+		{
+			return &value[0];
+		}
+		constexpr pointer_type data() noexcept
 		{
 			return &value[0];
 		}
@@ -44,6 +49,23 @@ namespace ver
 		constexpr value_type& operator[](size_t i)noexcept
 		{
 			return value[i];
+		}
+		constexpr auto& append(const_pointer s)
+		{
+			return append(s, traits_type::length(s));
+		}
+		constexpr auto* end() noexcept
+		{
+			return data() + size();
+		}
+		constexpr auto&	append(const_pointer s, size_t count)
+		{
+			const auto curr_size = size();
+			if (count > N - curr_size)
+				throw std::length_error(
+					"count > max_size() - size()");
+			traits_type::copy(end(), s, count);
+			return *this;
 		}
 
 		value_type value[N]{};

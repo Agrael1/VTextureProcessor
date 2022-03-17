@@ -144,7 +144,7 @@ void MainPage::OnOpenClicked(bool checked)
 		nullptr,
 		"Open existing project",
 		"",
-		ver::proj_filter.data()
+		ver::proj_filter.c_str()
 	).toStdString() };
 
 	if (proj_path.empty()) return;
@@ -336,7 +336,7 @@ UI::CreatePage::CreatePage(QWidget* app, ApplicationConfig& cfg)
 	search.setSizePolicy({ QSizePolicy::Preferred ,QSizePolicy::Preferred });
 	lay.addLayout(&fl);
 
-	auto p = ver::generate(fs::path(xfolder) / proj_def_name.data());
+	auto p = ver::generate(fs::path(xfolder) / proj_def_name.c_str());
 	pname.setText(p.stem().string().c_str());
 
 	lay.addSpacing(30);

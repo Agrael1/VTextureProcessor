@@ -19,13 +19,12 @@ public:
 	{
 		return code.toPlainText();
 	}
-	void SetTypeInfo(std::unordered_set<std::wstring> types)
+	void SetInfo(
+		std::unordered_set<std::wstring> types, 
+		std::unordered_set<std::wstring> macros, 
+		std::unordered_map<std::wstring, size_t> funcs)
 	{
-		hl.SetTypeInfo(std::move(types));
-	}
-	void SetFuncInfo(std::unordered_map<std::wstring, size_t> funcs)
-	{
-		hl.SetFuncInfo(std::move(funcs));
+		hl.SetInfo(std::move(types), std::move(macros), std::move(funcs));
 	}
 protected:
 	void wheelEvent(QWheelEvent* event);

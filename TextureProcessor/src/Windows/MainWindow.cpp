@@ -91,7 +91,7 @@ void MainWindow::OnLoad()
 		nullptr,
 		"Open existing project",
 		"",
-		ver::proj_filter.data()
+		ver::proj_filter.c_str()
 	).toStdString() };
 
 	if (proj_path.empty()) return;
@@ -110,7 +110,7 @@ void MainWindow::OnLoadNode()
 		nullptr,
 		"Open existing node",
 		"nodes",
-		ver::node_filter.data()
+		ver::node_filter.c_str()
 	).toStdString() };
 
 	if (node_path.empty()) return;
