@@ -10,7 +10,7 @@ namespace UI::Windows
 	{
 	public:
 		PropertyElement(INode& parent, std::string_view title);
-		PropertyElement(PropertyElement&& o);
+		PropertyElement(PropertyElement&& o)noexcept;
 	public:
 		template <typename W, typename ...Args> requires std::derived_from<W, QWidget>
 		W& AppendWidget(Args&&... args)

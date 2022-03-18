@@ -6,6 +6,7 @@
  */
 #pragma once 
 #include <string_view>
+#include <array>
 
 #define ENUMERATE()\
 	X(None)\
@@ -18,7 +19,14 @@ enum class PortType :uint8_t
 #define X(x) x,
 	ENUMERATE()
 #undef X
+	size
 };
+constexpr std::array<std::string_view, size_t(PortType::size)> PortStrings{
+#define X(x) #x,
+	ENUMERATE()
+#undef X
+};
+
 
 constexpr PortType from_str(std::string_view i)
 {
@@ -30,14 +38,7 @@ constexpr PortType from_str(std::string_view i)
 }
 constexpr std::string_view to_str(PortType p)
 {
-	switch (p)
-	{
-#define X(x) case PortType::x: return #x;
-		ENUMERATE()
-#undef X
-	default:
-		return "None";
-	}
+	return PortStrings[size_t(p)];
 }
 
 enum class PortSide :uint8_t
@@ -54,3 +55,4 @@ inline bool any(PortType p)
 {
 	return p != PortType::None;
 }
+#undef ENUMERATE

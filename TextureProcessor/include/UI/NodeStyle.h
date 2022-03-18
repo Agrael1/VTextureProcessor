@@ -53,6 +53,8 @@ namespace UI
 		QBrush brSource{ "#FF909090" };
 	public:
 		static const PortStyle Grayscale;
+		static const PortStyle Color;
+		static const PortStyle Normal;
 	};
 
 	struct ConnectionStyle

@@ -1,7 +1,7 @@
 #include <UI/DynamicNode.h>
 #include <QGraphicsProxyWidget>
 #include <Windows/Properties.h>
-#include <UI/PropertyContainer.h>
+#include <UI/PortContainer.h>
 
 
 using namespace UI;
@@ -77,5 +77,6 @@ std::pair<QJsonObject, std::string> UI::DynamicNode::Parse(const std::filesystem
 
 void UI::DynamicNode::UpdateProperties(Windows::PropertyElement& properties)
 {
-	properties.AppendWidget<PropertyContainer>(model);
+	base_class::UpdateProperties(properties);
+	properties.AppendWidget<PortContainer>(model);
 }

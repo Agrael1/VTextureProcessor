@@ -26,7 +26,8 @@ constexpr uint32_t nullcolor = 0;
 ShaderNode::NodePrivate::NodePrivate(QString&& code)
 	:shader(QOpenGLShader::Fragment), shadercode(code.toStdString())
 {
-	if (!shader.compileSourceCode(code))throw RGC_EXCEPTION("Failed to compile shader code");
+	if (!shader.compileSourceCode(code))
+		throw RGC_EXCEPTION("Failed to compile shader code");
 }
 
 /**

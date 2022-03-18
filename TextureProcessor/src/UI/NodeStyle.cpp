@@ -8,8 +8,13 @@
 #include <QJsonArray>
 #include <array>
 
+
+
 using namespace UI;
-const PortStyle PortStyle::Grayscale;
+const PortStyle PortStyle::Grayscale;		
+const PortStyle PortStyle::Color{ .brSink{"#1fff35"},.brSource{"#15b024"} };
+const PortStyle PortStyle::Normal{ .brSink{"#a87dff"},.brSource{"#906ed4"}};
+
 const ConnectionStyle ConnectionStyle::Grayscale;
 
 

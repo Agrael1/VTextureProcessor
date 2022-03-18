@@ -22,6 +22,7 @@ PropertyElement::PropertyElement(INode& parent, std::string_view title)
     :QGroupBox(title.data()), parent(parent)
 {
     lay.setAlignment(Qt::AlignTop);
+    lay.setSpacing(0);
     setLayout(&lay);
 }
 
@@ -29,10 +30,11 @@ PropertyElement::PropertyElement(INode& parent, std::string_view title)
  * @brief Move constructor for vector
  * @param o previous element
 */
-PropertyElement::PropertyElement(PropertyElement&& o)
+PropertyElement::PropertyElement(PropertyElement&& o)noexcept
     :QGroupBox(o.title()), widgets(std::move(o.widgets)), parent(o.parent)
 {
     lay.setAlignment(Qt::AlignTop);
+    lay.setSpacing(0);
     setLayout(&lay);
     for (auto& w : widgets)
         lay.addWidget(w.get());
