@@ -78,5 +78,5 @@ std::pair<QJsonObject, std::string> UI::DynamicNode::Parse(const std::filesystem
 void UI::DynamicNode::UpdateProperties(Windows::PropertyElement& properties)
 {
 	base_class::UpdateProperties(properties);
-	properties.AppendWidget<PortContainer>(model);
+	properties.AppendWidget<PortsProperty>().LoadPorts(model);
 }

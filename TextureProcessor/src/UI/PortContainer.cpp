@@ -1,8 +1,11 @@
 #include <UI/PortContainer.h>
-#include <QComboBox>
-#include <Logic/PortType.h>
-#include <QStylePainter>
 #include <UI/NodeStyle.h>
+#include <QComboBox>
+#include <QStylePainter>
+
+#include <Logic/Node.h>
+#include <Logic/Sink.h>
+#include <Logic/Source.h>
 
 class ComboBox :public QComboBox
 {
@@ -60,6 +63,14 @@ public:
 		name.setPlaceholderText("Port Name");
 		connect(&bclose, &QToolButton::clicked, [parent, this]() {parent->ClearEmpty(this); });
 	}
+	void SetName(std::string_view xname)
+	{
+		name.setText(xname.data());
+	}
+	void SetType(PortType pt)
+	{
+		cbox.setCurrentIndex(int(pt));
+	}
 private:
 	QHBoxLayout hl;
 	QLineEdit name;
@@ -71,44 +82,25 @@ const QRegularExpression Adder::varname{ "^[_a-z]\\w*$" };
 
 
 
-UI::PortContainer::PortContainer(ver::ShaderNode& model)
-	: heading("Edited Node:")
+UI::PortContainer::PortContainer()
 {
 	new_prop.setMinimumSize(24, 24);
 	new_prop.setIconSize({ 24, 24 });
 	new_prop.setIcon(QIcon{ ":/icons8-add-property.png" });
 
-	connect(&new_prop, &QToolButton::pressed, this, &PortContainer::AddEmpty);
+	vl.connect(&new_prop, &QToolButton::pressed, [this]() { AddEmpty(); });
 
 	hl.addWidget(&heading);
 	hl.addWidget(&new_prop);
 	vl.addLayout(&hl);
 	vl.addWidget(&props);
-	setLayout(&vl);
-
-	MakeProps();
 
 	props.setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
 	props.setDragDropMode(QAbstractItemView::InternalMove);
 	props.setDragEnabled(true);
 }
 
-void UI::PortContainer::MakeProps()
-{
-	//for (auto i : model.GetBuffer())
-	//{
-	//	auto* x = new Box(this); //is removed with list
-	//	auto& r = *old.emplace(x,std::make_unique<QListWidgetItem>()).first->second;
-
-	//	x->MakeProp(i);
-
-	//	r.setSizeHint(x->sizeHint());
-	//	props.addItem(&r);
-	//	props.setItemWidget(&r, x);
-	//}
-}
-
-void UI::PortContainer::AddEmpty()
+Adder* UI::PortContainer::AddEmpty()
 {
 	auto lw = std::make_unique<QListWidgetItem>();
 	auto* x = new Adder(this);
@@ -116,9 +108,36 @@ void UI::PortContainer::AddEmpty()
 	auto* r = added.emplace(x, std::move(lw)).first->second.get();
 	props.addItem(r);
 	props.setItemWidget(r, x);
+	return x;
 }
 
 void UI::PortContainer::ClearEmpty(QWidget* box)
 {
 	added.erase(box);
+}
+
+UI::PortsProperty::PortsProperty()
+{
+	vl.addLayout(sinks.Layout());
+	vl.addLayout(sources.Layout());
+
+	sinks.SetHeader("Inputs:");
+	sources.SetHeader("Sources:");
+	setLayout(&vl);
+}
+
+void UI::PortsProperty::LoadPorts(ver::Node& model)
+{
+	for (auto& i : model.GetSinks())
+	{
+		auto* x = sinks.AddEmpty();
+		x->SetName(i->GetRegisteredName());
+		x->SetType(i->GetType());
+	}
+	for (auto& i : model.GetSources())
+	{
+		auto* x = sources.AddEmpty();
+		x->SetName(i->GetName());
+		x->SetType(i->GetType());
+	}
 }

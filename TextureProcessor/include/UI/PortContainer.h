@@ -8,23 +8,28 @@
 
 namespace ver
 {
-	class ShaderNode;
+	class Node;
 }
+
+class Adder;
 
 namespace UI
 {
-	namespace Windows {
-		class PropertyElement;
-	}
-
-	class PortContainer : public QWidget
+	class PortContainer
 	{
 	public:
-		PortContainer(ver::ShaderNode& model);
+		PortContainer();
 	public:
-		void MakeProps();
-		void AddEmpty();
+		Adder* AddEmpty();
 		void ClearEmpty(QWidget* box);
+		QLayout* Layout()
+		{
+			return &vl;
+		}
+		void SetHeader(const QString& head)
+		{
+			heading.setText(head);
+		}
 	private:
 		QVBoxLayout vl;
 		QHBoxLayout hl;
@@ -33,5 +38,17 @@ namespace UI
 		QListWidget props;
 
 		std::unordered_map<QWidget*, std::unique_ptr<QListWidgetItem>> added;
+	};
+
+	class PortsProperty :public QWidget
+	{
+	public:
+		PortsProperty();
+	public:
+		void LoadPorts(ver::Node& model);
+	private:
+		QVBoxLayout vl;
+		PortContainer sinks;
+		PortContainer sources;
 	};
 }

@@ -4,7 +4,7 @@
 
 namespace UI
 {
-	class PortContainer;
+	class PortsProperty;
 
 	class DynamicNode :public XNode<ver::ShaderNode>
 	{
@@ -22,6 +22,6 @@ namespace UI
 
 		virtual void UpdateProperties(Windows::PropertyElement& properties) override;
 	private:
-		std::shared_ptr<PortContainer> container;
+		std::shared_ptr<PortsProperty> container;
 	};
 }
