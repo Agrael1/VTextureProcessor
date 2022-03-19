@@ -62,7 +62,10 @@ public:
 
 		name.setPlaceholderText("Port Name");
 		connect(&bclose, &QToolButton::clicked, [parent, this]() {parent->ClearEmpty(this); });
+		connect(&name, &QLineEdit::textEdited, [parent, this](const QString&) {});
+		connect(&cbox, QOverload<int>::of(&QComboBox::currentIndexChanged), [parent, this](int) {});
 	}
+public:
 	void SetName(std::string_view xname)
 	{
 		name.setText(xname.data());
@@ -70,6 +73,14 @@ public:
 	void SetType(PortType pt)
 	{
 		cbox.setCurrentIndex(int(pt));
+	}
+	QString Name()const noexcept
+	{
+		return name.text();
+	}
+	PortType Type()const noexcept
+	{
+		return PortType(cbox.currentIndex());
 	}
 private:
 	QHBoxLayout hl;
@@ -116,13 +127,27 @@ void UI::PortContainer::ClearEmpty(QWidget* box)
 	added.erase(box);
 }
 
+std::vector<UI::PortContainer::PortDesc> UI::PortContainer::GetPorts() const noexcept
+{
+	size_t length = added.size();
+	std::vector<UI::PortContainer::PortDesc> out;
+	out.reserve(length);
+
+	for (size_t i = 0; i < length; i++)
+	{
+		auto* x = static_cast<Adder*>(props.itemWidget(props.item(i)));
+		out.emplace_back(x->Name(), x->Type());
+	}
+	return out;
+}
+
 UI::PortsProperty::PortsProperty()
 {
 	vl.addLayout(sinks.Layout());
 	vl.addLayout(sources.Layout());
 
 	sinks.SetHeader("Inputs:");
-	sources.SetHeader("Sources:");
+	sources.SetHeader("Outputs:");
 	setLayout(&vl);
 }
 

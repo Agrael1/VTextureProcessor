@@ -1,5 +1,5 @@
 #pragma once
-#include <UI/Node.h>
+#include <UI/UINode.h>
 #include <Logic/DynamicNode.h>
 
 namespace UI
@@ -10,8 +10,8 @@ namespace UI
 	{
 		using base_class = XNode<ver::ShaderNode>;
 	public:
-		DynamicNode();
 		DynamicNode(const std::filesystem::path& p);
+		~DynamicNode();
 	public:
 		void Rename(const QString& name);
 		const QString& StyleName()const noexcept

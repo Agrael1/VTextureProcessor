@@ -5,7 +5,7 @@
  */
 #include <UI/FlowScene.h>
 #include <UI/SceneEvent.h>
-#include <UI/Node.h>
+#include <UI/UINode.h>
 #include <UI/Connection.h>
 
 #include <Windows/Properties.h>

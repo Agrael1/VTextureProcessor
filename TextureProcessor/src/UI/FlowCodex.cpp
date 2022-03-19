@@ -1,5 +1,5 @@
 #include <UI/FlowCodex.h>
-#include <UI/Node.h>
+#include <UI/UINode.h>
 #include <QJsonDocument>
 #include <Logic/ShaderNode.h>
 

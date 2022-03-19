@@ -6,15 +6,9 @@
 
 using namespace UI;
 
-DynamicNode::DynamicNode()
-	:base_class({}, "")
-{
-	l_main = new GraphicsLinearLayout(Qt::Orientation::Horizontal);
-	Init();
-}
 
 UI::DynamicNode::DynamicNode(const std::filesystem::path& p)
-	:base_class(Parse(p))
+	:base_class(Parse(p)), container(std::make_shared<PortsProperty>())
 {
 	l_main = new GraphicsLinearLayout(Qt::Orientation::Horizontal);
 
@@ -28,6 +22,12 @@ UI::DynamicNode::DynamicNode(const std::filesystem::path& p)
 
 	Init();
 	UpdateLayouts();
+	container->LoadPorts(model);
+}
+
+UI::DynamicNode::~DynamicNode()
+{
+
 }
 
 void UI::DynamicNode::Rename(const QString& name)
@@ -78,5 +78,5 @@ std::pair<QJsonObject, std::string> UI::DynamicNode::Parse(const std::filesystem
 void UI::DynamicNode::UpdateProperties(Windows::PropertyElement& properties)
 {
 	base_class::UpdateProperties(properties);
-	properties.AppendWidget<PortsProperty>().LoadPorts(model);
+	properties.Attach(container);
 }

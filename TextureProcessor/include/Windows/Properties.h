@@ -13,8 +13,8 @@ namespace UI::Windows
 		PropertyElement(PropertyElement&& o)noexcept;
 		~PropertyElement()
 		{
-			for (auto* i : attached)
-				Detach(i);
+			for (auto& i : attached)
+				i->setParent(nullptr);
 		}
 	public:
 		template <typename W, typename ...Args> requires std::derived_from<W, QWidget>
@@ -33,20 +33,15 @@ namespace UI::Windows
 		{
 			widgets.clear();
 		}
-		void Attach(QWidget* w)
+		void Attach(std::shared_ptr<QWidget> w)
 		{
-			attached.push_back(w);
-			lay.addWidget(w);
-		}
-		void Detach(QWidget* w)
-		{
-			lay.removeWidget(w);
+			lay.addWidget(attached.emplace_back(std::move(w)).get());
 		}
 	private:
 		INode& parent;
 		QVBoxLayout lay;
 		std::vector<std::unique_ptr<QWidget>> widgets;
-		std::vector<QWidget*> attached;
+		std::vector<std::shared_ptr<QWidget>> attached;
 	};
 
 	class Properties : public QDockWidget

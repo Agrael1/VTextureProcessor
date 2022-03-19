@@ -1,4 +1,4 @@
-#include <UI/Node.h>
+#include <UI/UINode.h>
 #include <UI/Connection.h>
 #include <UI/NodeStyle.h>
 #include <QPainter>

@@ -2,6 +2,7 @@
 #include <QBoxLayout>
 #include <QToolButton>
 #include <QListWidget>
+#include <Logic/PortType.h>
 
 #include <unordered_map>
 
@@ -18,6 +19,12 @@ namespace UI
 	class PortContainer
 	{
 	public:
+		struct PortDesc
+		{
+			QString name;
+			PortType type;
+		};
+	public:
 		PortContainer();
 	public:
 		Adder* AddEmpty();
@@ -30,6 +37,8 @@ namespace UI
 		{
 			heading.setText(head);
 		}
+
+		std::vector<PortDesc> GetPorts()const noexcept;
 	private:
 		QVBoxLayout vl;
 		QHBoxLayout hl;
@@ -46,6 +55,14 @@ namespace UI
 		PortsProperty();
 	public:
 		void LoadPorts(ver::Node& model);
+		auto GetSinks()const noexcept
+		{
+			return sinks.GetPorts();
+		}
+		auto GetSources()const noexcept
+		{
+			return sources.GetPorts();
+		}
 	private:
 		QVBoxLayout vl;
 		PortContainer sinks;
