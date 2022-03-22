@@ -62,8 +62,10 @@ bool UI::Windows::EditorTab::event(QEvent* e)
 
 void UI::Windows::EditorTab::Compile()
 {
+	edited.UpdatePorts();
+
 	auto code = edit.edit.GetText().toStdWString();
-	if (code.empty())return;
+	if (!code.empty())return;
 
 	NodeParser p(code);
 	p.Parse();

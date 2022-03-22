@@ -6,8 +6,11 @@
 #pragma once
 #include <Logic/Node.h>
 #include <Logic/DynamicConstant.h>
-#include <QOpenGLShader>
 #include <Logic/PropertyView.h>
+#include <Logic/Descriptor.h>
+#include <Logic/PortType.h>
+#include <UI/NodeStyle.h>
+#include <QOpenGLShader>
 
 class Engine;
 
@@ -17,23 +20,40 @@ namespace UI::Windows {
 
 namespace ver
 {
+	class TextureDescriptor : public Descriptor
+	{
+	public:
+		TextureDescriptor() = default;
+		TextureDescriptor(QJsonObject document, std::string_view styleName);
+	public:
+		virtual std::unique_ptr<Node> MakeModel()const override;
+		bool CompileShader(QString xshader) {
+			return shader.compileSourceCode(xshader);
+		}
+		virtual bool valid()const noexcept{
+			return shader.isCompiled();
+		}
+	private:
+		void SetProperties(const QJsonArray& props, QString& scode);
+	public:
+		QOpenGLShader shader{ QOpenGLShader::Fragment };
+		UI::NodeStyle style;
+		std::string shadercode;
+		std::vector<PortDesc> sinks;
+		std::vector<PortDesc> sources;
+		ver::dc::Layout buffer;
+		std::vector<std::pair<size_t, dc::param_storage>> params;
+	};
+
 	class ShaderNode : public Node
 	{
-		static constexpr auto desc = MakeDesc({
+		static constexpr auto xdesc = MakeDesc({
 			{DescType::Buffer, "Buffer"},
 			{DescType::Boolean, "Tiling"},
 			{DescType::BooleanUpd, "Buffer"}
 			});
-		//Shared value between same type of nodes
-		struct NodePrivate
-		{
-			NodePrivate(QString&& code);
-			QOpenGLShader shader;
-			std::string shadercode;
-		};
 	public:
-		ShaderNode(QJsonObject document);
-		ShaderNode(const ShaderNode& other);
+		ShaderNode(TextureDescriptor& td);
 	public:
 		dc::Buffer& GetBuffer() { return buf; }
 		bool& Tiling() { return tiling; }
@@ -46,65 +66,45 @@ namespace ver
 		{
 			PropertyView pv;
 			if (buffer)
-				pv.TieProp<desc[0]>(buf);
-			pv.TieProp<desc[1]>(tiling);
+				pv.TieProp<xdesc[0]>(buf);
+			pv.TieProp<xdesc[1]>(tiling);
 			if (buf)
-				pv.TieProp<desc[2]>(buffer);
+				pv.TieProp<xdesc[2]>(buffer);
 			return pv;
 		}
-		virtual QJsonObject Serialize()override
-		{
-			QJsonObject node = Node::Serialize();
-			node.insert("Tiling", tiling);
-			node.insert("BufferState", buffer);
-
-			QJsonObject buffer;
-			for (auto x : buf)
-				buffer.insert(x.GetName().data(), QJsonValue::fromVariant(x.ToVariant()));
-			node.insert("Buffer", buffer);
-			return node;
-		}
-		virtual void Deserialize(QJsonObject in)override
-		{
-			Node::Deserialize(in);
-			if (in.contains("Buffer"))
-			{
-				auto v = in["Buffer"].toObject();
-				auto keys = v.keys();
-				for (const auto& k : keys)
-				{
-					auto sk = k.toStdString();
-					buf[sk].SetIfExists(v[k].toVariant());
-				}
-			}
-			if (in.contains("Tiling"))
-			{
-				tiling = in["Tiling"].toBool(false);
-			}
-			if (in.contains("Buffer"))
-			{
-				buffer = in["Buffer"].toBool(true);
-			}
-		}
+		virtual QJsonObject Serialize()override;
+		virtual void Deserialize(QJsonObject in)override;
 		virtual void ExportSilent(std::string_view name)override;
 		virtual std::string Export()override;
+		virtual UI::NodeStyle& GetStyle()override
+		{
+			return desc.style;
+		}
 	private:
 		void SetProperties(const QJsonArray& props, QString& scode);
-	private:
+	protected:
 		std::vector<std::shared_ptr<QImage>> inputs;
 		std::vector<std::shared_ptr<QImage>> outputs;
-		std::shared_ptr<NodePrivate> shader;
+		TextureDescriptor& desc;
 
 		dc::Buffer buf;
 		bool tiling = false;
 		bool buffer = true;
 	};
 
+	class OutputDescriptor : public Descriptor
+	{
+	public:
+		virtual std::unique_ptr<Node> MakeModel()const override;
+		virtual bool valid()const noexcept {
+			return true;
+		}
+	};
+
 	class OutputNode : public Node
 	{
 	public:
-		OutputNode(QJsonObject document);
-		OutputNode(const OutputNode& in);
+		OutputNode();
 	public:
 		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
 		{

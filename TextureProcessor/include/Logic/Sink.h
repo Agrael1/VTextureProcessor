@@ -20,12 +20,12 @@ namespace ver
 		std::string_view GetOutputNodeName()const noexcept;
 		std::string_view GetSourceName()const noexcept;
 		void SetTarget(std::string_view nodeName, std::string_view sourceName);
-		virtual bool Link(Source& source) = 0;
-		virtual void Unlink() = 0;
+		virtual bool Link(Source& source) { return false; };
+		virtual void Unlink() {};
 		virtual ~Sink() = default;
 	protected:
 		Sink(std::string_view registeredName, PortType type);
-	private:
+	protected:
 		std::string registeredName;	//sink name
 		std::string nodeName;		//from which node input comes
 		std::string sourceName;		//which source it is

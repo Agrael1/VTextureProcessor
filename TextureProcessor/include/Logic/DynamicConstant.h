@@ -13,16 +13,18 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QMatrix4x4>
+#include <variant>
 #include <span>
 
 #define LEAF_ELEMENT_TYPES \
-	X(Float)\
-	X(Float2)\
-	X(Float3)\
-	X(Float4)\
-	X(Matrix)\
-	X(Bool)\
+	X(Float)SEP()\
+	X(Float2)SEP()\
+	X(Float3)SEP()\
+	X(Float4)SEP()\
+	X(Matrix)SEP()\
+	X(Bool)SEP()\
 	X(Integer)
+#define SEP()
 
 namespace ver::dc
 {
@@ -54,6 +56,7 @@ namespace ver::dc
 		static constexpr const uint16_t floats = 1;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "float";
+		struct param { float min; float max; float def; };
 	};
 	template<> struct Map< Type::Float2 >
 	{
@@ -63,6 +66,7 @@ namespace ver::dc
 		static constexpr const uint16_t floats = 2;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "vec2";
+		struct param { SysType min; SysType max; SysType def; };
 	};
 	template<> struct Map< Type::Float3 >
 	{
@@ -72,6 +76,7 @@ namespace ver::dc
 		static constexpr const uint16_t floats = 3;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "vec3";
+		struct param { SysType min; SysType max; SysType def; };
 	};
 	template<> struct Map< Type::Float4 >
 	{
@@ -81,6 +86,7 @@ namespace ver::dc
 		static constexpr const uint16_t floats = 4;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "vec4";
+		struct param { SysType min; SysType max; SysType def; };
 	};
 	template<> struct Map< Type::Matrix >
 	{
@@ -90,6 +96,7 @@ namespace ver::dc
 		static constexpr const uint16_t floats = 16;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "mat4";
+		struct param { SysType def; };
 	};
 	template<> struct Map< Type::Bool >
 	{
@@ -99,6 +106,7 @@ namespace ver::dc
 		static constexpr const uint16_t floats = 1;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "bool";
+		struct param { SysType def; };
 	};
 	template<> struct Map< Type::Integer >
 	{
@@ -108,13 +116,14 @@ namespace ver::dc
 		static constexpr const uint16_t floats = 1;
 		static constexpr const char* code = "int";
 		static constexpr bool valid = true;
+		struct param { SysType min; SysType max; SysType def; };
 	};
 
 #define X(el) static_assert(Map<Type::el>::valid, "Missing map implementation for " #el);
 	LEAF_ELEMENT_TYPES
 #undef X
 
-	template<typename T>
+		template<typename T>
 	struct ReverseMap
 	{
 		static constexpr bool valid = false;
@@ -129,6 +138,32 @@ namespace ver::dc
 #undef X
 
 
+
+
+	struct param_storage {
+		void set_default(Type t, QVariant v)
+		{
+			switch (t)
+			{
+#define X(el) case Type::el: std::get<typename Map<Type::el>::param>(val).def = v.value<Map<Type::el>::SysType>();break;
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+		}
+#define X(el) typename Map<Type::el>::param
+#define SEP() ,
+		std::variant<LEAF_ELEMENT_TYPES> val;
+#define SEP()
+#undef X
+	};
+
+	
+	
+
+
+
 	class LayoutElement
 	{
 	public:
@@ -138,39 +173,10 @@ namespace ver::dc
 		{}
 		constexpr LayoutElement(std::string_view signature)noexcept
 		{
-			if (signature == "float")
-				type = Type::Float;
-			else if (signature == "vec2")
-				type = Type::Float2;
-			else if (signature == "vec3")
-				type = Type::Float3;
-			else if (signature == "vec4")
-				type = Type::Float4;
-			else if (signature == "mat4")
-				type = Type::Matrix;
-			else if (signature == "bool")
-				type = Type::Bool;
-			else if (signature == "int")
-				type = Type::Integer;
-			else type = Type::Empty;
-		}
-		constexpr LayoutElement(std::wstring_view signature)noexcept
-		{
-			if (signature == L"float")
-				type = Type::Float;
-			else if (signature == L"vec2")
-				type = Type::Float2;
-			else if (signature == L"vec3")
-				type = Type::Float3;
-			else if (signature == L"vec4")
-				type = Type::Float4;
-			else if (signature == L"mat4")
-				type = Type::Matrix;
-			else if (signature == L"bool")
-				type = Type::Bool;
-			else if (signature == L"int")
-				type = Type::Integer;
-			else type = Type::Empty;
+#define X(el) if(signature == Map<Type::el>::code){type = Type::el; return;}
+			LEAF_ELEMENT_TYPES
+#undef X
+				type = Type::Empty;
 		}
 	public:
 		constexpr Type Get()const noexcept
@@ -328,7 +334,7 @@ namespace ver::dc
 	template <typename T, typename Array, std::size_t... I>
 	T v2T(const Array& a, std::index_sequence<I...>)
 	{
-		return T( a[I].toFloat()... );
+		return T(a[I].toFloat()...);
 	}
 	template<dc::Type type, class T = dc::Map<type>::SysType, typename Indices = std::make_index_sequence<dc::Map<type>::floats>>
 	T FromVariant(const QVariant& va)
@@ -463,7 +469,7 @@ namespace ver::dc
 		class Iterator
 		{
 		public:
-			explicit Iterator(Buffer *b, ElementRef r, size_t index) :ref(r), b(b), index(index) {}
+			explicit Iterator(Buffer* b, ElementRef r, size_t index) :ref(r), b(b), index(index) {}
 		public:
 			void operator++()
 			{
@@ -484,8 +490,8 @@ namespace ver::dc
 		};
 	public:
 		Buffer() = default;
-		Buffer(Layout&& lay) noexcept
-			:lay(lay)
+		Buffer(Layout lay) noexcept
+			:lay(std::move(lay))
 		{
 			bytes.resize(lay.GetSizeInBytes());
 		}

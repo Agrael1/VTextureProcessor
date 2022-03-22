@@ -22,9 +22,9 @@ namespace UI
 		Port(INode& parent, uint8_t port_num);
 		Port(Port&& in)noexcept;
 	public:
-		constexpr virtual PortSide GetType()const noexcept
+		constexpr virtual ver::PortSide GetType()const noexcept
 		{
-			return PortSide::None;
+			return ver::PortSide::None;
 		}
 		auto& Node() const noexcept
 		{
@@ -70,9 +70,9 @@ namespace UI
 		{
 			if (connection)connection->UpdatePosition();
 		}
-		constexpr virtual PortSide GetType()const noexcept override
+		constexpr virtual ver::PortSide GetType()const noexcept override
 		{
-			return PortSide::Sink;
+			return ver::PortSide::Sink;
 		}
 	protected:
 		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;
@@ -92,9 +92,9 @@ namespace UI
 	public:
 		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 		void MoveConnections(QPointF delta);
-		constexpr virtual PortSide GetType()const noexcept override
+		constexpr virtual ver::PortSide GetType()const noexcept override
 		{
-			return PortSide::Source;
+			return ver::PortSide::Source;
 		}
 	protected:
 		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;

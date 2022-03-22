@@ -10,6 +10,10 @@
 #include <span>
 #include <Interfaces/ISerialize.h>
 
+namespace UI {
+	class NodeStyle;
+}
+
 namespace ver
 {
 	class Sink;
@@ -19,6 +23,7 @@ namespace ver
 	{
 	public:
 		Node() = default;
+		Node(std::string name):name(name){};
 		virtual ~Node();
 	public:
 		std::span<const std::unique_ptr<Source>> GetSources()const noexcept	{return sources;}
@@ -40,9 +45,13 @@ namespace ver
 		void RegisterSink(std::unique_ptr<Sink>&& in);
 		void RegisterSource(std::unique_ptr<Source>&& in);
 
+		bool ValidateSink(Sink& in);
+		bool ValidateSource(Source& in);
+
 		void SetSinkLinkage(std::string_view registeredName, std::string_view to_node, std::string_view source);
 		void SetSinkLinkage(size_t index, std::string_view to_node, std::string_view source);
 
+		virtual UI::NodeStyle& GetStyle() = 0;
 		virtual PropertyView GetProperties() = 0;
 		virtual std::string Export() = 0;
 		virtual void Update() = 0;

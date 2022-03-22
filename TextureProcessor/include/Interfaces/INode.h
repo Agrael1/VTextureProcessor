@@ -16,7 +16,6 @@ namespace UI
 	struct NOVTABLE INode:public QGraphicsWidget, public ISerialize
 	{
 		virtual ~INode() = default;
-		virtual std::unique_ptr<INode> Clone(std::string&& name)const = 0;
 		virtual std::string_view Name()const = 0;
 		virtual void UpdateProperties(Windows::PropertyElement& properties) = 0;
 		virtual void Update() = 0;
@@ -25,5 +24,6 @@ namespace UI
 		virtual void ExportSilent(std::string_view in) = 0;
 		virtual void StartConnection(uint8_t index) = 0;
 		virtual void FinishConnection(uint8_t index) = 0;
+		virtual void Disconnect() = 0;
 	};
 }

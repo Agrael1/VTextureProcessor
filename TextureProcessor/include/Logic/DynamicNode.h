@@ -1,6 +1,7 @@
 #pragma once
 #include <Logic/ShaderNode.h>
 #include <UI/PropertyHandler.h>
+#include <Logic/PortType.h>
 
 namespace ver
 {
@@ -9,6 +10,7 @@ namespace ver
 	public:
 		using ShaderNode::ShaderNode;
 	public:
-
+		void ModifySinks(std::vector<ver::PortDesc> descs);
+		void ModifySources(std::vector<ver::PortDesc> descs);
 	};
 }

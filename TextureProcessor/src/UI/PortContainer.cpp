@@ -11,7 +11,7 @@ class ComboBox :public QComboBox
 {
 public:
 	ComboBox(){
-		std::ranges::for_each(PortStrings, [this](auto x) {addItem(x.data()); });
+		std::ranges::for_each(ver::PortStrings, [this](auto x) {addItem(x.data()); });
 		setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 	}
 protected:
@@ -70,7 +70,7 @@ public:
 	{
 		name.setText(xname.data());
 	}
-	void SetType(PortType pt)
+	void SetType(ver::PortType pt)
 	{
 		cbox.setCurrentIndex(int(pt));
 	}
@@ -78,9 +78,9 @@ public:
 	{
 		return name.text();
 	}
-	PortType Type()const noexcept
+	ver::PortType Type()const noexcept
 	{
-		return PortType(cbox.currentIndex());
+		return ver::PortType(cbox.currentIndex());
 	}
 private:
 	QHBoxLayout hl;
@@ -127,10 +127,10 @@ void UI::PortContainer::ClearEmpty(QWidget* box)
 	added.erase(box);
 }
 
-std::vector<UI::PortContainer::PortDesc> UI::PortContainer::GetPorts() const noexcept
+std::vector<ver::PortDesc> UI::PortContainer::GetPorts() const noexcept
 {
 	size_t length = added.size();
-	std::vector<UI::PortContainer::PortDesc> out;
+	std::vector<ver::PortDesc> out;
 	out.reserve(length);
 
 	for (size_t i = 0; i < length; i++)

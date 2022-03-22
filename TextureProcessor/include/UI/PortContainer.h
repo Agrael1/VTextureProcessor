@@ -19,12 +19,6 @@ namespace UI
 	class PortContainer
 	{
 	public:
-		struct PortDesc
-		{
-			QString name;
-			PortType type;
-		};
-	public:
 		PortContainer();
 	public:
 		Adder* AddEmpty();
@@ -38,7 +32,7 @@ namespace UI
 			heading.setText(head);
 		}
 
-		std::vector<PortDesc> GetPorts()const noexcept;
+		std::vector<ver::PortDesc> GetPorts()const noexcept;
 	private:
 		QVBoxLayout vl;
 		QHBoxLayout hl;

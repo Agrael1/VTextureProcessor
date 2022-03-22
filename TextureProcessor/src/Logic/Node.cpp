@@ -55,16 +55,24 @@ void Node::RegisterSink(std::unique_ptr<Sink>&& in)
 }
 void Node::RegisterSource(std::unique_ptr<Source>&& in)
 {
-	// check for overlap of output names
-	using namespace std::string_literals;
-	for (auto& src : sources)
-	{
-		if (src->GetName() == in->GetName())
-		{
-			throw RGC_EXCEPTION(std::format("Registered source overlaps with existing: {}", in->GetName()));
-		}
-	}
 	sources.push_back(std::move(in));
+}
+
+bool ver::Node::ValidateSink(Sink& in)
+{
+	for (auto& si : sinks)
+		if (si->GetRegisteredName() == in.GetRegisteredName())
+			return false;
+	return true;
+}
+
+bool ver::Node::ValidateSource(Source& in)
+{
+	// check for overlap of output names
+	for (auto& src : sources)
+		if (src->GetName() == in.GetName())
+			return false;
+	return true;
 }
 
 void Node::SetSinkLinkage(std::string_view registeredName, std::string_view to_node, std::string_view source)

@@ -44,7 +44,7 @@ void UI::Sink::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 void UI::Sink::MoveConnections(QPointF delta)
 {
 	if (connection)
-		connection->Move(delta, PortSide::Sink);
+		connection->Move(delta, ver::PortSide::Sink);
 }
 
 void UI::Sink::mousePressEvent(QGraphicsSceneMouseEvent * event)
@@ -64,7 +64,7 @@ void UI::Source::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 void UI::Source::MoveConnections(QPointF delta)
 {
 	for (auto& s : ConnectionMap::Get(Node()) | std::views::transform([](Connection* x)->IConnection& {return Query(x); }))
-		s.Move(delta, PortSide::Source);
+		s.Move(delta, ver::PortSide::Source);
 }
 
 void UI::Source::mousePressEvent(QGraphicsSceneMouseEvent* event)
