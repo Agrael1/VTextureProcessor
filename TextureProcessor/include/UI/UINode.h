@@ -5,8 +5,9 @@
 #include <Interfaces/INode.h>
 #include <Logic/Node.h>
 #include <UI/PropertyHandler.h>
-#include <UI/PropertyGenerator.h>
 
+class QGraphicsProxyWidget;
+class QLabel;
 
 namespace UI
 {
@@ -33,6 +34,7 @@ namespace UI
 		virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value)override;
 	public:
 		void MakeHeader();
+		void UpdateHeader();
 		void MakeSinks();
 		void MakeSources();
 		void Init();
@@ -72,43 +74,5 @@ namespace UI
 		bool b_destroyed = false;
 		Type type = Type::Other;
 	};
-
-
-	//template<class XModel> requires std::derived_from<XModel, ver::Node>
-	//class XNode : public NodeUI
-	//{
-	//public:
-	//	template<class ...Args>
-	//	XNode(QJsonObject document, std::string_view name, Args&&... e)
-	//		:NodeUI(document, name), model(document, std::forward<Args>(e)...) {}
-	//	explicit XNode(std::pair<QJsonObject, std::string> pair)
-	//		: NodeUI(pair.first, pair.second), model(pair.first) {}
-	//	XNode(const XNode& in)
-	//		:NodeUI(in), model(in.model)
-	//	{
-	//		Init();
-	//		UpdateLayouts();
-	//	}
-	//public:
-	//	virtual std::unique_ptr<INode> Clone(std::string&& name)const override
-	//	{
-	//		printf("copy called\n");
-	//		auto x = std::make_unique<XNode<XModel>>(*this);
-	//		x->model.SetUniqueName(name);
-	//		return x;
-	//	}
-	//	virtual ver::Node& GetModel() noexcept override
-	//	{
-	//		return model;
-	//	}
-	//	virtual void UpdateProperties(Windows::PropertyElement& properties) override
-	//	{
-	//		if constexpr (has_property_handler<XModel>)
-	//			return XModel::property_handler::ConstructProperties(properties, model);
-	//		PlaceProperties(properties, model);
-	//	}
-	//protected:
-	//	XModel model;
-	//};
 }
 

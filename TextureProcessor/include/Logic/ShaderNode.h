@@ -26,9 +26,14 @@ namespace ver
 		TextureDescriptor() = default;
 		TextureDescriptor(QJsonObject document, std::string_view styleName);
 	public:
-		virtual std::unique_ptr<Node> MakeModel()const override;
+		virtual std::unique_ptr<Node> MakeModel() override;
 		bool CompileShader(QString xshader) {
-			return shader.compileSourceCode(xshader);
+			if (shader.compileSourceCode(xshader))
+			{
+				shadercode = xshader.toStdString();
+				return true;
+			}
+			return false;
 		}
 		virtual bool valid()const noexcept{
 			return shader.isCompiled();
@@ -90,36 +95,6 @@ namespace ver
 		dc::Buffer buf;
 		bool tiling = false;
 		bool buffer = true;
-	};
-
-	class OutputDescriptor : public Descriptor
-	{
-	public:
-		virtual std::unique_ptr<Node> MakeModel()const override;
-		virtual bool valid()const noexcept {
-			return true;
-		}
-	};
-
-	class OutputNode : public Node
-	{
-	public:
-		OutputNode();
-	public:
-		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
-		{
-			return { &out, 1 };
-		}
-		void Update();
-		PropertyView GetProperties()override
-		{
-			return {};
-		}
-		std::string Export()override;
-		virtual void ExportSilent(std::string_view name);
-	private:
-		std::shared_ptr<QImage> in;
-		std::shared_ptr<QImage> out;
 	};
 }
 

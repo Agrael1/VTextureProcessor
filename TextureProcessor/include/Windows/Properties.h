@@ -1,7 +1,8 @@
 #pragma once
+#include <UI/Updater.h>
 #include <QDockWidget>
 #include <QGroupBox>
-#include <UI/Updater.h>
+#include <QBoxLayout>
 #include <vector>
 
 namespace UI::Windows

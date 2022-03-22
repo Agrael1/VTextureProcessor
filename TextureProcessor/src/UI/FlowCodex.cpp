@@ -2,16 +2,11 @@
 #include <UI/UINode.h>
 #include <QJsonDocument>
 #include <Logic/ShaderNode.h>
+#include <Logic/OutputNode.h>
+#include <filesystem>
+#include <fstream>
 
 using namespace UI;
-
-constexpr const char* output = R"(
-{
-    "NodeStyle": {
-      "TitleColor": "black",
-      "FontColor": "white"
-    }
-})";
 
 FlowCodex::FlowCodex()
 {
@@ -27,9 +22,6 @@ FlowCodex::FlowCodex()
 
 	// Scans for all Nodes .json files in the Node directory and loads them
 	QJsonParseError e;
-
-	auto json = QJsonDocument::fromJson(output, &e).object();
-	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); }
 
 	// Adds new group to the context menu
 	auto pair = codex.emplace("Output", std::make_unique<ver::OutputDescriptor>());
@@ -59,6 +51,11 @@ FlowCodex::FlowCodex()
 			ParseJson(json);
 		}
 	}
+}
+
+UI::FlowCodex::~FlowCodex()
+{
+
 }
 
 

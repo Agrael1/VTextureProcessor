@@ -5,9 +5,11 @@
  */
 #include <UI/FlowView.h>
 #include <UI/FlowScene.h>
+#include <UI/SceneEvent.h>
+
+#include <QApplication>
 #include <QMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
-#include <UI/SceneEvent.h>
 
 using namespace UI;
 

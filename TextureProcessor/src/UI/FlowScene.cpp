@@ -16,9 +16,19 @@
 
 #include <utils/utils.h>
 #include <Logic/ShaderNode.h>
+#include <Logic/Sink.h>
+#include <Logic/Source.h>
 #include <ranges>
 
 using namespace UI;
+
+namespace std {
+	template<> struct hash<QString> {
+		std::size_t operator()(const QString& s) const noexcept {
+			return (size_t)qHash(s);
+		}
+	};
+}
 
 /**
  * @brief Construct a new Flow Scene:: Flow Scene object
@@ -173,7 +183,7 @@ void FlowScene::DeleteSelected()
 		| std::views::transform([](auto* x) ->NodeUI& {return *static_cast<NodeUI*>(x); }))
 	{
 		if (item.GetType() == NodeUI::Type::Output)
-			outputs.erase(std::find(outputs.begin(), outputs.end(), item));
+			outputs.erase(std::find(outputs.begin(), outputs.end(), &item));
 		nodes.erase(item.Name().data());
 	}
 }
@@ -292,7 +302,7 @@ void FlowScene::Deserialize(QJsonObject xobj)
 		// Create unique name from Ref and Type
 		auto* xnode = CreateNode(type);
 		if (!xnode) { missing = true; continue; }
-		names.emplace(stype + node["Ref"].toString(), xnode->Name());
+		names.emplace(stype + node["Ref"].toString(), xnode->Name().data());
 
 		// Load config from JSON into the new Node
 		xnode->Deserialize(node);

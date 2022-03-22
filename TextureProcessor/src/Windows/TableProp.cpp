@@ -1,5 +1,6 @@
 #include <Windows/TableProp.h>
 #include <UI/ProjectEvent.h>
+#include <QApplication>
 
 UI::Windows::TableProperties::TableProperties(QWidget* tab_relay)
 	:QDockWidget("Node Properties"),

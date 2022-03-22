@@ -56,7 +56,7 @@ namespace ver::dc
 		static constexpr const uint16_t floats = 1;
 		static constexpr bool valid = true;
 		static constexpr const char* code = "float";
-		struct param { float min; float max; float def; };
+		struct param { SysType min; SysType max; SysType def; };
 	};
 	template<> struct Map< Type::Float2 >
 	{
@@ -141,6 +141,17 @@ namespace ver::dc
 
 
 	struct param_storage {
+		param_storage(Type t)
+		{
+			switch (t)
+			{
+#define X(el) case Type::el: val.emplace<typename Map<Type::el>::param>();break;
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+		}
 		void set_default(Type t, QVariant v)
 		{
 			switch (t)
@@ -153,8 +164,10 @@ namespace ver::dc
 			}
 		}
 #define X(el) typename Map<Type::el>::param
+#undef SEP
 #define SEP() ,
 		std::variant<LEAF_ELEMENT_TYPES> val;
+#undef SEP
 #define SEP()
 #undef X
 	};
@@ -514,7 +527,7 @@ namespace ver::dc
 			return Iterator{ this, Get(lay.count()), lay.count() };
 		}
 	public:
-		void Replace(Layout&& xlay)
+		void Replace(Layout xlay)
 		{
 			lay = std::move(xlay);
 			bytes.resize(lay.GetSizeInBytes());

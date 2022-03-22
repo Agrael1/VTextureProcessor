@@ -15,6 +15,7 @@ namespace UI
 		static constexpr std::string_view NodesDir = "nodes";
 	public:
 		FlowCodex();
+		~FlowCodex();
 	public:
 		const auto& CatMap()const noexcept
 		{

@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include <Logic/Constants.h>
 
 class ApplicationConfig

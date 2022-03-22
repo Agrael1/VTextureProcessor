@@ -120,7 +120,9 @@ void NodeParser::TryParseProperty(token& tok)
 	x = GetTokenInternal();
 	if (!x || x->xtype != keyword)return;
 
-	ver::dc::LayoutElement r(x->value);
+	std::string a(x->value.begin(), x->value.end());
+
+	ver::dc::LayoutElement r(a);
 	if (!r)return;
 	pdesc.ty = r.Get();
 

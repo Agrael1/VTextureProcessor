@@ -5,6 +5,7 @@
  */
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QFileDialog>
 
 #include <Logic/ShaderNode.h>
 #include <Logic/SourcesT.h>
@@ -16,10 +17,9 @@
 
 using namespace ver;
 
-constexpr uint32_t nullcolor = 0;
 
 ver::ShaderNode::ShaderNode(TextureDescriptor& td)
-	:desc(td), Node(std::format("{}_{}", desc.style.StyleName().toStdString(), desc.use_count()))
+	:desc(td), Node(std::format("{}_{}", td.style.StyleName().toStdString(), td.use_count()))
 {
 	sinks.reserve(desc.sinks.size());
 	sources.reserve(desc.sources.size());
@@ -41,6 +41,8 @@ ver::ShaderNode::ShaderNode(TextureDescriptor& td)
 		RegisterSink(DirectTextureSink::Make(s.name.toStdString(),
 			inputs.emplace_back(), s.type));
 	}
+
+	buf.Replace(td.buffer);
 }
 
 /**
@@ -138,39 +140,10 @@ void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
 	}
 }
 
-ver::OutputNode::OutputNode()
-	:out(std::make_shared<QImage>())
-{
-	RegisterSink(GrayscaleSink::Make("Out", in));
-}
 
-void ver::OutputNode::Update()
-{
-	if (in)
-		*out = *in;
-	else
-		*out = QImage((const uchar*)(&nullcolor), 1, 1, QImage::Format::Format_ARGB32);
-}
-
-std::string ver::OutputNode::Export()
-{
-	auto str = QFileDialog::getSaveFileName(nullptr,
-		"Export As",
-		"",
-		"PNG (*.png);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm);;All files (*.*);;"
-	);
-	if (str.isEmpty())return"";
-	out->mirrored().save(str);
-	return str.toStdString();
-}
-
-inline void ver::OutputNode::ExportSilent(std::string_view name)
-{
-	if (name.empty())return;
-	out->save(name.data());
-}
 
 ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view styleName)
+	:style(document, styleName)
 {
 	auto node = document["Node"].toObject();
 	QString xshader{ "#version 420 \n" };
@@ -185,8 +158,12 @@ ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view
 	{
 		auto sink = it.toObject();
 		auto type = from_str(sink["Type"].toString().toStdString());
-		auto sname = sink["Name"].toString().toStdString();
+		auto xname = sink["Name"].toString();
+		auto sname = xname.toStdString();
 		xshader += std::format("layout(binding = {})uniform sampler2D {};\n", sinks.size(), sname).c_str();
+		auto& s = sinks.emplace_back();
+		s.name = std::move(xname);
+		s.type = type;
 	}
 
 	auto xsources = node["Sources"].toArray();
@@ -197,8 +174,12 @@ ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view
 	{
 		auto source = it.toObject();
 		auto type = from_str(source["Type"].toString().toStdString());
-		auto sname = source["Name"].toString().toStdString();
+		auto xname = source["Name"].toString();
+		auto sname = xname.toStdString();
 		xshader += std::format("layout(location={})out vec4 {};\n", sources.size(), sname).c_str();
+		auto& s = sources.emplace_back();
+		s.name = std::move(xname);
+		s.type = type;
 	}
 	xshader += "in vec2 sv_texc;\n"; //load texture coordinates
 
@@ -209,7 +190,7 @@ ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view
 	CompileShader(xshader);
 }
 
-std::unique_ptr<Node> ver::TextureDescriptor::MakeModel() const
+std::unique_ptr<Node> ver::TextureDescriptor::MakeModel()
 {
 	refcount++;
 	return std::make_unique<ShaderNode>(*this);
@@ -229,16 +210,11 @@ void ver::TextureDescriptor::SetProperties(const QJsonArray& props, QString& sco
 		buffer += { qtag.toStdString(), type};
 		if (p.contains("Val"))
 		{
-			auto& r = params.emplace_back();
-			r.first = i;
+			auto& r = params.emplace_back(i,type.Get());
 			r.second.set_default(type.Get(), p["Val"].toVariant());
 		}
 		i++;
 	}
 }
 
-std::unique_ptr<Node> ver::OutputDescriptor::MakeModel() const
-{
-	refcount++;
-	return std::unique_ptr<OutputNode>();
-}
+

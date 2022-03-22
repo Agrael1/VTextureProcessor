@@ -2,13 +2,17 @@
 #include <UI/Connection.h>
 #include <UI/NodeStyle.h>
 #include <QPainter>
+#include <QLabel>
+#include <QJsonArray>
 #include <QGraphicsProxyWidget>
+#include <UI/PropertyGenerator.h>
+
 
 
 using namespace UI;
 
-UI::NodeUI::NodeUI(std::unique_ptr<ver::Node> model)
-	:model(std::move(model)),
+UI::NodeUI::NodeUI(std::unique_ptr<ver::Node> xmodel)
+	:model(std::move(xmodel)),
 	l_main(new GraphicsLinearLayout(Qt::Orientation::Horizontal)),
 	l_left(Qt::Orientation::Vertical),
 	l_central(Qt::Orientation::Vertical),
@@ -124,6 +128,10 @@ void UI::NodeUI::MakeHeader()
 	xlab->setWordWrap(true);
 	proxy->setWidget(xlab);
 }
+void UI::NodeUI::UpdateHeader()
+{
+	Header().setText(model->GetStyle().StyleName());
+}
 void UI::NodeUI::MakeSinks()
 {
 	size_t sk = model->SinksCount();
@@ -134,7 +142,7 @@ void UI::NodeUI::MakeSinks()
 }
 void UI::NodeUI::MakeSources()
 {
-	size_t sk = model->SinksCount();
+	size_t sk = model->SourcesCount();
 	sources.clear();
 	sources.reserve(sk);
 
@@ -148,10 +156,10 @@ void UI::NodeUI::Init()
 	MakeSinks();
 	MakeSources();
 	ConstructModules();
-	UpdateLayouts();
 
 	Update();
 	adjustSize();
+	UpdateLayouts();
 }
 
 void UI::NodeUI::ConstructModules()
@@ -254,3 +262,5 @@ void UI::NodeUI::Disconnect()
 {
 	ConnectionMap::Trim(*this);
 }
+
+

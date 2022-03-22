@@ -6,19 +6,18 @@
  * https://github.com/Agrael1/VeritasD3D
  */
 #pragma once
-#include <Logic/PropertyView.h>
-#include <span>
 #include <Interfaces/ISerialize.h>
+#include <Logic/PropertyView.h>
+#include <Logic/Source.h>
+#include <Logic/Sink.h>
+#include <span>
 
 namespace UI {
 	class NodeStyle;
 }
-
+class QImage;
 namespace ver
 {
-	class Sink;
-	class Source;
-
 	class Node : public ISerialize
 	{
 	public:
@@ -29,8 +28,7 @@ namespace ver
 		std::span<const std::unique_ptr<Source>> GetSources()const noexcept	{return sources;}
 		std::span<const std::unique_ptr<Sink>> GetSinks()const noexcept	{return sinks;}
 
-		void SetUniqueName(std::string_view xname) { name = xname; }
-		void SetUniqueName(std::string&& xname) { name = std::move(xname); }
+		void SetUniqueName(std::string xname) { name = std::move(xname); }
 		std::string_view GetName() const noexcept;
 
 		Source& GetSource(std::string_view registeredName);

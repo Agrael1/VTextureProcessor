@@ -1,5 +1,6 @@
 #pragma once
 #include <coroutine>
+#include <utility>
 
 namespace ver {
 
@@ -38,7 +39,6 @@ namespace ver {
         };
 
         struct iterator {
-            using iterator_category = std::input_iterator_tag;
             using difference_type = ptrdiff_t;
             using value_type = T;
             using reference = const T&;

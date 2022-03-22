@@ -2,6 +2,7 @@
 #include <QBoxLayout>
 #include <QToolButton>
 #include <QListWidget>
+#include <QLabel>
 #include <Logic/PortType.h>
 
 #include <unordered_map>

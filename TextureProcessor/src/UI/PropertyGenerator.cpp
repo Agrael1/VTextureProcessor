@@ -4,6 +4,7 @@
 #include <Logic/Node.h>
 #include <Logic/DynamicConstant.h>
 #include <Windows/Properties.h>
+#include <QLabel>
 
 using namespace UI;
 

@@ -1,4 +1,6 @@
 #pragma once
+#include <string_view>
+#include <array>
 
 #define STATEMENT_ENUM()\
 	X(break)\

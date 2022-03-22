@@ -4,6 +4,8 @@
 #include <UI/ProjectEvent.h>
 #include <Editor/NodeParser.h>
 
+#include <QJsonDocument>
+
 #include <fstream>
 #include <iterator>
 
@@ -53,16 +55,60 @@ bool UI::Windows::EditorTab::event(QEvent* e)
 	switch (e->type())
 	{
 	case NameChangedEvent::etype:
-		edited.Rename(((NameChangedEvent*)e)->name);
+		tdesc->style.SetStyleName(((NameChangedEvent*)e)->name);
+		node->UpdateHeader();
 		return true;
 	default:return QMainWindow::event(e);
 	}
 }
+UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
+	:Tab(std::move(p)), scene(props), tp(this)
+{
+	auto[a,b] = Parse(Path());
+	tdesc.emplace(a, b);
+	node.emplace(tdesc->MakeModel());
+	Init(props);
+	auto& x = tdesc->style.StyleName();
+	tp.SetName(x.isEmpty() ? "Node" : x);
+	scene.scene.addItem(&*node);
+}
+std::pair<QJsonObject, std::string> UI::Windows::EditorTab::Parse(const std::filesystem::path& p)
+{
+	if (p.empty())return{};
 
+	std::ifstream t(p);
+	std::string str;
+
+	t.seekg(0, std::ios::end);
+	str.reserve(t.tellg());
+	t.seekg(0, std::ios::beg);
+
+	str.assign((std::istreambuf_iterator<char>(t)),
+		std::istreambuf_iterator<char>());
+	QJsonParseError e{};
+	// Deserialize loaded JSON
+	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e);
+	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return{}; }
+
+	QJsonObject topLevelObject = json.object();
+
+	auto key = topLevelObject.keys()[0];
+	{
+		QJsonObject obj = topLevelObject[key].toObject();
+		// Name of the node style
+		auto wkey = key.toStdString();
+		auto node = obj["Node"].toObject();
+
+		// Loads texture Node style
+		if (node["Class"].toString() == "Texture")
+			return { obj, wkey };
+		return {};
+	}
+}
 
 void UI::Windows::EditorTab::Compile()
 {
-	edited.UpdatePorts();
+	//edited.UpdatePorts();
 
 	auto code = edit.edit.GetText().toStdWString();
 	if (!code.empty())return;

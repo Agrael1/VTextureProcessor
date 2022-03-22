@@ -4,10 +4,12 @@
  * @brief Class for managing connections between Nodes
  */
 #pragma once
-#include <unordered_map>
-#include <span>
-#include <Logic/PortType.h>
 #include <Interfaces/IConnection.h>
+#include <Logic/PortType.h>
+#include <unordered_map>
+#include <memory>
+#include <span>
+
 
 namespace UI
 {

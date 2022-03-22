@@ -1,6 +1,7 @@
 #include <UI/PortContainer.h>
 #include <UI/NodeStyle.h>
 #include <QComboBox>
+#include <QLineEdit>
 #include <QStylePainter>
 
 #include <Logic/Node.h>
