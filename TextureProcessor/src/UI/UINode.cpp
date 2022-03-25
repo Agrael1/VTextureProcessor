@@ -31,8 +31,6 @@ UI::NodeUI::NodeUI(std::unique_ptr<ver::Node> xmodel)
 	l_main->addItem(&l_left);
 	l_main->addItem(&l_central);
 	l_main->addItem(&l_right);
-
-	//l_central.setSpacing(NodeStyle::item_padding);
 	setLayout(l_main);
 
 	auto& stn = model->GetStyle().StyleName();
@@ -46,12 +44,10 @@ UI::NodeUI::NodeUI(std::unique_ptr<ver::Node> xmodel)
 
 
 	l_main->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-	l_left.setContentsMargins(0.0, 0.0, 0.0, 0.0);
-	l_right.setContentsMargins(0.0, 0.0, 0.0, 0.0);
-	l_central.setContentsMargins(0.0, 0.0, 0.0, 0.0);
-
 	l_main->setSpacing(0.0);
-	l_central.setSpacing(0.0);
+
+	l_central.setSpacing(NodeStyle::item_padding);
+	l_central.setContentsMargins(0.0, 0.0, 0.0, NodeStyle::item_padding);
 
 	Init();
 }
@@ -65,13 +61,6 @@ UI::NodeUI::~NodeUI()
 void UI::NodeUI::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	DrawBackground(painter);
-	painter->setPen("green");
-	painter->drawRect(l_central.geometry());
-	painter->setPen("blue");
-	painter->drawRect(l_left.geometry());
-	painter->drawRect(l_right.geometry());
-	painter->drawRect(Header().geometry());
-
 	QGraphicsWidget::paint(painter, option, widget);
 }
 
@@ -143,7 +132,6 @@ void UI::NodeUI::MakeHeader()
 	xlab->setContentsMargins(0, sz, 0, sz);
 	proxy->setWidget(xlab);
 	l_central.addItem(proxy.get());
-	//l_central.setItemSpacing(0, 2 * NodeStyle::item_padding);
 }
 void UI::NodeUI::UpdateHeader()
 {
@@ -169,12 +157,13 @@ void UI::NodeUI::MakeSources()
 void UI::NodeUI::Init()
 {
 	MakeHeader();
+	ConstructModules();
+	adjustSize();
+
 	MakeSinks();
 	MakeSources();
-	ConstructModules();
 
 	Update();
-	adjustSize();
 	UpdateLayouts();
 }
 
@@ -188,23 +177,19 @@ void UI::NodeUI::ConstructModules()
 
 void UI::NodeUI::UpdateLayouts()
 {
-	const auto off_l = sinks.empty() ? PortStyle::port_bbox : 0.0f;
-	const auto off_r = sources.empty() ? PortStyle::port_bbox : 0.0f;
+	auto h = l_central.contentsRect().height();
+	auto sink_s = sinks.size();
+	auto source_s = sources.size();
 
-	//l_main->setContentsMargins(off_l, 3.0, off_r, PortStyle::port_bbox);
 
-	
-	//l_main->setContentsMargins(off_l, 3.0f, off_r, PortStyle::port_bbox);
+	auto sink_delta = (h - sink_s * PortStyle::port_bbox) / (sink_s + 1);
+	auto source_delta = (h - source_s * PortStyle::port_bbox) / (source_s + 1);
 
-	//auto h = l_main->contentsRect().height();
-	//auto sink_delta = (h - sinks.size() * PortStyle::port_bbox) / (sinks.size() + 1);
-	//auto source_delta = (h - sources.size() * PortStyle::port_bbox) / (sources.size() + 1);
+	l_left.setContentsMargins(sink_s ? 0.0 : PortStyle::port_bbox, sink_delta + PortStyle::port_bbox/2, 0.0f, 0.0f);
+	l_left.setSpacing(sink_delta);
 
-	//l_left.setContentsMargins(0.0f, sink_delta + 2 * NodeStyle::item_padding * (sinks.size() > 0), 0.0f, 0.0f);
-	//l_left.setSpacing(sink_delta);
-
-	//l_right.setContentsMargins(0.0f, source_delta + 2 * NodeStyle::item_padding * (sources.size() > 0), 0.0f, 0.0f);
-	//l_right.setSpacing(source_delta);
+	l_right.setContentsMargins(0.0f, source_delta + PortStyle::port_bbox / 2, source_s ? 0.0 : PortStyle::port_bbox, 0.0f);
+	l_right.setSpacing(source_delta);
 	l_main->activate();
 }
 
