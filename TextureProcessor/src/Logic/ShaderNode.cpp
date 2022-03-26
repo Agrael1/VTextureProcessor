@@ -13,13 +13,13 @@
 #include <Logic/Engine.h>
 #include <utils/utils.h>
 
-#include <Windows/Properties.h>
+#include <UI/PropertyGenerator.h>
 
 using namespace ver;
 
 
 ver::ShaderNode::ShaderNode(TextureDescriptor& td)
-	:desc(td), Node(std::format("{}_{}", td.style.StyleName().toStdString(), td.use_count()))
+	:desc(td), Node(std::format("{}_{}", td.style.StyleName().toStdString(), td.use_count())), buf(td.buffer, td.params)
 {
 	sinks.reserve(desc.sinks.size());
 	sources.reserve(desc.sources.size());
@@ -41,8 +41,6 @@ ver::ShaderNode::ShaderNode(TextureDescriptor& td)
 		RegisterSink(DirectTextureSink::Make(s.name.toStdString(),
 			inputs.emplace_back(), s.type));
 	}
-
-	buf.Replace(td.buffer);
 }
 
 /**
@@ -53,6 +51,12 @@ ver::ShaderNode::ShaderNode(TextureDescriptor& td)
 void ver::ShaderNode::Update()
 {
 	Engine::Instance().Render(desc.shader, inputs, tiling, outputs, buf);
+}
+
+void ver::ShaderNode::GetProperties(UI::Windows::PropertyElement& props)
+{
+	UI::PropertyBuffer(props, buf, desc.params);
+	//PlaceProperties(props, *this);
 }
 
 QJsonObject ver::ShaderNode::Serialize()
@@ -105,42 +109,6 @@ std::string ver::ShaderNode::Export()
 	std::ranges::for_each(outputs, [&str](auto& in) {in->mirrored().save(str); });
 	return str.toStdString();
 }
-
-/**
- * @brief Sets properties of the shader node
- *
- * @param props List of properties to be added
- * @param scode Source code for dynamic replacement
- */
-void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
-{
-	if (props.isEmpty())return;
-	dc::Layout lay;
-
-	std::vector<std::string> tags;
-	std::vector<QVariant> vars;
-	for (auto it : props)
-	{
-		auto p = it.toObject();
-		scode += "uniform ";
-		auto qtype = p["Type"].toString();
-		scode += qtype + " ";
-		auto qtag = p["Tag"].toString();
-		scode += qtag + ";\n";
-		lay += { tags.emplace_back(qtag.toStdString()), dc::LayoutElement{ qtype.toStdString() }};
-	}
-
-	buf.Replace(std::move(lay));
-	for (size_t i = 0; auto it : props)
-	{
-		auto p = it.toObject();
-		if (p.contains("Val"))
-			buf[tags[i]] = p["Val"].toVariant();
-		i++;
-	}
-}
-
-
 
 ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view styleName)
 	:style(document, styleName)
@@ -210,11 +178,30 @@ void ver::TextureDescriptor::SetProperties(const QJsonArray& props, QString& sco
 		buffer += { qtag.toStdString(), type};
 		if (p.contains("Val"))
 		{
-			auto& r = params.emplace_back(i,type.Get());
-			r.second.set_default(type.Get(), p["Val"].toVariant());
+			auto& r = params.emplace_back(type.Get());
+			r.index = i;
+			if (p["Val"].isObject())
+				SetOptions(p["Val"].toObject(), r);
+			else
+			{
+				r.enable_def = 1;
+				r.param.set_default(p["Val"].toVariant());
+			}
 		}
 		i++;
 	}
+}
+void ver::TextureDescriptor::SetOptions(QJsonObject obj, dc::Options& opt)
+{
+	auto def = obj.find("default");
+	if (opt.enable_def = def!=obj.end())
+		opt.param.set_default(def->toVariant());
+	auto min = obj.find("min");
+	if (opt.enable_min = min != obj.end())
+		opt.param.set_min(min->toVariant());
+	auto max = obj.find("max");
+	if (opt.enable_max = max != obj.end())
+		opt.param.set_max(max->toVariant());
 }
 
 

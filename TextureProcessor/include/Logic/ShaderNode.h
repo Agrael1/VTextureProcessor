@@ -39,6 +39,7 @@ namespace ver
 			return shader.isCompiled();
 		}
 	private:
+		void SetOptions(QJsonObject obj, dc::Options& opt);
 		void SetProperties(const QJsonArray& props, QString& scode);
 	public:
 		QOpenGLShader shader{ QOpenGLShader::Fragment };
@@ -47,16 +48,11 @@ namespace ver
 		std::vector<PortDesc> sinks;
 		std::vector<PortDesc> sources;
 		ver::dc::Layout buffer;
-		std::vector<std::pair<size_t, dc::param_storage>> params;
+		std::vector<dc::Options> params;
 	};
 
 	class ShaderNode : public Node
 	{
-		static constexpr auto xdesc = MakeDesc({
-			{DescType::Buffer, "Buffer"},
-			{DescType::Boolean, "Tiling"},
-			{DescType::BooleanUpd, "Buffer"}
-			});
 	public:
 		ShaderNode(TextureDescriptor& td);
 	public:
@@ -67,16 +63,9 @@ namespace ver
 			return outputs;
 		}
 		void Update()override;
-		PropertyView GetProperties()override
-		{
-			PropertyView pv;
-			if (buffer)
-				pv.TieProp<xdesc[0]>(buf);
-			pv.TieProp<xdesc[1]>(tiling);
-			if (buf)
-				pv.TieProp<xdesc[2]>(buffer);
-			return pv;
-		}
+		
+		void GetProperties(UI::Windows::PropertyElement& props);
+
 		virtual QJsonObject Serialize()override;
 		virtual void Deserialize(QJsonObject in)override;
 		virtual void ExportSilent(std::string_view name)override;
@@ -85,8 +74,6 @@ namespace ver
 		{
 			return desc.style;
 		}
-	private:
-		void SetProperties(const QJsonArray& props, QString& scode);
 	protected:
 		std::vector<std::shared_ptr<QImage>> inputs;
 		std::vector<std::shared_ptr<QImage>> outputs;

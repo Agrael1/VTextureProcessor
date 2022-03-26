@@ -1,28 +1,44 @@
-#define USE_TYPES
 #include <UI/PropertyGenerator.h>
 #include <UI/Sliders.h>
-#include <Logic/Node.h>
 #include <Logic/DynamicConstant.h>
 #include <Windows/Properties.h>
 #include <QLabel>
 
-using namespace UI;
+using ver::dc::Options;
 
-static void PropertyBuffer(Windows::PropertyElement& elem, const char* name, ver::dc::Buffer& buf)
+void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, std::span<ver::dc::Options> params)
 {
-	for (auto ref : buf)
+	using enum ver::dc::Type;
+	auto it = params.begin();
+	Options* opt = nullptr;
+
+	for (size_t i = 0; auto&& ref : buf)
 	{
+		opt = it != params.end() && it->index == i ? std::addressof(*it) : nullptr;
 		auto t = ref.GetType();
 		switch (t)
 		{
 		case ver::dc::Type::Float:
+		{
 			elem.AppendWidget<QLabel>(ref.GetName().data());
-			elem.AppendWidget<FloatSlider>((float&)ref);
+			auto& s = elem.AppendWidget<FloatSlider>((float&)ref);
+			if (!opt)break;
+			auto& par = opt->param.get<Float>();
+			if (opt->enable_min) s.SetMin(par.min);
+			if (opt->enable_max) s.SetMax(par.max);
+			s.Revalidate();
 			break;
+		}
 		case ver::dc::Type::Float2:
+		{
 			elem.AppendWidget<QLabel>(ref.GetName().data());
-			elem.AppendWidget<Vec2Slider>((QVector2D&)ref);
+			auto& s = elem.AppendWidget<Vec2Slider>((QVector2D&)ref);
+			if (!opt)break;
+			auto& par = opt->param.get<Float2>();
+			if (opt->enable_min) s.SetMin(par.min);
+			if (opt->enable_max) s.SetMax(par.max);
 			break;
+		}
 		case ver::dc::Type::Float3:
 			break;
 		case ver::dc::Type::Float4:
@@ -33,36 +49,20 @@ static void PropertyBuffer(Windows::PropertyElement& elem, const char* name, ver
 			elem.AppendWidget<CheckBox>((bool&)ref, ref.GetName().data());
 			break;
 		case ver::dc::Type::Integer:
-			elem.AppendWidget<QLabel>(ref.GetName().data());
-			elem.AppendWidget<IntSlider>((int&)ref);
-			break;
-		default:
-			break;
-		}
-	}
-}
-static void PropertyBoolean(Windows::PropertyElement& elem, const char* name, bool& buf)
-{
-	elem.AppendWidget<CheckBox>(buf, name);
-}
-static void PropertyBooleanUpd(Windows::PropertyElement& elem, const char* name, bool& buf)
-{
-	elem.AppendWidget<RefreshCheckBox>(buf, name);
-}
-
-void UI::PlaceProperties(Windows::PropertyElement& elem, ver::Node& node)
-{
-	elem.Clear();
-	auto props = node.GetProperties();
-	for (const auto& x : props.Get())
-	{
-		switch (x.first.first)
 		{
-#define X(a) case ver::DescType::a: Property##a(elem, x.first.second, *std::get<ver::DescMap<ver::DescType::a>::tied_t*>(x.second));break;
-			TYPES
-#undef X
+			elem.AppendWidget<QLabel>(ref.GetName().data());
+			auto& s = elem.AppendWidget<IntSlider>((int&)ref);
+			if (!opt)break;
+			auto& par = opt->param.get<Integer>();
+			if (opt->enable_min) s.SetMin(par.min);
+			if (opt->enable_max) s.SetMax(par.max);
+			s.Revalidate();
+		}
+			break;
 		default:
 			break;
 		}
+		i++;
+		if (opt) { it++; opt = nullptr; }
 	}
 }

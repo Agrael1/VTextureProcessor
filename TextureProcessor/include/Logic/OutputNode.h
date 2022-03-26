@@ -28,10 +28,6 @@ namespace ver
 			return style;
 		}
 		void Update();
-		PropertyView GetProperties()override
-		{
-			return {};
-		}
 		std::string Export()override;
 		virtual void ExportSilent(std::string_view name);
 	private:

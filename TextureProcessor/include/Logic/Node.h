@@ -14,6 +14,9 @@
 
 namespace UI {
 	class NodeStyle;
+	namespace Windows {
+		class PropertyElement;
+	}
 }
 class QImage;
 namespace ver
@@ -50,7 +53,7 @@ namespace ver
 		void SetSinkLinkage(size_t index, std::string_view to_node, std::string_view source);
 
 		virtual UI::NodeStyle& GetStyle() = 0;
-		virtual PropertyView GetProperties() = 0;
+		virtual void GetProperties(UI::Windows::PropertyElement& properties) {}
 		virtual std::string Export() = 0;
 		virtual void Update() = 0;
 		virtual void ExportSilent(std::string_view name) = 0;

@@ -260,7 +260,7 @@ void UI::NodeUI::FinishConnection(uint8_t index)
 
 void UI::NodeUI::UpdateProperties(Windows::PropertyElement& properties)
 {
-	PlaceProperties(properties, *model);
+	model->GetProperties(properties);
 }
 
 void UI::NodeUI::Disconnect()

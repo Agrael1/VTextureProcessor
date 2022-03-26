@@ -1,7 +1,9 @@
 #pragma once
-namespace ver
+namespace ver::dc
 {
-	class Node;
+	struct Options;
+	class Buffer;
+	struct param_storage;
 }
 
 namespace UI
@@ -11,5 +13,5 @@ namespace UI
 	{
 		class PropertyElement;
 	}
-	void PlaceProperties(Windows::PropertyElement& props, ver::Node& node);
+	void PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, std::span<ver::dc::Options> params);
 }

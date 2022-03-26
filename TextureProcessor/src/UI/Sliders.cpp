@@ -5,6 +5,7 @@
  */
 #include <UI/Sliders.h>
 #include <Interfaces/INode.h>
+#include <Logic/DynamicConstant.h>
 #include <QVector2D>
 
 
@@ -17,10 +18,10 @@ using namespace UI;
  * @param min Minimum value
  * @param max Maximum value
  */
-FloatSlider::FloatSlider(float& value, QWidget* parent)
-	:slider(Qt::Horizontal), value(value), valid(-20,20,2), Updater(parent)
+FloatSlider::FloatSlider(float& value, float min, float max, QWidget* parent)
+	:slider(Qt::Horizontal), value(value), valid(min, max, 2), Updater(parent), min(min), max(max)
 {
-	dpi = (value * 2) / 100.0f;
+	dpi = (max - min) / 100.0f;
 
 	setLayout(&lay);
 	text.setValidator(&valid);
@@ -56,10 +57,11 @@ void FloatSlider::ValueChanged(int xvalue)
 	text.setText(std::format("{:.2f}", value).c_str());
 
 	// Rescale according to DPI
-	if (xvalue == 100 && value < 20)
+	if (xvalue == 100 && value < max)
 	{
-		dpi = value < 10 ? (value * 2.0f) / 100.0f : 0.2f;
-	} else if (xvalue <= 1)
+		dpi = value < 10 ? (max - min) / 100.0f : 0.2f;
+	}
+	else if (xvalue <= 1)
 	{
 		dpi = 0.01f;
 	}
@@ -90,6 +92,24 @@ void FloatSlider::SetChangedCallback(INode* to)
 		});
 }
 
+void UI::FloatSlider::SetMin(float m)
+{
+	valid.setBottom(m);
+	min = m;
+}
+
+void UI::FloatSlider::SetMax(float m)
+{
+	valid.setTop(m);
+	max = m;
+}
+
+void UI::FloatSlider::Revalidate()
+{
+	dpi = (max - min) / 100.0f;
+	slider.setValue(int(value / dpi));
+}
+
 /**
  * @brief Construct a new Vec 2 Slider:: Vec 2 Slider object
  *
@@ -98,7 +118,7 @@ void FloatSlider::SetChangedCallback(INode* to)
  * @param max Maximum vector value
  */
 Vec2Slider::Vec2Slider(QVector2D& value, QWidget* parent)
-	:value(value), upper(value[0]), lower(value[1]) , Updater(parent)
+	:value(value), upper(value[0]), lower(value[1]), Updater(parent)
 {
 	lay.setAlignment(Qt::AlignmentFlag::AlignTop);
 	setLayout(&lay);
@@ -115,6 +135,24 @@ void Vec2Slider::SetChangedCallback(INode* to)
 {
 	upper.SetChangedCallback(to);
 	lower.SetChangedCallback(to);
+}
+
+void UI::Vec2Slider::SetMin(QVector2D& m)
+{
+	upper.SetMin(m[0]);
+	lower.SetMin(m[1]);
+}
+
+void UI::Vec2Slider::SetMax(QVector2D& m)
+{
+	upper.SetMax(m[0]);
+	lower.SetMax(m[1]);
+}
+
+void UI::Vec2Slider::Revalidate()
+{
+	upper.Revalidate();
+	lower.Revalidate();
 }
 
 
@@ -134,9 +172,9 @@ IntSlider::IntSlider(int& value, QWidget* parent)
 	text.connect(&text, &QLineEdit::textEdited, this, &IntSlider::TextEdited);
 
 	// Display with 2 floating point precision
-	slider.setRange(0, 20);
+	slider.setRange(min, max);
 	slider.setValue(value);
-	text.setText(std::format("{}", value).c_str());
+	text.setText(QString::number(value));
 
 	// Set text size policy
 	QSizePolicy spText(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -189,7 +227,21 @@ void IntSlider::SetChangedCallback(INode* to)
 			to->Update();
 		});
 }
-
+void IntSlider::SetMin(int m)
+{
+	valid.setBottom(m);
+	min = m;
+}
+void IntSlider::SetMax(int m)
+{
+	valid.setTop(m);
+	max = m;
+}
+void IntSlider::Revalidate()
+{
+	slider.setRange(min, max);
+	slider.setValue(value);
+}
 
 
 /**

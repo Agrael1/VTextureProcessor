@@ -139,9 +139,15 @@ namespace ver::dc
 
 
 
+	template<Type t>
+	concept has_min = requires(typename Map<t>::param p) { p.min; };
+	template<Type t>
+	concept has_max = requires(typename Map<t>::param p) { p.max; };
 
-	struct param_storage {
-		param_storage(Type t)
+	struct param_storage 
+	{
+	public:
+		param_storage(Type xt):t(xt)
 		{
 			switch (t)
 			{
@@ -152,24 +158,91 @@ namespace ver::dc
 				break;
 			}
 		}
-		void set_default(Type t, QVariant v)
+	public:
+		template <Type t>
+		auto& get()
+		{
+			return std::get<typename Map<t>::param>(val);
+		}
+		template <Type t>
+		auto& get()const
+		{
+			return std::get<typename Map<t>::param>(val);
+		}
+	private:
+		template <Type t> requires has_min<t>
+		void set_min_impl(QVariant v)
+		{
+			get<t>().min = v.value<typename Map<t>::SysType>();
+		}
+		template <Type t>
+		void set_min_impl(QVariant v)
+		{}
+		template <Type t> requires has_min<t>
+		void set_max_impl(QVariant v)
+		{
+			get<t>().max = v.value<typename Map<t>::SysType>();
+		}
+		template <Type t>
+		void set_max_impl(QVariant v)
+		{}
+	public:
+		void set_default(QVariant v)
 		{
 			switch (t)
 			{
-#define X(el) case Type::el: std::get<typename Map<Type::el>::param>(val).def = v.value<Map<Type::el>::SysType>();break;
+#define X(el) case Type::el: get<Type::el>().def = v.value<typename Map<Type::el>::SysType>();break;
 				LEAF_ELEMENT_TYPES
 #undef X
 			default:
 				break;
 			}
 		}
+		void set_min(QVariant v)
+		{
+			switch (t)
+			{
+#define X(el) case Type::el: set_min_impl<Type::el>(v);break;
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+		}
+		void set_max(QVariant v)
+		{
+			switch (t)
+			{
+#define X(el) case Type::el: set_max_impl<Type::el>(v);break;
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+		}
+
+
+	public:
 #define X(el) typename Map<Type::el>::param
 #undef SEP
 #define SEP() ,
 		std::variant<LEAF_ELEMENT_TYPES> val;
+		Type t;
 #undef SEP
 #define SEP()
 #undef X
+	};
+	
+
+	struct Options
+	{
+		Options(Type t):param(t){}
+		uint16_t index = 0;
+		uint8_t enable_def : 1 = 0;
+		uint8_t enable_min : 1 = 0;
+		uint8_t enable_max : 1 = 0;
+		uint8_t reserved : 5 = 0;
+		dc::param_storage param;
 	};
 
 	
@@ -340,7 +413,6 @@ namespace ver::dc
 		std::vector<std::pair<std::string, LayoutElement>> lay;
 	};
 
-
 	class Buffer;
 
 
@@ -439,6 +511,19 @@ namespace ver::dc
 			}
 			assert(false && "Attemt to set non existent element");
 		}
+		void operator=(const param_storage& rhs) const noexcept
+		{
+			if (type.Get() != rhs.t)return;
+			switch (type.Get())
+			{
+#define X(el) case Type::el: return this->operator=(rhs.get<Type::el>().def);
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+			assert(false && "Attemt to set non existent element");
+		}
 		QVariant ToVariant()const noexcept
 		{
 			switch (type.Get())
@@ -503,10 +588,18 @@ namespace ver::dc
 		};
 	public:
 		Buffer() = default;
-		Buffer(Layout lay) noexcept
-			:lay(std::move(lay))
+		Buffer(Layout xlay) noexcept
+			:lay(std::move(xlay))
 		{
 			bytes.resize(lay.GetSizeInBytes());
+		}
+		Buffer(Layout xlay, std::span<const Options> def) noexcept
+			:lay(std::move(xlay))
+		{
+			bytes.resize(lay.GetSizeInBytes());
+			for (auto& i : def)
+				if(i.enable_def)
+					Get(i.index) = i.param;
 		}
 	public:
 		ElementRef operator[](std::string_view key) noexcept

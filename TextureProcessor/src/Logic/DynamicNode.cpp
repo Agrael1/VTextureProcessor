@@ -1,6 +1,7 @@
-//#include <Logic/DynamicNode.h>
-//#include <Logic/SinksT.h>
-//#include <Logic/SourcesT.h>
+#include <Logic/DynamicNode.h>
+
+
+
 //
 //void ver::DynamicNode::ModifySinks(std::vector<ver::PortDesc> descs)
 //{
