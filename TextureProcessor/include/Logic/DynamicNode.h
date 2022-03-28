@@ -3,27 +3,38 @@
 
 namespace UI
 {
-	class Node;
+	class NodeUI;
+	class PortsProperty;
 }
 
 namespace ver
 {
 	class DynamicDescriptor :public TextureDescriptor
 	{
+		friend class DynamicNode;
 	public:
-		using TextureDescriptor::TextureDescriptor;
+		DynamicDescriptor();
+		DynamicDescriptor(QJsonObject document, std::string_view styleName);
 	public:
-		void SetParent(UI::Node* xnode){node = xnode;}
-
+		virtual std::unique_ptr<Node> MakeModel() override;
+		void SetParent(UI::NodeUI* xnode){node = xnode;}
+		void ModifySinks();
+		void ModifySources();
+		void Recompile();
 	private:
-		UI::Node* node;
+		UI::NodeUI* node = nullptr;
+		std::shared_ptr<UI::PortsProperty> prop;
 	};
-	//class DynamicNode :public ShaderNode
-	//{
-	//public:
-	//	using ShaderNode::ShaderNode;
-	//public:
-	//	void ModifySinks(std::vector<ver::PortDesc> descs);
-	//	void ModifySources(std::vector<ver::PortDesc> descs);
-	//};
+
+
+	class DynamicNode :public ShaderNode
+	{
+		using base_class = ShaderNode;
+	public:
+		using ShaderNode::ShaderNode;
+	public:
+		void UpdateSinks();
+		void UpdateSources();
+		void GetProperties(UI::Windows::PropertyElement& props)override;
+	};
 }

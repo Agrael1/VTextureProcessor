@@ -13,18 +13,13 @@ namespace ver
 	class DirectTextureSource : public Source
 	{
 	public:
-		DirectTextureSource(std::string_view name, std::string_view shader_value, std::shared_ptr<QImage>& buffer, ver::PortType ty)
+		DirectTextureSource(std::string_view name, std::shared_ptr<QImage>& buffer, ver::PortType ty)
 			:Source(name, ty),
-			shader_value(shader_value),
 			buffer(buffer)
 		{}
-		static auto Make(std::string_view name, std::string_view shader_value, std::shared_ptr<QImage>& buffer, ver::PortType ty)
+		static auto Make(std::string_view name, std::shared_ptr<QImage>& buffer, ver::PortType ty)
 		{
-			return std::make_unique<DirectTextureSource>(name, shader_value, buffer, ty);
-		}
-		std::string_view YieldShader()override
-		{
-			return shader_value;
+			return std::make_unique<DirectTextureSource>(name, buffer, ty);
 		}
 		std::shared_ptr<QImage> YieldTexture()override
 		{
@@ -32,17 +27,16 @@ namespace ver
 		}
 	private:
 		std::shared_ptr<QImage>& buffer;
-		std::string_view shader_value;
 	};
 
 	template<PortType ty>
 	struct _DTSO_T : DirectTextureSource
 	{
-		_DTSO_T(std::string_view name, std::string_view shader_value, std::shared_ptr<QImage>& buffer)
-			:DirectTextureSource(name, shader_value, buffer, ty) {}
-		static std::unique_ptr<Source> Make(std::string_view name, std::string_view shader_value, std::shared_ptr<QImage>& buffer)
+		_DTSO_T(std::string_view name, std::shared_ptr<QImage>& buffer)
+			:DirectTextureSource(name, buffer, ty) {}
+		static std::unique_ptr<Source> Make(std::string_view name,  std::shared_ptr<QImage>& buffer)
 		{
-			return std::make_unique<DirectTextureSource>(name, shader_value, buffer, ty);
+			return std::make_unique<DirectTextureSource>(name, buffer, ty);
 		}
 	};
 	using GrayscaleSource = _DTSO_T<PortType::Grayscale>;

@@ -27,24 +27,20 @@ namespace ver
 		TextureDescriptor(QJsonObject document, std::string_view styleName);
 	public:
 		virtual std::unique_ptr<Node> MakeModel() override;
-		bool CompileShader(QString xshader) {
-			if (shader.compileSourceCode(xshader))
-			{
-				shadercode = xshader.toStdString();
-				return true;
-			}
-			return false;
+		bool Assemble();
+		bool CompileShader(const QString& xshader) {
+			return shader.compileSourceCode(xshader);
 		}
 		virtual bool valid()const noexcept{
 			return shader.isCompiled();
 		}
 	private:
 		void SetOptions(QJsonObject obj, dc::Options& opt);
-		void SetProperties(const QJsonArray& props, QString& scode);
+		void SetProperties(const QJsonArray& props);
 	public:
 		QOpenGLShader shader{ QOpenGLShader::Fragment };
 		UI::NodeStyle style;
-		std::string shadercode;
+		QString shader_body;
 		std::vector<PortDesc> sinks;
 		std::vector<PortDesc> sources;
 		ver::dc::Layout buffer;

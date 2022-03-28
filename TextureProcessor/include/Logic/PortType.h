@@ -65,5 +65,35 @@ namespace ver
 		PortType type;
 	};
 }
+namespace UI
+{
+	struct PortStyle
+	{
+	public:
+		constexpr static const qreal diameter = 10.0;
+		constexpr static const qreal port_bbox = 20.0;
+		constexpr static const qreal pen_width = 1.0;
+	public:
+		static const PortStyle* Get(ver::PortType ty)
+		{
+			switch (ty)
+			{
+			case ver::PortType::Grayscale:return &Grayscale;
+			case ver::PortType::Color:return &Color;
+			case ver::PortType::Normal:return &Normal;
+			default:return nullptr;
+			}
+		}
+	public:
+		QPen port{ {"#FFFFFFFF"}, pen_width };
+		QBrush brSink{ "#FF828282" };
+		QBrush brSinkUsed{ "#FFD9DDDC" };
+		QBrush brSource{ "#FF909090" };
+	public:
+		static const PortStyle Grayscale;
+		static const PortStyle Color;
+		static const PortStyle Normal;
+	};
+}
 
 #undef ENUMERATE

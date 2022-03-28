@@ -8,7 +8,7 @@
 #include <QMainWindow>
 
 #include <UI/UINode.h>
-#include <Logic/ShaderNode.h>
+#include <Logic/DynamicNode.h>
 
 namespace UI::Windows
 {
@@ -52,7 +52,7 @@ namespace UI::Windows
 		TableProperties tp;
 		SceneDock scene;
 		EditorDock edit;
-		std::optional<ver::TextureDescriptor> tdesc;
+		std::optional<ver::DynamicDescriptor> tdesc;
 		std::optional<UI::NodeUI> node;
 	};
 }

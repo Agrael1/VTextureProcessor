@@ -34,10 +34,6 @@ std::string_view Source::GetName() const noexcept
 {
 	return name;
 }
-std::string_view Source::YieldShader()
-{
-	throw RGC_EXCEPTION("Source cannot be accessed as shader");
-}
 std::shared_ptr<QImage> Source::YieldTexture()
 {
 	throw RGC_EXCEPTION("Source cannot be accessed as texture");

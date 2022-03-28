@@ -64,9 +64,12 @@ bool UI::Windows::EditorTab::event(QEvent* e)
 UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 	:Tab(std::move(p)), scene(props), tp(this)
 {
+	Engine::SwitchScene(&scene.scene);
 	auto[a,b] = Parse(Path());
 	tdesc.emplace(a, b);
 	node.emplace(tdesc->MakeModel());
+	tdesc->SetParent(&*node);
+
 	Init(props);
 	auto& x = tdesc->style.StyleName();
 	tp.SetName(x.isEmpty() ? "Node" : x);
@@ -108,7 +111,7 @@ std::pair<QJsonObject, std::string> UI::Windows::EditorTab::Parse(const std::fil
 
 void UI::Windows::EditorTab::Compile()
 {
-	//edited.UpdatePorts();
+	tdesc->Recompile();
 
 	auto code = edit.edit.GetText().toStdWString();
 	if (!code.empty())return;

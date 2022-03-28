@@ -32,7 +32,7 @@ ver::ShaderNode::ShaderNode(TextureDescriptor& td)
 	{
 		auto r = std::make_shared<QImage>();
 		RegisterSource(DirectTextureSource::Make(s.name.toStdString(),
-			desc.shadercode, outputs.emplace_back(std::move(r)), s.type));
+			outputs.emplace_back(std::move(r)), s.type));
 	}
 
 	// Copies and registers sinks
@@ -56,7 +56,7 @@ void ver::ShaderNode::Update()
 void ver::ShaderNode::GetProperties(UI::Windows::PropertyElement& props)
 {
 	UI::PropertyBuffer(props, buf, desc.params);
-	//PlaceProperties(props, *this);
+
 }
 
 QJsonObject ver::ShaderNode::Serialize()
@@ -95,10 +95,10 @@ void ver::ShaderNode::Deserialize(QJsonObject in)
 	}
 }
 
-void ver::ShaderNode::ExportSilent(std::string_view name) 
+void ver::ShaderNode::ExportSilent(std::string_view name)
 {}
-std::string ver::ShaderNode::Export() 
-{ 
+std::string ver::ShaderNode::Export()
+{
 	auto str = QFileDialog::getSaveFileName(nullptr,
 		"Export As",
 		"",
@@ -114,10 +114,12 @@ ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view
 	:style(document, styleName)
 {
 	auto node = document["Node"].toObject();
-	QString xshader{ "#version 420 \n" };
 
 	if (node.contains("Properties"))
-		SetProperties(node["Properties"].toArray(), xshader);
+		SetProperties(node["Properties"].toArray());
+
+
+
 
 	auto xsinks = node["Sinks"].toArray();
 	sinks.reserve(xsinks.size());
@@ -128,7 +130,6 @@ ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view
 		auto type = from_str(sink["Type"].toString().toStdString());
 		auto xname = sink["Name"].toString();
 		auto sname = xname.toStdString();
-		xshader += std::format("layout(binding = {})uniform sampler2D {};\n", sinks.size(), sname).c_str();
 		auto& s = sinks.emplace_back();
 		s.name = std::move(xname);
 		s.type = type;
@@ -144,18 +145,17 @@ ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view
 		auto type = from_str(source["Type"].toString().toStdString());
 		auto xname = source["Name"].toString();
 		auto sname = xname.toStdString();
-		xshader += std::format("layout(location={})out vec4 {};\n", sources.size(), sname).c_str();
 		auto& s = sources.emplace_back();
 		s.name = std::move(xname);
 		s.type = type;
 	}
-	xshader += "in vec2 sv_texc;\n"; //load texture coordinates
 
 	auto val = document["Value"];
-	for (auto x : val.toArray())
-		xshader += x.toString();
 
-	CompileShader(xshader);
+	for (auto x : val.toArray())
+		shader_body += x.toString();
+
+	Assemble();
 }
 
 std::unique_ptr<Node> ver::TextureDescriptor::MakeModel()
@@ -164,18 +164,29 @@ std::unique_ptr<Node> ver::TextureDescriptor::MakeModel()
 	return std::make_unique<ShaderNode>(*this);
 }
 
-void ver::TextureDescriptor::SetProperties(const QJsonArray& props, QString& scode)
+bool ver::TextureDescriptor::Assemble()
+{
+	QString xshader{ "#version 420 \n" };
+	for (auto& i : buffer.Get())
+		xshader += std::format("uniform {} {};\n",
+			i.second.GetSignature().data(), i.first).c_str();
+
+	for (auto i = 0; i < sinks.size(); i++)
+		xshader += std::format("layout(binding = {})uniform sampler2D {};\n", i, sinks[i].name.toStdString()).c_str();
+	for (auto i = 0; i < sources.size(); i++)
+		xshader += std::format("layout(location = {})out vec4 {};\n", i, sources[i].name.toStdString()).c_str();
+	xshader += "in vec2 sv_texc;\n"; //load texture coordinates
+	xshader += shader_body;
+	return CompileShader(xshader);
+}
+
+void ver::TextureDescriptor::SetProperties(const QJsonArray& props)
 {
 	for (size_t i = 0; auto it : props)
 	{
 		auto p = it.toObject();
-		scode += "uniform ";
-		auto qtype = p["Type"].toString();
-		auto type = dc::LayoutElement{ qtype.toStdString() };
-		scode += qtype + " ";
-		auto qtag = p["Tag"].toString();
-		scode += qtag + ";\n";
-		buffer += { qtag.toStdString(), type};
+		auto type = dc::LayoutElement{ p["Type"].toString().toStdString() };
+		buffer += { p["Tag"].toString().toStdString(), type};
 		if (p.contains("Val"))
 		{
 			auto& r = params.emplace_back(type.Get());
@@ -194,7 +205,7 @@ void ver::TextureDescriptor::SetProperties(const QJsonArray& props, QString& sco
 void ver::TextureDescriptor::SetOptions(QJsonObject obj, dc::Options& opt)
 {
 	auto def = obj.find("default");
-	if (opt.enable_def = def!=obj.end())
+	if (opt.enable_def = def != obj.end())
 		opt.param.set_default(def->toVariant());
 	auto min = obj.find("min");
 	if (opt.enable_min = min != obj.end())
@@ -203,5 +214,3 @@ void ver::TextureDescriptor::SetOptions(QJsonObject obj, dc::Options& opt)
 	if (opt.enable_max = max != obj.end())
 		opt.param.set_max(max->toVariant());
 }
-
-

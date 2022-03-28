@@ -5,7 +5,6 @@
 #include <QLabel>
 #include <QJsonArray>
 #include <QGraphicsProxyWidget>
-#include <UI/PropertyGenerator.h>
 
 
 
@@ -135,7 +134,10 @@ void UI::NodeUI::MakeHeader()
 }
 void UI::NodeUI::UpdateHeader()
 {
-	Header().setText(model->GetStyle().StyleName());
+	auto& h = Header();
+	h.setText(model->GetStyle().StyleName());
+	h.adjustSize();
+	h.setMinimumSize(h.size());
 }
 void UI::NodeUI::MakeSinks()
 {

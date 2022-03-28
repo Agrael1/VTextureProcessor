@@ -19,7 +19,7 @@ namespace UI
 	{
 		static constexpr QPointF center = { PortStyle::port_bbox / 2, PortStyle::port_bbox / 2 };
 	public:
-		Port(INode& parent, uint8_t port_num);
+		Port(INode& parent, uint8_t port_num, ver::PortType ty);
 		Port(Port&& in)noexcept;
 	public:
 		constexpr virtual ver::PortSide GetType()const noexcept
@@ -55,6 +55,7 @@ namespace UI
 	protected:
 		INode& parent;
 		uint8_t port_num;
+		ver::PortType ty;
 	};
 
 	class Sink : public Port
@@ -85,9 +86,7 @@ namespace UI
 	{
 		friend class Connection;
 	public:
-		Source(INode& parent, uint8_t port_num, ver::Source& model)
-			:Port(parent, port_num), model(model)
-		{}
+		Source(INode& parent, uint8_t port_num, ver::Source& model);
 		Source(Source&& in)noexcept :Port(std::move(in)), model(in.model){}
 	public:
 		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
