@@ -12,7 +12,9 @@ class NodeParser
 		std::wstring_view name;
 		std::wstring_view code_name;
 		ver::dc::Type ty;//min max
+		std::optional<ver::dc::param_storage> params;
 	};
+	
 public:
 	NodeParser(std::wstring_view code);
 public:

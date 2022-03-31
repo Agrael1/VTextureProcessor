@@ -205,6 +205,24 @@ public:
 			return create_advance(m_define, token::type::macro_stmt);
 		return{};
 	}
+	std::optional<token> try_get_lit()
+	{
+		size_t roffset = offset - 1;
+		const wchar_t* av = code.data() - 1;
+		bool dot = false;
+		while (true)
+		{
+			wchar_t c = prefetch_one();
+			if (c == '.')
+				if (dot)return {};
+				else { dot = true; continue; }
+			if (!iswalnum(c))
+				break;
+			if (!iswdigit(c))return{};
+			advance();
+		}
+		return token{ token::type::tt_num_literal, roffset, line, {av, offset - roffset} };
+	}
 
 	static bool not_lit(wchar_t c) {
 		return !iswalnum(c) && c != L'_';
@@ -357,7 +375,7 @@ static std::optional<token> GetTokenLoop(LexContext& lex)
 	{
 		wchar_t c = lex.fetch_one();
 		if (iswdigit(c))
-			continue;
+			return lex.try_get_lit();
 
 		switch (c)
 		{

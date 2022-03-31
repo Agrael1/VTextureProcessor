@@ -22,13 +22,6 @@
 
 using namespace UI;
 
-namespace std {
-	template<> struct hash<QString> {
-		std::size_t operator()(const QString& s) const noexcept {
-			return (size_t)qHash(s);
-		}
-	};
-}
 
 /**
  * @brief Construct a new Flow Scene:: Flow Scene object

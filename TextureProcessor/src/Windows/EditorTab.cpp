@@ -114,7 +114,7 @@ void UI::Windows::EditorTab::Compile()
 	tdesc->Recompile();
 
 	auto code = edit.edit.GetText().toStdWString();
-	if (!code.empty())return;
+	if (code.empty())return;
 
 	NodeParser p(code);
 	p.Parse();
