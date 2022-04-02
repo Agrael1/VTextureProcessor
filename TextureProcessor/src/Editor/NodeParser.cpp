@@ -354,7 +354,7 @@ void NodeParser::TryParseProperty(token& tok)
 	}
 
 
-	auto x = GetTokenInternal();
+	/*auto x = GetTokenInternal();
 	if (!x || x->xtype!=open_br)return;
 	x = GetTokenInternal();
 	if (!x || x->xtype != keyword || x->value != L"property")return;
@@ -393,21 +393,21 @@ void NodeParser::TryParseProperty(token& tok)
 	if (!x || x->xtype != identifier)return;
 
 	pdesc.code_name = x->value;
-	properties.push_back(pdesc);
+	properties.push_back(pdesc);*/
 }
 
 void NodeParser::GetPropertyVal(PropertyDesc& pd)
 {
-	using enum token::type;
-	auto x = GetTokenInternal();
-	if (!x) return;
-	if (x->value == L"name")
-	{
-		x = GetTokenInternal();
-		if (!x || x->xtype != eq) return;
+	//using enum token::type;
+	//auto x = GetTokenInternal();
+	//if (!x) return;
+	//if (x->value == L"name")
+	//{
+	//	x = GetTokenInternal();
+	//	if (!x || x->xtype != eq) return;
 
-		x = GetTokenInternal();
-		if (!x || x->xtype != str_literal) return;
-		pd.name = x->value;
-	}
+	//	x = GetTokenInternal();
+	//	if (!x || x->xtype != str_literal) return;
+	//	pd.name = x->value;
+	//}
 }

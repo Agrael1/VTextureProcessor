@@ -25,7 +25,7 @@ add_compile_definitions(_HAS_DEPRECATED_RESULT_OF=1)
 file(GLOB_RECURSE vsrc "src/*.cpp")
 file(GLOB_RECURSE vhead "include/*.h" "include/*.hpp")
 
-add_executable (TextureProcessor "${vsrc}" "${vhead}" "resources/resources.qrc")
+add_executable (TextureProcessor "${vsrc}" "${vhead}" "resources/resources.qrc" "include/Logic/ParameterStorage.h")
 
 target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt5Widgets_INCLUDE_DIRS}")
 target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

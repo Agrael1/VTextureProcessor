@@ -5,6 +5,8 @@
 #include <UI/PortContainer.h>
 #include <Windows/Properties.h>
 
+#include <UI/PropertyContainer.h>
+
 
 
 
@@ -47,7 +49,7 @@ void ver::DynamicNode::UpdateSources()
 
 void ver::DynamicNode::GetProperties(UI::Windows::PropertyElement& props)
 {
-	base_class::GetProperties(props);
+	props.AppendWidget<UI::PropertyContainer>(desc.buffer, desc.params);
 	props.Attach(static_cast<DynamicDescriptor&>(desc).prop);
 }
 

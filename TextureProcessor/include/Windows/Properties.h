@@ -2,6 +2,7 @@
 #include <UI/Updater.h>
 #include <QDockWidget>
 #include <QGroupBox>
+#include <QScrollArea>
 #include <QBoxLayout>
 #include <vector>
 
@@ -61,6 +62,7 @@ namespace UI::Windows
 		void Show();
 		void Clear();
 	private:
+		QScrollArea s;
 		Dummy dum;
 		std::vector<PropertyElement> props;
 	};

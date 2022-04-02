@@ -6,250 +6,16 @@
  * https://github.com/Agrael1/VeritasD3D
  */
 #pragma once
+#include <Logic/ParameterStorage.h>
 #include <cassert>
 #include <optional>
 #include <vector>
-#include <QVector2D>
-#include <QVector3D>
-#include <QVector4D>
-#include <QMatrix4x4>
 #include <variant>
 #include <span>
 
-#define LEAF_ELEMENT_TYPES \
-	X(Float)SEP()\
-	X(Float2)SEP()\
-	X(Float3)SEP()\
-	X(Float4)SEP()\
-	X(Matrix)SEP()\
-	X(Bool)SEP()\
-	X(Integer)
-#define SEP()
 
 namespace ver::dc
 {
-	enum class Type
-	{
-		Empty,
-#define X(el) el,
-		LEAF_ELEMENT_TYPES
-#undef X
-	};
-
-	constexpr const char* type_strings[] =
-	{
-#define X(el) #el,
-		LEAF_ELEMENT_TYPES
-#undef X
-	};
-
-	template<Type type>
-	struct Map
-	{
-		static constexpr bool valid = false;
-	};
-	template<> struct Map< Type::Float >
-	{
-		using SysType = float;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 1;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "float";
-		struct param { SysType min; SysType max; SysType def; };
-	};
-	template<> struct Map< Type::Float2 >
-	{
-		using SysType = QVector2D;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 2;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "vec2";
-		struct param { SysType min; SysType max; SysType def; };
-	};
-	template<> struct Map< Type::Float3 >
-	{
-		using SysType = QVector3D;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 3;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "vec3";
-		struct param { SysType min; SysType max; SysType def; };
-	};
-	template<> struct Map< Type::Float4 >
-	{
-		using SysType = QVector4D;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 4;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "vec4";
-		struct param { SysType min; SysType max; SysType def; };
-	};
-	template<> struct Map< Type::Matrix >
-	{
-		using SysType = QMatrix4x4;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 4;
-		static constexpr const uint16_t floats = 16;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "mat4";
-		struct param { SysType def; };
-	};
-	template<> struct Map< Type::Bool >
-	{
-		using SysType = bool;
-		static constexpr size_t hlslSize = 4u;
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 1;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "bool";
-		struct param { SysType def; };
-	};
-	template<> struct Map< Type::Integer >
-	{
-		using SysType = int;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 1;
-		static constexpr const char* code = "int";
-		static constexpr bool valid = true;
-		struct param { SysType min; SysType max; SysType def; };
-	};
-
-#define X(el) static_assert(Map<Type::el>::valid, "Missing map implementation for " #el);
-	LEAF_ELEMENT_TYPES
-#undef X
-
-		template<typename T>
-	struct ReverseMap
-	{
-		static constexpr bool valid = false;
-	};
-#define X(el)\
-	template<> struct ReverseMap<typename Map<Type::el>::SysType>\
-	{\
-		static constexpr bool valid = true;\
-		static constexpr Type type = Type::el;\
-	};
-	LEAF_ELEMENT_TYPES
-#undef X
-
-
-
-	template<Type t>
-	concept has_min = requires(typename Map<t>::param p) { p.min; };
-	template<Type t>
-	concept has_max = requires(typename Map<t>::param p) { p.max; };
-
-	struct param_storage 
-	{
-	public:
-		param_storage(Type xt):t(xt)
-		{
-			switch (t)
-			{
-#define X(el) case Type::el: val.emplace<typename Map<Type::el>::param>();break;
-				LEAF_ELEMENT_TYPES
-#undef X
-			default:
-				break;
-			}
-		}
-	public:
-		template <Type t>
-		auto& get()
-		{
-			return std::get<typename Map<t>::param>(val);
-		}
-		template <Type t>
-		auto& get()const
-		{
-			return std::get<typename Map<t>::param>(val);
-		}
-	private:
-		template <Type t> requires has_min<t>
-		void set_min_impl(QVariant v)
-		{
-			get<t>().min = v.value<typename Map<t>::SysType>();
-		}
-		template <Type t>
-		void set_min_impl(QVariant v)
-		{}
-		template <Type t> requires has_min<t>
-		void set_max_impl(QVariant v)
-		{
-			get<t>().max = v.value<typename Map<t>::SysType>();
-		}
-		template <Type t>
-		void set_max_impl(QVariant v)
-		{}
-	public:
-		void set_default(QVariant v)
-		{
-			switch (t)
-			{
-#define X(el) case Type::el: get<Type::el>().def = v.value<typename Map<Type::el>::SysType>();break;
-				LEAF_ELEMENT_TYPES
-#undef X
-			default:
-				break;
-			}
-		}
-		void set_min(QVariant v)
-		{
-			switch (t)
-			{
-#define X(el) case Type::el: set_min_impl<Type::el>(v);break;
-				LEAF_ELEMENT_TYPES
-#undef X
-			default:
-				break;
-			}
-		}
-		void set_max(QVariant v)
-		{
-			switch (t)
-			{
-#define X(el) case Type::el: set_max_impl<Type::el>(v);break;
-				LEAF_ELEMENT_TYPES
-#undef X
-			default:
-				break;
-			}
-		}
-
-
-	public:
-#define X(el) typename Map<Type::el>::param
-#undef SEP
-#define SEP() ,
-		std::variant<LEAF_ELEMENT_TYPES> val;
-		Type t;
-#undef SEP
-#define SEP()
-#undef X
-	};
-	
-
-	struct Options
-	{
-		Options(Type t):param(t){}
-		uint16_t index = 0;
-		uint8_t enable_def : 1 = 0;
-		uint8_t enable_min : 1 = 0;
-		uint8_t enable_max : 1 = 0;
-		uint8_t reserved : 5 = 0;
-		dc::param_storage param;
-	};
-
-	
-	
-
-
-
 	class LayoutElement
 	{
 	public:
@@ -322,6 +88,8 @@ namespace ver::dc
 	class Layout
 	{
 	public:
+		using Entry = std::pair<std::string, LayoutElement>;
+	public:
 		Layout() noexcept = default;
 	public:
 		Layout& Add(Type addedType, std::string name) noexcept
@@ -334,12 +102,12 @@ namespace ver::dc
 			lay.insert(lay.end(), pairs);
 			return *this;
 		}
-		Layout& operator+=(std::pair<std::string, LayoutElement> element) noexcept
+		Layout& operator+=(Entry element) noexcept
 		{
 			lay.emplace_back(std::move(element));
 			return *this;
 		}
-		std::span<const std::pair<std::string, LayoutElement>> Get()const noexcept
+		std::span<const Entry> Get()const noexcept
 		{
 			return lay;
 		}
@@ -410,7 +178,7 @@ namespace ver::dc
 			return out;
 		}
 	private:
-		std::vector<std::pair<std::string, LayoutElement>> lay;
+		std::vector<Entry> lay;
 	};
 
 	class Buffer;
