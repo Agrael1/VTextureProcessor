@@ -4,7 +4,7 @@
 
 
 template<ver::dc::Type ty>
-class Editable :public QWidget
+class Editable :public UI::IEditorOption
 {
 	using map_t = ver::dc::Map<ty>;
 	using internal_t = map_t::SysType;
@@ -102,9 +102,9 @@ public:
 		setLayout(&gl);
 	}
 public:
-	auto&& GetOption()
+	ver::dc::Options& GetOption() noexcept override
 	{
-		return std::move(opt);
+		return opt;
 	}
 private:
 	QGridLayout gl;
@@ -112,7 +112,7 @@ private:
 	ver::dc::Options opt{ ty };
 };
 
-std::unique_ptr<QWidget> make_widget(ver::dc::Type ty, ver::dc::Options* opt)
+std::unique_ptr<UI::IEditorOption> make_widget(ver::dc::Type ty, ver::dc::Options* opt)
 {
 	switch (ty)
 	{
@@ -122,31 +122,6 @@ std::unique_ptr<QWidget> make_widget(ver::dc::Type ty, ver::dc::Options* opt)
 	}
 	return nullptr;
 }
-
-
-
-//template <> class Editable<ver::dc::Type::Float> :public QWidget
-//{
-//	using map_t = ver::dc::Map<ver::dc::Type::Float>;
-//	using internal_t = map_t::SysType;
-//	using option_t = map_t::param;
-//public:
-//	Editable(ver::dc::Options* opt)
-//	{
-//		
-//	}
-//private:
-//	QLabel lmin{ "Min:" };
-//	QLineEdit min;
-//	QLabel lmax{"Max:"};
-//	QLineEdit max;
-//	QLabel ldef{"Default:"};
-//	QLineEdit def;
-//	QVBoxLayout vl;
-//};
-
-
-
 
 
 UI::PropertyContainer::PropertyContainer(ver::dc::Layout buffer, std::span<ver::dc::Options> params)
@@ -161,19 +136,51 @@ UI::PropertyContainer::PropertyContainer(ver::dc::Layout buffer, std::span<ver::
 		opt = it != params.end() && it->index == r ? std::addressof(*it) : nullptr;
 
 		vl.addWidget(&editors.emplace_back(i, opt));
+		auto lineA = new QFrame;
+		lineA->setFrameShape(QFrame::HLine);
+		lineA->setFrameShadow(QFrame::Sunken);
+		vl.addWidget(lineA);
 
 		if (opt) { it++; }
 		r++;
 	}
-
+	vl.addWidget(&saver);
+	auto lineA = new QFrame;
+	lineA->setFrameShape(QFrame::HLine);
+	lineA->setFrameShadow(QFrame::Sunken);
+	vl.addWidget(lineA);
 	setLayout(&vl);
 }
 
-UI::Editor::Editor(const ver::dc::Layout::Entry& entry, ver::dc::Options* opt)
-	:lName("Name:"), lcname("Code Name:"), opt(opt)
+std::vector<ver::dc::Options> UI::PropertyContainer::GatherOptions()
+{
+	std::vector<ver::dc::Options> out;
+	out.reserve(editors.size());
+	for (size_t r = 0; auto& i : editors)
+	{
+		auto* x = i.GetOption();
+		if (!x)continue;
+		auto& a = out.emplace_back(*x);
+		a.index = r++;
+	}
+	return out;
+}
+
+bool UI::PropertyContainer::Accept()
+{
+	bool x = true;
+	for (auto & i : editors)
+		x &= i.Accept();
+	return x;
+}
+
+
+UI::Editor::Editor(const ver::dc::Layout::Entry& entry, ver::dc::Options* xopt)
+	:lName("Name:"), lcname("Code Name:"), opt(xopt), rev(QRegularExpression{"^[_a-zA-Z]\\w*$"})
 {
 	type.addItem("Empty");
 	std::ranges::for_each(ver::dc::type_strings, [&](auto x) {type.addItem(x); });
+
 
 	type.setCurrentIndex(int(entry.second.Get()));
 	vl.addWidget(&type);
@@ -183,22 +190,60 @@ UI::Editor::Editor(const ver::dc::Layout::Entry& entry, ver::dc::Options* opt)
 	vl.addWidget(&name);
 	vl.addWidget(&lcname);
 	code_name.setText(opt && opt->enable_alias ? opt->alias.c_str() : entry.first.c_str());
+	code_name.setValidator(&rev);
 	vl.addWidget(&code_name);
+	edit.setFixedSize({ 24,24 });
+	edit.setIconSize({ 24,24 });
+	edit.setIcon(QIcon{ ":/icons8-edit-prop.png" });
+
 	vl.addWidget(&edit);
 
-	edit.connect(&edit, &QToolButton::pressed, [this]() {OnEdit(); });
-	//edit.connect(&edit, &QToolButton::pressed, [this]() {OnEdit(); });
-	//edit.connect(&edit, &QToolButton::pressed, [this]() {OnEdit(); });
-
-	hl.addWidget(&save);
-	hl.addWidget(&discard);
-	vl.addLayout(&hl);
+	edit.connect(&edit, &QToolButton::pressed, [this]() {
+		edit.hide();
+		editor = make_widget(ver::dc::Type(type.currentIndex()), opt);
+		if(editor)vl.addWidget(editor.get());
+		});
+	type.connect(&type, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index)
+		{
+			edit.show();
+			editor = nullptr;
+			opt = nullptr;
+		});
 	setLayout(&vl);
 }
 
-void UI::Editor::OnEdit()
+ver::dc::Options* UI::Editor::GetOption() const noexcept
 {
-	edit.hide();
-	editor = make_widget(ver::dc::Type(type.currentIndex()), opt);
-	vl.addWidget(editor.get());
+	if (!editor)return opt;
+	auto& o = editor->GetOption();
+	auto n = name.text();
+	auto cn = code_name.text();
+
+	o.enable_alias = n != cn;
+	if (o.enable_alias)
+		o.alias = n.toStdString();
+	if (!o.flags)return nullptr;
+	return &o;
+}
+
+bool UI::Editor::Accept()
+{
+	bool b = code_name.text().isEmpty();
+	if (b) code_name.setStyleSheet("border: 1px solid red");
+	return !b;
+}
+
+UI::PropertyContainer::Saver::Saver()
+{
+	save.setFixedSize({ 32, 32 });
+	save.setIconSize({ 32, 32 });
+	discard.setFixedSize({ 32, 32 });
+	discard.setIconSize({ 32, 32 });
+	save.setIcon(QIcon{ ":/icons8-save.png" });
+	discard.setIcon(QIcon{ ":/icons8-discard.png" });
+	hl.addWidget(&save);
+	hl.addWidget(&discard);
+	hl.setContentsMargins(0, 0, 11, 0);
+	hl.setAlignment(Qt::AlignRight);
+	setLayout(&hl);
 }

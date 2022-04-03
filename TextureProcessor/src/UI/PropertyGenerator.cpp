@@ -6,6 +6,9 @@
 
 using ver::dc::Options;
 
+
+
+
 void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, std::span<ver::dc::Options> params)
 {
 	using enum ver::dc::Type;

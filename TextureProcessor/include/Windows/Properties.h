@@ -15,8 +15,7 @@ namespace UI::Windows
 		PropertyElement(PropertyElement&& o)noexcept;
 		~PropertyElement()
 		{
-			for (auto& i : attached)
-				i->setParent(nullptr);
+			DetachAll();
 		}
 	public:
 		template <typename W, typename ...Args> requires std::derived_from<W, QWidget>
@@ -31,13 +30,31 @@ namespace UI::Windows
 			lay.addWidget(&r);
 			return r;
 		}
+		template <typename W> requires std::derived_from<W, QWidget>
+		W& AppendWidget(std::unique_ptr<W> r)
+		{
+			auto& r = static_cast<W&>(*widgets.emplace_back(std::move(r)));
+			if constexpr (std::derived_from<W, IUpdater>)
+				((IUpdater&)r).SetChangedCallback(&parent);
+			if constexpr (std::derived_from<W, PropertyUpdater>)
+				((PropertyUpdater&)r).SetChangedCallback(&parent, *this);
+
+			lay.addWidget(&r);
+			return r;
+		}
 		void Clear()noexcept
 		{
 			widgets.clear();
+			DetachAll();
 		}
 		void Attach(std::shared_ptr<QWidget> w)
 		{
 			lay.addWidget(attached.emplace_back(std::move(w)).get());
+		}
+		void DetachAll()
+		{
+			for (auto& i : attached)
+				i->setParent(nullptr);
 		}
 	private:
 		INode& parent;

@@ -98,11 +98,18 @@ namespace ver::dc
 	{
 		Options(Type t) :param(t) {}
 		uint16_t index = 0;
-		uint8_t enable_def : 1 = 0;
-		uint8_t enable_min : 1 = 0;
-		uint8_t enable_max : 1 = 0;
-		uint8_t enable_alias : 1 = 0;
-		uint8_t reserved : 4 = 0;
+		union
+		{
+			struct
+			{
+				uint8_t enable_def : 1;
+				uint8_t enable_min : 1;
+				uint8_t enable_max : 1;
+				uint8_t enable_alias : 1;
+				uint8_t reserved : 4;
+			};
+			uint8_t flags = 0;
+		};
 		std::string alias;
 		param_storage param;
 	};
