@@ -98,7 +98,7 @@ UI::PortContainer::PortContainer()
 {
 	new_prop.setMinimumSize(24, 24);
 	new_prop.setIconSize({ 24, 24 });
-	new_prop.setIcon(QIcon{ ":/icons8-add-property.png" });
+	new_prop.setIcon(QIcon{ ":/icons8-add-port.png" });
 
 	vl.connect(&new_prop, &QToolButton::pressed, [this]() { AddEmpty(); });
 

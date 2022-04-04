@@ -23,4 +23,5 @@ private:
 	std::unordered_set<std::wstring> types;
 	std::unordered_set<std::wstring> macros;
 	std::unordered_map<std::wstring, size_t> funcs;
+	std::unordered_set<std::wstring> constants;
 };

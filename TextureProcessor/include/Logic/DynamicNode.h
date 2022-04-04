@@ -42,6 +42,7 @@ namespace ver
 	public:
 		void UpdateSinks();
 		void UpdateSources();
+		void UpdateBuffer();
 		void GetProperties(UI::Windows::PropertyElement& props)override;
 		DynamicDescriptor& Desc()
 		{

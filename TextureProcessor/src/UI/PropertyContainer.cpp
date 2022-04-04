@@ -1,7 +1,7 @@
 #include <UI/PropertyContainer.h>
 #include <QCheckBox>
 #include <QGroupBox>
-
+#include <ranges>
 
 template<ver::dc::Type ty>
 class Editable :public UI::IEditorOption
@@ -18,6 +18,7 @@ public:
 	public:
 		Def(ver::dc::Options& opt)
 		{
+			opt.enable_def = true;
 			setTitle("Default:");
 			mat.setContentsMargins(0, 0, 0, 0);
 			FillLayout(opt);
@@ -61,7 +62,7 @@ public:
 
 			setChecked(min ? opt.enable_min : opt.enable_max);
 
-			connect(this, &QGroupBox::toggled, [min, &opt](int state) {min ? opt.enable_min : opt.enable_max = state; });
+			connect(this, &QGroupBox::toggled, [min, &opt](int state) {(min ? opt.enable_min : opt.enable_max) = state; });
 
 			for (size_t j = 0; j < map_t::floats; j++)
 			{
@@ -126,39 +127,62 @@ std::unique_ptr<UI::IEditorOption> make_widget(ver::dc::Type ty, ver::dc::Option
 
 UI::PropertyContainer::PropertyContainer(ver::dc::Layout buffer, std::span<ver::dc::Options> params)
 {
+	add.setIconSize({ 24,24 });
+	add.setIcon(QIcon{ ":/icons8-add-property.png" });
+	hl.setAlignment(Qt::AlignRight);
 	vl.setContentsMargins(0, 0, 0, 0);
-	editors.reserve(buffer.count());
+	hl.addWidget(&add);
+	vl.addLayout(&hl);
 
+	add.connect(&add, &QToolButton::pressed, [this]() {
+		auto& x = editors.emplace_back(std::make_unique<Editor>(editors.size()));
+		x->SetDesctructCallback([this](size_t x) {RemoveElement(x); });
+		vl.addWidget(x.get());
+		}
+	);
+
+	auto xlineA = new QFrame;
+	xlineA->setFrameShape(QFrame::HLine);
+	xlineA->setFrameShadow(QFrame::Sunken);
+	vl.addWidget(xlineA);
+
+
+	editors.reserve(buffer.count());
 	auto it = params.begin();
 	ver::dc::Options* opt = nullptr;
 	for (size_t r = 0; auto & i : buffer.Get())
 	{
 		opt = it != params.end() && it->index == r ? std::addressof(*it) : nullptr;
 
-		vl.addWidget(&editors.emplace_back(i, opt));
-		auto lineA = new QFrame;
-		lineA->setFrameShape(QFrame::HLine);
-		lineA->setFrameShadow(QFrame::Sunken);
-		vl.addWidget(lineA);
-
+		auto& x = editors.emplace_back(std::make_unique<Editor>(i, opt, r));
+		x->SetDesctructCallback([this](size_t x) {RemoveElement(x); });
+		vl.addWidget(x.get());
 		if (opt) { it++; }
 		r++;
 	}
-	vl.addWidget(&saver);
+
 	auto lineA = new QFrame;
 	lineA->setFrameShape(QFrame::HLine);
 	lineA->setFrameShadow(QFrame::Sunken);
-	vl.addWidget(lineA);
-	setLayout(&vl);
+
+	vl2.setContentsMargins(0, 0, 0, 0);
+	vl2.addLayout(&vl);
+	vl2.addWidget(&saver);
+	vl2.addWidget(lineA);
+	setLayout(&vl2);
+}
+UI::PropertyContainer::~PropertyContainer()
+{
+
 }
 
 std::vector<ver::dc::Options> UI::PropertyContainer::GatherOptions()
 {
 	std::vector<ver::dc::Options> out;
 	out.reserve(editors.size());
-	for (size_t r = 0; auto& i : editors)
+	for (size_t r = 0; auto & i : editors)
 	{
-		auto* x = i.GetOption();
+		auto* x = i->GetOption();
 		if (!x)continue;
 		auto& a = out.emplace_back(*x);
 		a.index = r++;
@@ -166,30 +190,80 @@ std::vector<ver::dc::Options> UI::PropertyContainer::GatherOptions()
 	return out;
 }
 
+ver::dc::Layout UI::PropertyContainer::GatherLayout()
+{
+	ver::dc::Layout out;
+	for (auto& i : editors)
+		out.Add(i->GetEntry());
+	return out;
+}
+
 bool UI::PropertyContainer::Accept()
 {
 	bool x = true;
-	for (auto & i : editors)
-		x &= i.Accept();
+	for (auto& i : editors)
+		x &= i->Accept();
 	return x;
 }
 
+void UI::PropertyContainer::RemoveElement(size_t xposition)
+{
+	editors.erase(editors.begin() + xposition);
+	for (auto& i : std::views::drop(editors, xposition))
+		i->UpdatePosition();
+}
 
-UI::Editor::Editor(const ver::dc::Layout::Entry& entry, ver::dc::Options* xopt)
-	:lName("Name:"), lcname("Code Name:"), opt(xopt), rev(QRegularExpression{"^[_a-zA-Z]\\w*$"})
+UI::Editor::Editor(size_t position)
+	:opt(nullptr), position(position)
+{
+	Init();
+}
+UI::Editor::Editor(const ver::dc::Layout::Entry& entry, ver::dc::Options* xopt, size_t position)
+	:opt(xopt), position(position)
+{
+	Init();
+	type.setCurrentIndex(int(entry.second.Get()));
+	name.setText(entry.first.c_str());
+	code_name.setText(opt && opt->enable_alias ? opt->alias.c_str() : entry.first.c_str());
+}
+
+ver::dc::Options* UI::Editor::GetOption() const noexcept
+{
+	if (!editor)return opt;
+	auto& o = editor->GetOption();
+	auto n = name.text();
+	auto cn = code_name.text();
+
+	o.enable_alias = n != cn && !n.isEmpty();
+	if (o.enable_alias)
+		o.alias = n.toStdString();
+	if (!o.flags)return nullptr;
+	return &o;
+}
+ver::dc::Layout::Entry UI::Editor::GetEntry() const noexcept
+{
+	return ver::dc::Layout::Entry{ code_name.text().toStdString(), ver::dc::Type(type.currentIndex()) };
+}
+bool UI::Editor::Accept()
+{
+	bool b = code_name.text().isEmpty();
+	if (b) code_name.setStyleSheet("border: 1px solid red");
+	bool c = type.currentIndex();
+	//no empty entry
+	return !b && c;
+}
+void UI::Editor::Init()
 {
 	type.addItem("Empty");
 	std::ranges::for_each(ver::dc::type_strings, [&](auto x) {type.addItem(x); });
-
-
-	type.setCurrentIndex(int(entry.second.Get()));
-	vl.addWidget(&type);
+	hl.addWidget(&type);
+	remove.setIcon(QIcon{ ":/icon_window_close.png" });
+	hl.addWidget(&remove);
+	vl.addLayout(&hl);
 
 	vl.addWidget(&lName);
-	name.setText(entry.first.c_str());
 	vl.addWidget(&name);
 	vl.addWidget(&lcname);
-	code_name.setText(opt && opt->enable_alias ? opt->alias.c_str() : entry.first.c_str());
 	code_name.setValidator(&rev);
 	vl.addWidget(&code_name);
 	edit.setFixedSize({ 24,24 });
@@ -201,7 +275,7 @@ UI::Editor::Editor(const ver::dc::Layout::Entry& entry, ver::dc::Options* xopt)
 	edit.connect(&edit, &QToolButton::pressed, [this]() {
 		edit.hide();
 		editor = make_widget(ver::dc::Type(type.currentIndex()), opt);
-		if(editor)vl.addWidget(editor.get());
+		if (editor)vl.addWidget(editor.get());
 		});
 	type.connect(&type, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index)
 		{
@@ -209,28 +283,11 @@ UI::Editor::Editor(const ver::dc::Layout::Entry& entry, ver::dc::Options* xopt)
 			editor = nullptr;
 			opt = nullptr;
 		});
+	auto xlineA = new QFrame;
+	xlineA->setFrameShape(QFrame::HLine);
+	xlineA->setFrameShadow(QFrame::Sunken);
+	vl.addWidget(xlineA);
 	setLayout(&vl);
-}
-
-ver::dc::Options* UI::Editor::GetOption() const noexcept
-{
-	if (!editor)return opt;
-	auto& o = editor->GetOption();
-	auto n = name.text();
-	auto cn = code_name.text();
-
-	o.enable_alias = n != cn;
-	if (o.enable_alias)
-		o.alias = n.toStdString();
-	if (!o.flags)return nullptr;
-	return &o;
-}
-
-bool UI::Editor::Accept()
-{
-	bool b = code_name.text().isEmpty();
-	if (b) code_name.setStyleSheet("border: 1px solid red");
-	return !b;
 }
 
 UI::PropertyContainer::Saver::Saver()

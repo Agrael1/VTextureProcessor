@@ -97,6 +97,11 @@ namespace ver::dc
 			lay.emplace_back(std::move(name), addedType);
 			return *this;
 		}
+		Layout& Add(Entry e) noexcept
+		{
+			lay.emplace_back(std::move(e));
+			return *this;
+		}
 		Layout& Add(std::initializer_list<std::pair<std::string, LayoutElement>> pairs) noexcept
 		{
 			lay.insert(lay.end(), pairs);

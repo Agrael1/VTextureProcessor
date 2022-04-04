@@ -89,7 +89,7 @@ void ver::DynamicNode::GetProperties(UI::Windows::PropertyElement& props)
 				bool x = d.AcceptContainer();
 				if (!x)return;
 				bchange = false;
-				d.ResetContainer();
+				d.GatherPropertyInfo();
 				d.UpdateProperties(props);
 			});
 		props.Attach(d.pcont);
@@ -168,6 +168,7 @@ bool ver::DynamicDescriptor::AcceptContainer()
 void ver::DynamicDescriptor::GatherPropertyInfo()
 {
 	params = std::move(pcont->GatherOptions());
+	buffer = std::move(pcont->GatherLayout());
 }
 
 void ver::DynamicDescriptor::UpdateProperties(UI::Windows::PropertyElement& props)
