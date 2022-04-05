@@ -22,6 +22,7 @@ namespace UI
 	public:
 		PortContainer();
 	public:
+		bool Validate()const noexcept;
 		Adder* AddEmpty();
 		void ClearEmpty(QWidget* box);
 		QLayout* Layout()

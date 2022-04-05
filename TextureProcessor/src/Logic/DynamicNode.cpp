@@ -9,50 +9,6 @@
 #include <UI/PropertyContainer.h>
 
 
-
-
-ver::DynamicNode::DynamicNode(DynamicDescriptor& td)
-	:base_class(td)
-{
-}
-
-void ver::DynamicNode::UpdateSinks()
-{
-	auto& descs = desc.sinks;
-	sinks.clear();
-	if (descs.size() != sinks.size())
-	{
-		sinks.reserve(descs.size());
-		inputs.resize(descs.size());
-	}
-	for (size_t i = 0; i < descs.size(); i++)
-	{
-		auto& d = descs[i];
-		if (d.name.isEmpty() || !any(d.type))continue;
-		RegisterSink(DirectTextureSink::Make(d.name.toStdString(), inputs[i], d.type));
-	}
-}
-
-void ver::DynamicNode::UpdateSources()
-{
-	auto& descs = desc.sources;
-	sources.clear();
-	if (auto a = descs.size() - sources.size(); a > 0)
-	{
-		outputs.reserve(descs.size());
-		for (size_t i = 0; i < a; i++)
-			outputs.emplace_back(std::make_shared<QImage>());
-	}
-	sources.reserve(descs.size());
-	outputs.resize(descs.size());
-	for (size_t i = 0; i < descs.size(); i++)
-	{
-		auto& d = descs[i];
-		if (d.name.isEmpty() || !any(d.type))continue;
-		RegisterSource(DirectTextureSource::Make(d.name.toStdString(), outputs[i], d.type));
-	}
-}
-
 void ver::DynamicNode::GetProperties(UI::Windows::PropertyElement& props)
 {
 	auto& d = Desc();
@@ -90,6 +46,7 @@ void ver::DynamicNode::GetProperties(UI::Windows::PropertyElement& props)
 				if (!x)return;
 				bchange = false;
 				d.GatherPropertyInfo();
+				d.prop_callback();
 				d.UpdateProperties(props);
 			});
 		props.Attach(d.pcont);
@@ -115,56 +72,32 @@ ver::DynamicDescriptor::~DynamicDescriptor()
 
 std::unique_ptr<ver::Node> ver::DynamicDescriptor::MakeModel()
 {
-	auto p = std::make_unique<ver::DynamicNode>(*this);
-	prop->LoadPorts(*p);
-	return p;
+	return std::make_unique<ver::DynamicNode>(*this);
 }
-
 void ver::DynamicDescriptor::ModifySinks()
 {
 	sinks = std::move(prop->GetSinks());
-	auto& dn = static_cast<ver::DynamicNode&>(node->GetModel());
-	dn.UpdateSinks();
-	node->MakeSinks();
-	node->UpdateLayouts();
-	node->Update();
 }
-
 void ver::DynamicDescriptor::ModifySources()
 {
 	sources = std::move(prop->GetSources());
-	auto& dn = static_cast<ver::DynamicNode&>(node->GetModel());
-	dn.UpdateSources();
-	node->MakeSources();
-	node->UpdateLayouts();
-	node->Update();
 }
 
 void ver::DynamicDescriptor::Recompile()
 {
-	sinks = std::move(prop->GetSinks());
-	sources = std::move(prop->GetSources());
-	auto& dn = static_cast<ver::DynamicNode&>(node->GetModel());
-	dn.UpdateSources();
-	dn.UpdateSinks();
+	ModifySinks();
+	ModifySources();
 	Assemble();
-
-	node->MakeSinks();
-	node->MakeSources();
-	node->UpdateLayouts();
-	node->Update();
 }
 
 void ver::DynamicDescriptor::ResetContainer()
 {
 	pcont = std::make_shared<UI::PropertyContainer>(buffer, params);
 }
-
 bool ver::DynamicDescriptor::AcceptContainer()
 {
 	return pcont->Accept();
 }
-
 void ver::DynamicDescriptor::GatherPropertyInfo()
 {
 	params = std::move(pcont->GatherOptions());

@@ -3,6 +3,7 @@
  * @author Ilya Doroshenko (xdoros01)
  * @brief ShaderNode model logic
  */
+#include <ranges>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QFileDialog>
@@ -28,7 +29,7 @@ ver::ShaderNode::ShaderNode(TextureDescriptor& td)
 	outputs.reserve(desc.sources.size());
 
 	// Copies and registers sources
-	for (auto& s : desc.sources)
+	for (auto&& s : desc.sources | std::views::filter([](const ver::PortDesc& pd) ->bool {return any(pd.type); }))
 	{
 		auto r = std::make_shared<QImage>();
 		RegisterSource(DirectTextureSource::Make(s.name.toStdString(),
@@ -36,7 +37,7 @@ ver::ShaderNode::ShaderNode(TextureDescriptor& td)
 	}
 
 	// Copies and registers sinks
-	for (auto& s : desc.sinks)
+	for (auto& s : desc.sinks | std::views::filter([](const ver::PortDesc& pd) ->bool {return any(pd.type); }))
 	{
 		RegisterSink(DirectTextureSink::Make(s.name.toStdString(),
 			inputs.emplace_back(), s.type));
@@ -66,7 +67,7 @@ QJsonObject ver::ShaderNode::Serialize()
 	node.insert("BufferState", buffer);
 
 	QJsonObject buffer;
-	for (auto x : buf)
+	for (auto&& x : buf)
 		buffer.insert(x.GetName().data(), QJsonValue::fromVariant(x.ToVariant()));
 	node.insert("Buffer", buffer);
 	return node;
@@ -117,9 +118,6 @@ ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view
 
 	if (node.contains("Properties"))
 		SetProperties(node["Properties"].toArray());
-
-
-
 
 	auto xsinks = node["Sinks"].toArray();
 	sinks.reserve(xsinks.size());

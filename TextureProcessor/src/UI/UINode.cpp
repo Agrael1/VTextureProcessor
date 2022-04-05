@@ -111,6 +111,12 @@ QVariant UI::NodeUI::itemChange(GraphicsItemChange change, const QVariant& value
 	return INode::itemChange(change, value);
 }
 
+void UI::NodeUI::ReplaceModel(std::unique_ptr<ver::Node> xmodel)
+{
+	model = std::move(xmodel);
+	Init();
+}
+
 void UI::NodeUI::MakeHeader()
 {
 	if (proxy)return UpdateHeader();
@@ -146,6 +152,7 @@ void UI::NodeUI::MakeSinks()
 	sinks.reserve(sk);
 	for (uint8_t i = 0; i < sk; i++)
 		l_left.addItem(&sinks.emplace_back(*this, i, model->GetSink(i)));
+	l_left.activate();
 }
 void UI::NodeUI::MakeSources()
 {
@@ -154,13 +161,13 @@ void UI::NodeUI::MakeSources()
 	sources.reserve(sk);
 	for (uint8_t i = 0; i < sk; i++)
 		l_right.addItem(&sources.emplace_back(*this, i, model->GetSource(i)));
+	l_right.activate();
 }
 
 void UI::NodeUI::Init()
 {
 	MakeHeader();
 	ConstructModules();
-	adjustSize();
 
 	MakeSinks();
 	MakeSources();
@@ -171,10 +178,12 @@ void UI::NodeUI::Init()
 
 void UI::NodeUI::ConstructModules()
 {
+	modules.clear();
 	auto r = GetModel().GetLayout();
 	modules.reserve(r.size());
 	for (const auto& x : r)
 		l_central.addItem(&modules.emplace_back(x));
+	l_central.activate();
 }
 
 void UI::NodeUI::UpdateLayouts()
@@ -183,11 +192,12 @@ void UI::NodeUI::UpdateLayouts()
 	auto sink_s = sinks.size();
 	auto source_s = sources.size();
 
+	auto dsi = (h - sink_s * PortStyle::port_bbox);
+	auto dso = (h - source_s * PortStyle::port_bbox);
+	auto sink_delta = dsi < 0 ? 0 : dsi / (sink_s + 1);
+	auto source_delta = dso < 0 ? 0 : dso / (source_s + 1);
 
-	auto sink_delta = (h - sink_s * PortStyle::port_bbox) / (sink_s + 1);
-	auto source_delta = (h - source_s * PortStyle::port_bbox) / (source_s + 1);
-
-	l_left.setContentsMargins(sink_s ? 0.0 : PortStyle::port_bbox, sink_delta + PortStyle::port_bbox/2, 0.0f, 0.0f);
+	l_left.setContentsMargins(sink_s ? 0.0 : PortStyle::port_bbox, sink_delta + PortStyle::port_bbox / 2, 0.0f, 0.0f);
 	l_left.setSpacing(sink_delta);
 
 	l_right.setContentsMargins(0.0f, source_delta + PortStyle::port_bbox / 2, source_s ? 0.0 : PortStyle::port_bbox, 0.0f);

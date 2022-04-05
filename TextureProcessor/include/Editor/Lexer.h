@@ -40,9 +40,6 @@ public:
 		tt_type,
 		tt_uniform,
 		other,
-
-		T0,
-		TX = T0+12
 	}xtype;
 	size_t offset;
 	size_t line;

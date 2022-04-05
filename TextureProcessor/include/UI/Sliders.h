@@ -9,7 +9,7 @@
 #include <QSlider>
 #include <QLineEdit>
 #include <QValidator>
-#include <QBoxLayout>
+#include <QBoxLayout.h>
 
 namespace ver::dc
 {

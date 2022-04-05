@@ -8,6 +8,7 @@
 
 #include <fstream>
 #include <iterator>
+#include <ranges>
 
 using namespace UI::Windows;
 
@@ -27,10 +28,7 @@ UI::Windows::EditorTab::SceneDock::~SceneDock()
 
 void EditorTab::Load()
 {
-	//using namespace std::string_literals;
-	//QFile t(Path().string().c_str());
-	//t.open(QIODevice::ReadOnly | QIODevice::Text);
-	//edit.LoadText(t.readAll());
+	edit.edit.LoadText(tdesc->shader_body);
 }
 
 void UI::Windows::EditorTab::OnEnter() noexcept
@@ -61,14 +59,23 @@ bool UI::Windows::EditorTab::event(QEvent* e)
 	default:return QMainWindow::event(e);
 	}
 }
+void UI::Windows::EditorTab::SetCBufInfo()
+{
+	std::unordered_set<std::wstring> consts;
+	for (auto& i : tdesc->buffer.Get())
+		consts.emplace(i.first.begin(), i.first.end());
+	edit.edit.SetCBufInfo(std::move(consts));
+}
 UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 	:Tab(std::move(p)), scene(props), tp(this)
 {
 	Engine::SwitchScene(&scene.scene);
 	auto[a,b] = Parse(Path());
 	tdesc.emplace(a, b);
+	tdesc->prop_callback = [this]() {SetCBufInfo(); };
 	node.emplace(tdesc->MakeModel());
 	tdesc->SetParent(&*node);
+	SetCBufInfo();
 
 	Init(props);
 	auto& x = tdesc->style.StyleName();
@@ -111,7 +118,12 @@ std::pair<QJsonObject, std::string> UI::Windows::EditorTab::Parse(const std::fil
 
 void UI::Windows::EditorTab::Compile()
 {
+	tdesc->shader_body = edit.edit.GetText();
 	tdesc->Recompile();
+	auto pos = node->pos();
+	node.emplace(tdesc->MakeModel());
+	scene.scene.addItem(&*node);
+	node->setPos(pos);
 
 	auto code = edit.edit.GetText().toStdWString();
 	if (code.empty())return;

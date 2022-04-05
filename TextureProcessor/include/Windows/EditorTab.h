@@ -46,7 +46,7 @@ namespace UI::Windows
 	private:
 		void Init(Properties& props)noexcept;
 		bool event(QEvent* e)override;
-
+		void SetCBufInfo();
 		void Compile();
 	private:
 		TableProperties tp;

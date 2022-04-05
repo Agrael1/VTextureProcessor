@@ -63,8 +63,6 @@ public:
 
 		name.setPlaceholderText("Port Name");
 		connect(&bclose, &QToolButton::clicked, [parent, this]() {parent->ClearEmpty(this); });
-		connect(&name, &QLineEdit::textEdited, [parent, this](const QString&) {});
-		connect(&cbox, QOverload<int>::of(&QComboBox::currentIndexChanged), [parent, this](int) {});
 	}
 public:
 	void SetName(std::string_view xname)
@@ -111,6 +109,7 @@ UI::PortContainer::PortContainer()
 	props.setDragDropMode(QAbstractItemView::InternalMove);
 	props.setDragEnabled(true);
 }
+
 
 Adder* UI::PortContainer::AddEmpty()
 {
@@ -167,3 +166,4 @@ void UI::PortsProperty::LoadPorts(ver::Node& model)
 		x->SetType(i->GetType());
 	}
 }
+

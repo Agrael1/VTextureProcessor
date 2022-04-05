@@ -25,8 +25,6 @@ public:
 private:
 	std::optional<token> GetTokenInternal();
 	void TryParseFunction();
-	void TryParseProperty(token& tok);
-	void GetPropertyVal(PropertyDesc& pd);
 private:
 	ver::generator<token> gen;
 	std::unordered_set<std::wstring> types;

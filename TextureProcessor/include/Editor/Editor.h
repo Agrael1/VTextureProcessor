@@ -20,6 +20,10 @@ public:
 	{
 		return code.toPlainText();
 	}
+	void SetCBufInfo(std::unordered_set<std::wstring> cbuf)
+	{
+		hl.SetCBufInfo(std::move(cbuf));
+	}
 	void SetInfo(
 		std::unordered_set<std::wstring> types, 
 		std::unordered_set<std::wstring> macros, 

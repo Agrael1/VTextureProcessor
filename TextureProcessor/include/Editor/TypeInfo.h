@@ -13,6 +13,7 @@ namespace ver::detail
 		str_lit,
 		macro_lit,
 		define,
+		cbuf,
 		size
 	};
 }

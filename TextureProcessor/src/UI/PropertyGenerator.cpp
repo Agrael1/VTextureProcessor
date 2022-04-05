@@ -19,11 +19,13 @@ void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, st
 	{
 		opt = it != params.end() && it->index == i ? std::addressof(*it) : nullptr;
 		auto t = ref.GetType();
+		QString name = opt && opt->enable_alias ? opt->alias.c_str() : ref.GetName().data();
+
 		switch (t)
 		{
 		case ver::dc::Type::Float:
 		{
-			elem.AppendWidget<QLabel>(ref.GetName().data());
+			elem.AppendWidget<QLabel>(name);
 			auto& s = elem.AppendWidget<FloatSlider>((float&)ref);
 			if (!opt)break;
 			auto& par = opt->param.get<Float>();
@@ -34,7 +36,7 @@ void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, st
 		}
 		case ver::dc::Type::Float2:
 		{
-			elem.AppendWidget<QLabel>(ref.GetName().data());
+			elem.AppendWidget<QLabel>(name);
 			auto& s = elem.AppendWidget<Vec2Slider>((QVector2D&)ref);
 			if (!opt)break;
 			auto& par = opt->param.get<Float2>();
@@ -49,11 +51,11 @@ void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, st
 		case ver::dc::Type::Matrix:
 			break;
 		case ver::dc::Type::Bool:
-			elem.AppendWidget<CheckBox>((bool&)ref, ref.GetName().data());
+			elem.AppendWidget<CheckBox>((bool&)ref, name);
 			break;
 		case ver::dc::Type::Integer:
 		{
-			elem.AppendWidget<QLabel>(ref.GetName().data());
+			elem.AppendWidget<QLabel>(name);
 			auto& s = elem.AppendWidget<IntSlider>((int&)ref);
 			if (!opt)break;
 			auto& par = opt->param.get<Integer>();

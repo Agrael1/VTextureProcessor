@@ -33,6 +33,7 @@ namespace UI
 		void DrawBackground(QPainter* painter);
 		virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value)override;
 	public:
+		void ReplaceModel(std::unique_ptr<ver::Node> model);
 		void MakeHeader();
 		void UpdateHeader();
 		void MakeSinks();
@@ -63,9 +64,9 @@ namespace UI
 	protected:
 		std::unique_ptr<ver::Node> model;
 		GraphicsLinearLayout* l_main = nullptr;
-		QGraphicsLinearLayout l_left;
-		QGraphicsLinearLayout l_central;
-		QGraphicsLinearLayout l_right;
+		GraphicsLinearLayout l_left;
+		GraphicsLinearLayout l_central;
+		GraphicsLinearLayout l_right;
 
 		std::vector<Module> modules;
 		std::unique_ptr<QGraphicsProxyWidget> proxy;

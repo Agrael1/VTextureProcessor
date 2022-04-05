@@ -1,5 +1,6 @@
 #pragma once
 #include <Logic/ShaderNode.h>
+#include <unordered_set>
 
 namespace UI
 {
@@ -23,6 +24,7 @@ namespace ver
 		void ModifySinks();
 		void ModifySources();
 		void Recompile();
+
 		void ResetContainer();
 		bool AcceptContainer();
 		void GatherPropertyInfo();
@@ -31,18 +33,15 @@ namespace ver
 		UI::NodeUI* node = nullptr;
 		std::shared_ptr<UI::PortsProperty> prop;
 		std::shared_ptr<UI::PropertyContainer> pcont;
+		std::function<void()> prop_callback;
 	};
 
 
 	class DynamicNode :public ShaderNode
 	{
-		using base_class = ShaderNode;
 	public:
-		DynamicNode(DynamicDescriptor& td);
+		using ShaderNode::ShaderNode;
 	public:
-		void UpdateSinks();
-		void UpdateSources();
-		void UpdateBuffer();
 		void GetProperties(UI::Windows::PropertyElement& props)override;
 		DynamicDescriptor& Desc()
 		{

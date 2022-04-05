@@ -393,10 +393,13 @@ namespace ver::dc
 			return Iterator{ this, Get(lay.count()), lay.count() };
 		}
 	public:
-		void Replace(Layout xlay)
+		void Replace(Layout xlay, std::span<const Options> def)
 		{
 			lay = std::move(xlay);
 			bytes.resize(lay.GetSizeInBytes());
+			for (auto& i : def)
+				if (i.enable_def)
+					Get(i.index) = i.param;
 		}
 		constexpr std::span<const std::byte> GetData() const noexcept
 		{

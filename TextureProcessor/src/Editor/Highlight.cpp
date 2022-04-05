@@ -25,6 +25,7 @@ constexpr auto fun_c = ver::rgb_to_hex(220, 220, 170);
 constexpr auto str_lit_c = ver::rgb_to_hex(214, 157, 133);
 constexpr auto macro_lit_c = ver::rgb_to_hex(190, 183, 255);
 constexpr auto define_c = ver::rgb_to_hex(154, 154, 154);
+constexpr auto const_c = ver::rgb_to_hex(156, 220, 254);
 
 Highlighter::Highlighter(QTextDocument* parent)
 	:QSyntaxHighlighter(parent)
@@ -39,6 +40,7 @@ Highlighter::Highlighter(QTextDocument* parent)
 	formats[str_lit].setForeground({ str_lit_c.c_str() });
 	formats[define].setForeground({ define_c.c_str() });
 	formats[macro_lit].setForeground({ macro_lit_c.c_str() });
+	formats[cbuf].setForeground({ const_c.c_str() });
 }
 
 void Highlighter::highlightBlock(const QString& text)
@@ -90,6 +92,11 @@ void Highlighter::highlightBlock(const QString& text)
 
 }
 
+void Highlighter::SetCBufInfo(std::unordered_set<std::wstring> xcbuf)
+{
+	cbuf = std::move(xcbuf);
+}
+
 void Highlighter::SetInfo(
 	std::unordered_set<std::wstring> xtypes, 
 	std::unordered_set<std::wstring> xmacros, 
@@ -123,14 +130,19 @@ void Highlighter::Parse(std::wstring_view part, size_t offset)
 			setFormat(i.offset, i.length(), formats[ver::detail::Format::define]);
 			break;
 		case identifier:
-			if (macros.contains({ i.value.data(), i.value.size() }))
-				setFormat(i.offset, i.length(), formats[ver::detail::Format::macro_lit]);
-			if (types.contains({ i.value.data(), i.value.size() }))
-				setFormat(i.offset, i.length(), formats[ver::detail::Format::user_type]);
+		{
+			std::wstring x{ i.value };
 			if (auto x = funcs.find({ i.value.data(), i.value.size() }); x != funcs.end()
 				&& x->second == currentBlock().blockNumber())
 				setFormat(i.offset, i.length(), formats[ver::detail::Format::function]);
+			if (macros.contains(x))
+				setFormat(i.offset, i.length(), formats[ver::detail::Format::macro_lit]);
+			if (types.contains(x))
+				setFormat(i.offset, i.length(), formats[ver::detail::Format::user_type]);
+			if(cbuf.contains(x))
+				setFormat(i.offset, i.length(), formats[ver::detail::Format::cbuf]);
 			break;
+		}
 		default:
 			break;
 		}

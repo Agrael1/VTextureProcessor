@@ -215,7 +215,7 @@ public:
 			wchar_t c = prefetch_one();
 			if (c == '.')
 				if (dot)return {};
-				else { dot = true; continue; }
+				else { dot = true;}
 			if (!iswalnum(c))
 				break;
 			if (!iswdigit(c))return{};
