@@ -18,6 +18,11 @@ ApplicationConfig::ApplicationConfig()
 
 	f.open(cache, std::ios::in);
 	std::getline(f, s);
+	if (s.empty() || fs::exists(s) || !fs::is_directory(s))
+	{
+		SetProjFolder(Defaults::defprojdir);
+		return;
+	}
 	SetProjFolder(s);
 }
 

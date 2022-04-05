@@ -1,16 +1,19 @@
 #include <UI/Port.h>
 #include <UI/Connection.h>
 #include <QPainter>
+#include <Logic/Sink.h>
+#include <Logic/Source.h>
 #include <ranges>
 
-UI::Port::Port(INode& parent, uint8_t port_num)
-	:parent(parent), port_num(port_num)
+UI::Port::Port(INode& parent, uint8_t port_num, ver::PortType ty)
+	:parent(parent), port_num(port_num), ty(ty)
 {
 	setGraphicsItem(this);
 }
 UI::Port::Port(Port&& in) noexcept
 	:parent(in.parent)
 	, port_num(in.port_num)
+	,ty(in.ty)
 {
 	setGraphicsItem(this);
 }
@@ -31,12 +34,12 @@ QSizeF UI::Port::sizeHint(Qt::SizeHint which, const QSizeF& constraint) const
 }
 
 UI::Sink::Sink(INode& parent, uint8_t port_num, ver::Sink& model)
-	:Port(parent, port_num), model(model)
+	:Port(parent, port_num, model.GetType()), model(model)
 {}
 
 void UI::Sink::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-	auto style = PortStyle::Grayscale;
+	auto& style = *PortStyle::Get(ty);
 	painter->setBrush(connection ? style.brSinkUsed : style.brSink);
 	painter->drawEllipse(QPointF{ PortStyle::port_bbox / 2,PortStyle::port_bbox / 2 }, PortStyle::diameter / 2, PortStyle::diameter / 2);
 }
@@ -44,7 +47,7 @@ void UI::Sink::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 void UI::Sink::MoveConnections(QPointF delta)
 {
 	if (connection)
-		connection->Move(delta, PortSide::Sink);
+		connection->Move(delta, ver::PortSide::Sink);
 }
 
 void UI::Sink::mousePressEvent(QGraphicsSceneMouseEvent * event)
@@ -54,9 +57,13 @@ void UI::Sink::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	ConnectionMap::MakeTemporary(*this);
 }
 
+UI::Source::Source(INode& parent, uint8_t port_num, ver::Source& model)
+	:Port(parent, port_num, model.GetType()), model(model)
+{}
+
 void UI::Source::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-	auto style = PortStyle::Grayscale;
+	auto& style = *PortStyle::Get(ty);
 	painter->setBrush(style.brSource);
 	painter->drawEllipse(QPointF{ PortStyle::port_bbox / 2,PortStyle::port_bbox / 2 }, PortStyle::diameter / 2, PortStyle::diameter / 2);
 }
@@ -64,7 +71,7 @@ void UI::Source::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 void UI::Source::MoveConnections(QPointF delta)
 {
 	for (auto& s : ConnectionMap::Get(Node()) | std::views::transform([](Connection* x)->IConnection& {return Query(x); }))
-		s.Move(delta, PortSide::Source);
+		s.Move(delta, ver::PortSide::Source);
 }
 
 void UI::Source::mousePressEvent(QGraphicsSceneMouseEvent* event)

@@ -8,10 +8,14 @@
 		<file>icon_window_restore.png</file>
 		<file>icons8-add-file.png</file>
 		<file>icons8-edit.png</file>
+		<file>icons8-edit-prop.png</file>
 		<file>icons8-accept.png</file>
 		<file>icons8-add-property.png</file>
+		<file>icons8-add-port.png</file>
 		<file>icons8-opened-folder.png</file>
 		<file>icons8-link.png</file>
+		<file>icons8-save.png</file>
+		<file>icons8-discard.png</file>
 		<file>icons8-broken-link.png</file>
 		<file>build.png</file>
 	</qresource>

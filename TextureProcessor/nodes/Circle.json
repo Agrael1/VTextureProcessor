@@ -7,12 +7,20 @@
         {
           "Tag": "Shade",
           "Type": "float",
-          "Val": 1.0
+          "Val": {
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+          }
         },
         {
           "Tag": "Radius",
           "Type": "float",
-          "Val": 1.0
+          "Val": {
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+          }
         }
       ],
       "Sources": [

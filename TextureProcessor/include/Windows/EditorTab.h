@@ -5,8 +5,10 @@
 #include <Windows/Tab.h>
 #include <Windows/TableProp.h>
 #include <QDockWidget>
+#include <QMainWindow>
 
-#include <UI/DynamicNode.h>
+#include <UI/UINode.h>
+#include <Logic/DynamicNode.h>
 
 namespace UI::Windows
 {
@@ -26,14 +28,8 @@ namespace UI::Windows
 		};
 
 	public:
-		EditorTab(std::filesystem::path&& p, Properties& props)
-			:Tab(std::move(p)), scene(props), tp(this), edited(Path())
-		{
-			Init(props);
-			auto& x = edited.StyleName();
-			tp.SetName(x.isEmpty()?"Node":x);
-			scene.scene.addItem(&edited);
-		}
+		EditorTab(std::filesystem::path&& p, Properties& props);
+		std::pair<QJsonObject, std::string> Parse(const std::filesystem::path& p);
 	public:
 		QWidget* Widget() noexcept override
 		{
@@ -50,12 +46,13 @@ namespace UI::Windows
 	private:
 		void Init(Properties& props)noexcept;
 		bool event(QEvent* e)override;
-
+		void SetCBufInfo();
 		void Compile();
 	private:
 		TableProperties tp;
 		SceneDock scene;
 		EditorDock edit;
-		UI::DynamicNode edited;
+		std::optional<ver::DynamicDescriptor> tdesc;
+		std::optional<UI::NodeUI> node;
 	};
 }

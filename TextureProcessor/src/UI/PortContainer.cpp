@@ -1,6 +1,7 @@
 #include <UI/PortContainer.h>
 #include <UI/NodeStyle.h>
 #include <QComboBox>
+#include <QLineEdit>
 #include <QStylePainter>
 
 #include <Logic/Node.h>
@@ -11,7 +12,7 @@ class ComboBox :public QComboBox
 {
 public:
 	ComboBox(){
-		std::ranges::for_each(PortStrings, [this](auto x) {addItem(x.data()); });
+		std::ranges::for_each(ver::PortStrings, [this](auto x) {addItem(x.data()); });
 		setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 	}
 protected:
@@ -62,15 +63,13 @@ public:
 
 		name.setPlaceholderText("Port Name");
 		connect(&bclose, &QToolButton::clicked, [parent, this]() {parent->ClearEmpty(this); });
-		connect(&name, &QLineEdit::textEdited, [parent, this](const QString&) {});
-		connect(&cbox, QOverload<int>::of(&QComboBox::currentIndexChanged), [parent, this](int) {});
 	}
 public:
 	void SetName(std::string_view xname)
 	{
 		name.setText(xname.data());
 	}
-	void SetType(PortType pt)
+	void SetType(ver::PortType pt)
 	{
 		cbox.setCurrentIndex(int(pt));
 	}
@@ -78,9 +77,9 @@ public:
 	{
 		return name.text();
 	}
-	PortType Type()const noexcept
+	ver::PortType Type()const noexcept
 	{
-		return PortType(cbox.currentIndex());
+		return ver::PortType(cbox.currentIndex());
 	}
 private:
 	QHBoxLayout hl;
@@ -97,7 +96,7 @@ UI::PortContainer::PortContainer()
 {
 	new_prop.setMinimumSize(24, 24);
 	new_prop.setIconSize({ 24, 24 });
-	new_prop.setIcon(QIcon{ ":/icons8-add-property.png" });
+	new_prop.setIcon(QIcon{ ":/icons8-add-port.png" });
 
 	vl.connect(&new_prop, &QToolButton::pressed, [this]() { AddEmpty(); });
 
@@ -110,6 +109,7 @@ UI::PortContainer::PortContainer()
 	props.setDragDropMode(QAbstractItemView::InternalMove);
 	props.setDragEnabled(true);
 }
+
 
 Adder* UI::PortContainer::AddEmpty()
 {
@@ -127,10 +127,10 @@ void UI::PortContainer::ClearEmpty(QWidget* box)
 	added.erase(box);
 }
 
-std::vector<UI::PortContainer::PortDesc> UI::PortContainer::GetPorts() const noexcept
+std::vector<ver::PortDesc> UI::PortContainer::GetPorts() const noexcept
 {
 	size_t length = added.size();
-	std::vector<UI::PortContainer::PortDesc> out;
+	std::vector<ver::PortDesc> out;
 	out.reserve(length);
 
 	for (size_t i = 0; i < length; i++)
@@ -166,3 +166,4 @@ void UI::PortsProperty::LoadPorts(ver::Node& model)
 		x->SetType(i->GetType());
 	}
 }
+

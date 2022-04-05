@@ -6,26 +6,32 @@
  * https://github.com/Agrael1/VeritasD3D
  */
 #pragma once
-#include <Logic/PropertyView.h>
-#include <span>
 #include <Interfaces/ISerialize.h>
+#include <Logic/PropertyView.h>
+#include <Logic/Source.h>
+#include <Logic/Sink.h>
+#include <span>
 
+namespace UI {
+	class NodeStyle;
+	namespace Windows {
+		class PropertyElement;
+	}
+}
+class QImage;
 namespace ver
 {
-	class Sink;
-	class Source;
-
 	class Node : public ISerialize
 	{
 	public:
 		Node() = default;
+		Node(std::string name):name(name){};
 		virtual ~Node();
 	public:
 		std::span<const std::unique_ptr<Source>> GetSources()const noexcept	{return sources;}
 		std::span<const std::unique_ptr<Sink>> GetSinks()const noexcept	{return sinks;}
 
-		void SetUniqueName(std::string_view xname) { name = xname; }
-		void SetUniqueName(std::string&& xname) { name = std::move(xname); }
+		void SetUniqueName(std::string xname) { name = std::move(xname); }
 		std::string_view GetName() const noexcept;
 
 		Source& GetSource(std::string_view registeredName);
@@ -40,10 +46,14 @@ namespace ver
 		void RegisterSink(std::unique_ptr<Sink>&& in);
 		void RegisterSource(std::unique_ptr<Source>&& in);
 
+		bool ValidateSink(Sink& in);
+		bool ValidateSource(Source& in);
+
 		void SetSinkLinkage(std::string_view registeredName, std::string_view to_node, std::string_view source);
 		void SetSinkLinkage(size_t index, std::string_view to_node, std::string_view source);
 
-		virtual PropertyView GetProperties() = 0;
+		virtual UI::NodeStyle& GetStyle() = 0;
+		virtual void GetProperties(UI::Windows::PropertyElement& properties) {}
 		virtual std::string Export() = 0;
 		virtual void Update() = 0;
 		virtual void ExportSilent(std::string_view name) = 0;

@@ -16,8 +16,8 @@ std::optional<Engine> Engine::e;
 Engine::Context::Context()
 {
 	QSurfaceFormat surfaceFormat;
-	surfaceFormat.setMajorVersion(3);
-	surfaceFormat.setMinorVersion(3);
+	surfaceFormat.setMajorVersion(4);
+	surfaceFormat.setMinorVersion(2);
 
 	context.setFormat(surfaceFormat);
 	context.create();
@@ -122,6 +122,11 @@ void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs
 		}
 		else Empty().bind(s++);
 	}
+
+	auto catt = current->sizes();
+	for (size_t i = catt.size(); i < outputs.size(); i++)
+		current->addColorAttachment(catt[0]);
+
 
 	if (buffer)BindBuffer(buffer);
 

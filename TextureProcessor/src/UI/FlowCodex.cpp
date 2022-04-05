@@ -2,16 +2,11 @@
 #include <UI/UINode.h>
 #include <QJsonDocument>
 #include <Logic/ShaderNode.h>
+#include <Logic/OutputNode.h>
+#include <filesystem>
+#include <fstream>
 
 using namespace UI;
-
-constexpr const char* output = R"(
-{
-    "NodeStyle": {
-      "TitleColor": "black",
-      "FontColor": "white"
-    }
-})";
 
 FlowCodex::FlowCodex()
 {
@@ -28,12 +23,8 @@ FlowCodex::FlowCodex()
 	// Scans for all Nodes .json files in the Node directory and loads them
 	QJsonParseError e;
 
-	auto json = QJsonDocument::fromJson(output, &e).object();
-	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); }
-	RefCountPair p = RefCountPair::set<XNode<ver::OutputNode>>(json, "Output");
-
 	// Adds new group to the context menu
-	auto pair = codex.emplace("Output", std::move(p));
+	auto pair = codex.emplace("Output", std::make_unique<ver::OutputDescriptor>());
 	cats["Output"].emplace_back("Output");
 
 
@@ -62,22 +53,27 @@ FlowCodex::FlowCodex()
 	}
 }
 
+UI::FlowCodex::~FlowCodex()
+{
+
+}
+
 
 std::unique_ptr<UI::INode> FlowCodex::GetNode(std::string_view nodety)const
 {
-	auto& x = codex.at(nodety.data());
-	return x->Clone(std::format("{}_{}", nodety, x.refcount++));
-}
-std::unique_ptr<UI::INode> FlowCodex::GetNode(std::string_view nodety, size_t ref)const
-{
-	auto& x = codex.at(nodety.data());
-	x.refcount = std::max(x.refcount, ref + 1);
-	return x->Clone(std::format("{}_{}", nodety, ref));
+	auto it = codex.find(nodety.data());
+	return it == codex.end() ? nullptr : std::make_unique<UI::NodeUI>(it->second->MakeModel());
 }
 
 bool UI::FlowCodex::contains(std::string_view nodety) const
 {
 	return codex.contains(nodety.data());
+}
+
+void UI::FlowCodex::ClearCounts()
+{
+	for (auto& i : codex)
+		i.second->refcount = 0;
 }
 
 
@@ -93,9 +89,10 @@ void UI::FlowCodex::ParseJson(const QJsonDocument& json)
 		auto node = obj["Node"].toObject();
 
 		// Loads texture Node style
-		RefCountPair p;
+		std::unique_ptr<ver::Descriptor> p;
 		if (node["Class"].toString() == "Texture")
-			p = RefCountPair::set<XNode<ver::ShaderNode>>(obj, wkey);
+			p = std::make_unique<ver::TextureDescriptor>(obj, wkey);
+		if (!p || !p->valid())continue;
 
 		// Adds new group to the context menu
 		auto pair = codex.emplace(wkey, std::move(p));

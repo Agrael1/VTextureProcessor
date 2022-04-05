@@ -9,11 +9,13 @@ struct token
 public:
 	enum class type
 	{
+		tt_none,
 		keyword,
 		statement,
 		identifier,
 		macro_stmt,
 		str_literal,
+		tt_num_literal,
 		macro,
 
 		open_sq,
@@ -30,6 +32,13 @@ public:
 		_operator,
 		eq,
 
+
+		tt_min,
+		tt_max,
+		tt_name,
+		tt_property,
+		tt_type,
+		tt_uniform,
 		other,
 	}xtype;
 	size_t offset;

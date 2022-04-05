@@ -16,9 +16,12 @@
 
 #include <utils/utils.h>
 #include <Logic/ShaderNode.h>
+#include <Logic/Sink.h>
+#include <Logic/Source.h>
 #include <ranges>
 
 using namespace UI;
+
 
 /**
  * @brief Construct a new Flow Scene:: Flow Scene object
@@ -126,16 +129,19 @@ void FlowScene::OnSelectionChanged()
  * @param name Name of the new Node
  * @return UI::Node& Newly created node
  */
-UI::INode& FlowScene::CreateNode(std::string_view name)
+UI::INode* FlowScene::CreateNode(std::string_view name)
 {
-	auto& node = InsertNode(name);
-	addItem(&node);
+	auto x = codex.GetNode(name);
+	auto* gx = x.get();
+	if (!gx)return gx;
+	nodes.emplace(x->Name(), std::move(x));
+	addItem(gx);
 
 	// Add to Output nodes if output
 	if (name == "Output")
-		outputs.push_back(&node);
+		outputs.push_back(gx);
 
-	return node;
+	return gx;
 }
 
 void UI::FlowScene::OnItemSelected(QTreeWidgetItem* item, int)
@@ -143,8 +149,8 @@ void UI::FlowScene::OnItemSelected(QTreeWidgetItem* item, int)
 	auto modelName = item->data(0, Qt::UserRole).toString().toStdString();
 	if (modelName == ContextMenu::skipper) return;
 
-	auto& type = CreateNode(modelName);
-	type.setPos(views()[0]->mapToScene(last_event));
+	auto* type = CreateNode(modelName);
+	type->setPos(views()[0]->mapToScene(last_event));
 	update();
 
 	menu.close();
@@ -165,17 +171,13 @@ void FlowScene::DeleteSelected()
 	}
 
 	// Delete Nodes
-	for (QGraphicsItem* item : selectedItems())
+	for (NodeUI& item : selectedItems()
+		| std::views::filter([](auto* x) {return dynamic_cast<NodeUI*>(x); })
+		| std::views::transform([](auto* x) ->NodeUI& {return *static_cast<NodeUI*>(x); }))
 	{
-		// Deregister output
-		if (auto n = dynamic_cast<XNode<ver::OutputNode>*>(item))
-		{
-			outputs.erase(std::find(outputs.begin(), outputs.end(), n));
-			nodes.erase(n->Name().data());
-			continue;
-		}
-		if (auto n = dynamic_cast<INode*>(item))
-			nodes.erase(n->Name().data());
+		if (item.GetType() == NodeUI::Type::Output)
+			outputs.erase(std::find(outputs.begin(), outputs.end(), &item));
+		nodes.erase(item.Name().data());
 	}
 }
 
@@ -209,16 +211,16 @@ void FlowScene::ExportAll()
 	}
 }
 
-QSize UI::FlowScene::Dimensions(QJsonObject in) const noexcept 
+QSize UI::FlowScene::Dimensions(QJsonObject in) const noexcept
 {
 	if (dims != QSize{}) return dims;
-	if (!in.contains("Dimensions")) return{0,0};
+	if (!in.contains("Dimensions")) return{ 0,0 };
 	QJsonArray arr = in["Dimensions"].toArray();
 	if (arr.count() != 2) {
 		qDebug() << "Bad Dimensions";
-		return{0,0};
+		return{ 0,0 };
 	}
-	return dims = QSize(arr[0].toInt(), arr[1].toInt()); 
+	return dims = QSize(arr[0].toInt(), arr[1].toInt());
 }
 
 /**
@@ -272,6 +274,8 @@ void FlowScene::Deserialize(QJsonObject xobj)
 	// Nothing to draw if no Nodes
 	if (!xobj.contains("Nodes")) return;
 
+	std::unordered_map<QString, QString> names;
+
 	bool missing = false;
 
 	QJsonArray arr = xobj["Nodes"].toArray();
@@ -289,13 +293,9 @@ void FlowScene::Deserialize(QJsonObject xobj)
 		auto xref = node["Ref"].toInt();
 
 		// Create unique name from Ref and Type
-		auto* xnode = TryInsertNode(type, xref);
+		auto* xnode = CreateNode(type);
 		if (!xnode) { missing = true; continue; }
-		addItem(xnode);
-
-		// Register output
-		if (type == "Output")
-			outputs.push_back(xnode);
+		names.emplace(stype + node["Ref"].toString(), xnode->Name().data());
 
 		// Load config from JSON into the new Node
 		xnode->Deserialize(node);
@@ -318,7 +318,9 @@ void FlowScene::Deserialize(QJsonObject xobj)
 		{
 			if (v.isString())
 			{
-				auto key = v.toString().toStdString();
+				auto xkey = names.find(v.toString());
+				if (xkey == names.end()) break;
+				auto key = xkey->second.toStdString();
 				auto xnode = nodes.find(key);
 				if (xnode == nodes.end()) break;
 				node = xnode->second.get();
@@ -339,9 +341,11 @@ void FlowScene::Deserialize(QJsonObject xobj)
 		{
 			if (v.isString())
 			{
-				auto key = v.toString().toStdString();
+				auto xkey = names.find(v.toString());
+				if (xkey == names.end()) break;
+				auto key = xkey->second.toStdString();
 				auto xnode = nodes.find(key);
-				if (xnode == nodes.end())break;
+				if (xnode == nodes.end()) break;
 				node = xnode->second.get();
 				continue;
 			}
@@ -354,21 +358,6 @@ void FlowScene::Deserialize(QJsonObject xobj)
 	if (missing)
 		QMessageBox{ QMessageBox::Warning, "Warning", "Some nodes were missing, because their type was not loaded properly",
 		QMessageBox::Ok }.exec();
-}
-
-/**
- * @brief Creates new Node of selected type
- *
- * @param name Name of the Node type
- * @param unique_name Name of the new Node (must be unique)
- * @return UI::Node&
- */
-UI::INode* FlowScene::TryInsertNode(std::string_view name, size_t ref)
-{
-	if (!codex.contains(name))
-		return nullptr;
-	auto x = codex.GetNode(name, ref);
-	return &*nodes.emplace(x->Name(), std::move(x)).first->second;
 }
 
 UI::INode* GetNode(const auto& in)
@@ -397,9 +386,4 @@ bool UI::FlowScene::event(QEvent* e)
 		return true;
 	}
 	return QGraphicsScene::event(e);
-}
-UI::INode& UI::FlowScene::InsertNode(std::string_view name)
-{
-	auto x = codex.GetNode(name);
-	return *nodes.emplace(x->Name(), std::move(x)).first->second;
 }

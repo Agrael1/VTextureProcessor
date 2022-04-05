@@ -6,129 +6,16 @@
  * https://github.com/Agrael1/VeritasD3D
  */
 #pragma once
+#include <Logic/ParameterStorage.h>
 #include <cassert>
 #include <optional>
 #include <vector>
-#include <QVector2D>
-#include <QVector3D>
-#include <QVector4D>
-#include <QMatrix4x4>
+#include <variant>
 #include <span>
 
-#define LEAF_ELEMENT_TYPES \
-	X(Float)\
-	X(Float2)\
-	X(Float3)\
-	X(Float4)\
-	X(Matrix)\
-	X(Bool)\
-	X(Integer)
 
 namespace ver::dc
 {
-	enum class Type
-	{
-		Empty,
-#define X(el) el,
-		LEAF_ELEMENT_TYPES
-#undef X
-	};
-
-	constexpr const char* type_strings[] =
-	{
-#define X(el) #el,
-		LEAF_ELEMENT_TYPES
-#undef X
-	};
-
-	template<Type type>
-	struct Map
-	{
-		static constexpr bool valid = false;
-	};
-	template<> struct Map< Type::Float >
-	{
-		using SysType = float;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 1;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "float";
-	};
-	template<> struct Map< Type::Float2 >
-	{
-		using SysType = QVector2D;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 2;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "vec2";
-	};
-	template<> struct Map< Type::Float3 >
-	{
-		using SysType = QVector3D;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 3;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "vec3";
-	};
-	template<> struct Map< Type::Float4 >
-	{
-		using SysType = QVector4D;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 4;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "vec4";
-	};
-	template<> struct Map< Type::Matrix >
-	{
-		using SysType = QMatrix4x4;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 4;
-		static constexpr const uint16_t floats = 16;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "mat4";
-	};
-	template<> struct Map< Type::Bool >
-	{
-		using SysType = bool;
-		static constexpr size_t hlslSize = 4u;
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 1;
-		static constexpr bool valid = true;
-		static constexpr const char* code = "bool";
-	};
-	template<> struct Map< Type::Integer >
-	{
-		using SysType = int;
-		static constexpr size_t hlslSize = sizeof(SysType);
-		static constexpr const uint16_t ocslot = 1;
-		static constexpr const uint16_t floats = 1;
-		static constexpr const char* code = "int";
-		static constexpr bool valid = true;
-	};
-
-#define X(el) static_assert(Map<Type::el>::valid, "Missing map implementation for " #el);
-	LEAF_ELEMENT_TYPES
-#undef X
-
-	template<typename T>
-	struct ReverseMap
-	{
-		static constexpr bool valid = false;
-	};
-#define X(el)\
-	template<> struct ReverseMap<typename Map<Type::el>::SysType>\
-	{\
-		static constexpr bool valid = true;\
-		static constexpr Type type = Type::el;\
-	};
-	LEAF_ELEMENT_TYPES
-#undef X
-
-
 	class LayoutElement
 	{
 	public:
@@ -138,39 +25,10 @@ namespace ver::dc
 		{}
 		constexpr LayoutElement(std::string_view signature)noexcept
 		{
-			if (signature == "float")
-				type = Type::Float;
-			else if (signature == "vec2")
-				type = Type::Float2;
-			else if (signature == "vec3")
-				type = Type::Float3;
-			else if (signature == "vec4")
-				type = Type::Float4;
-			else if (signature == "mat4")
-				type = Type::Matrix;
-			else if (signature == "bool")
-				type = Type::Bool;
-			else if (signature == "int")
-				type = Type::Integer;
-			else type = Type::Empty;
-		}
-		constexpr LayoutElement(std::wstring_view signature)noexcept
-		{
-			if (signature == L"float")
-				type = Type::Float;
-			else if (signature == L"vec2")
-				type = Type::Float2;
-			else if (signature == L"vec3")
-				type = Type::Float3;
-			else if (signature == L"vec4")
-				type = Type::Float4;
-			else if (signature == L"mat4")
-				type = Type::Matrix;
-			else if (signature == L"bool")
-				type = Type::Bool;
-			else if (signature == L"int")
-				type = Type::Integer;
-			else type = Type::Empty;
+#define X(el) if(signature == Map<Type::el>::code){type = Type::el; return;}
+			LEAF_ELEMENT_TYPES
+#undef X
+				type = Type::Empty;
 		}
 	public:
 		constexpr Type Get()const noexcept
@@ -230,6 +88,8 @@ namespace ver::dc
 	class Layout
 	{
 	public:
+		using Entry = std::pair<std::string, LayoutElement>;
+	public:
 		Layout() noexcept = default;
 	public:
 		Layout& Add(Type addedType, std::string name) noexcept
@@ -237,17 +97,22 @@ namespace ver::dc
 			lay.emplace_back(std::move(name), addedType);
 			return *this;
 		}
+		Layout& Add(Entry e) noexcept
+		{
+			lay.emplace_back(std::move(e));
+			return *this;
+		}
 		Layout& Add(std::initializer_list<std::pair<std::string, LayoutElement>> pairs) noexcept
 		{
 			lay.insert(lay.end(), pairs);
 			return *this;
 		}
-		Layout& operator+=(std::pair<std::string, LayoutElement> element) noexcept
+		Layout& operator+=(Entry element) noexcept
 		{
 			lay.emplace_back(std::move(element));
 			return *this;
 		}
-		std::span<const std::pair<std::string, LayoutElement>> Get()const noexcept
+		std::span<const Entry> Get()const noexcept
 		{
 			return lay;
 		}
@@ -318,9 +183,8 @@ namespace ver::dc
 			return out;
 		}
 	private:
-		std::vector<std::pair<std::string, LayoutElement>> lay;
+		std::vector<Entry> lay;
 	};
-
 
 	class Buffer;
 
@@ -328,7 +192,7 @@ namespace ver::dc
 	template <typename T, typename Array, std::size_t... I>
 	T v2T(const Array& a, std::index_sequence<I...>)
 	{
-		return T( a[I].toFloat()... );
+		return T(a[I].toFloat()...);
 	}
 	template<dc::Type type, class T = dc::Map<type>::SysType, typename Indices = std::make_index_sequence<dc::Map<type>::floats>>
 	T FromVariant(const QVariant& va)
@@ -420,6 +284,19 @@ namespace ver::dc
 			}
 			assert(false && "Attemt to set non existent element");
 		}
+		void operator=(const param_storage& rhs) const noexcept
+		{
+			if (type.Get() != rhs.t)return;
+			switch (type.Get())
+			{
+#define X(el) case Type::el: return this->operator=(rhs.get<Type::el>().def);
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+			assert(false && "Attemt to set non existent element");
+		}
 		QVariant ToVariant()const noexcept
 		{
 			switch (type.Get())
@@ -463,7 +340,7 @@ namespace ver::dc
 		class Iterator
 		{
 		public:
-			explicit Iterator(Buffer *b, ElementRef r, size_t index) :ref(r), b(b), index(index) {}
+			explicit Iterator(Buffer* b, ElementRef r, size_t index) :ref(r), b(b), index(index) {}
 		public:
 			void operator++()
 			{
@@ -484,10 +361,18 @@ namespace ver::dc
 		};
 	public:
 		Buffer() = default;
-		Buffer(Layout&& lay) noexcept
-			:lay(lay)
+		Buffer(Layout xlay) noexcept
+			:lay(std::move(xlay))
 		{
 			bytes.resize(lay.GetSizeInBytes());
+		}
+		Buffer(Layout xlay, std::span<const Options> def) noexcept
+			:lay(std::move(xlay))
+		{
+			bytes.resize(lay.GetSizeInBytes());
+			for (auto& i : def)
+				if(i.enable_def)
+					Get(i.index) = i.param;
 		}
 	public:
 		ElementRef operator[](std::string_view key) noexcept
@@ -508,10 +393,13 @@ namespace ver::dc
 			return Iterator{ this, Get(lay.count()), lay.count() };
 		}
 	public:
-		void Replace(Layout&& xlay)
+		void Replace(Layout xlay, std::span<const Options> def)
 		{
 			lay = std::move(xlay);
 			bytes.resize(lay.GetSizeInBytes());
+			for (auto& i : def)
+				if (i.enable_def)
+					Get(i.index) = i.param;
 		}
 		constexpr std::span<const std::byte> GetData() const noexcept
 		{

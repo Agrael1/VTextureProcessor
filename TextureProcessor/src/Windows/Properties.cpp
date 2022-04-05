@@ -5,7 +5,9 @@ using namespace UI::Windows;
 UI::Windows::Properties::Properties(QWidget* parent)
 	:QDockWidget("Properties", parent)
 {
-    setWidget(&dum);
+    s.setWidget(&dum);
+    s.setWidgetResizable(true);
+    setWidget(&s);
 }
 
 Properties::Dummy::Dummy() {
@@ -23,6 +25,10 @@ PropertyElement::PropertyElement(INode& parent, std::string_view title)
 {
     lay.setAlignment(Qt::AlignTop);
     lay.setSpacing(0);
+
+    int a, b, c, d;
+    getContentsMargins(&a, &b, &c, &d);
+    setContentsMargins(0, b, 0, 0);
     setLayout(&lay);
 }
 
@@ -35,6 +41,10 @@ PropertyElement::PropertyElement(PropertyElement&& o)noexcept
 {
     lay.setAlignment(Qt::AlignTop);
     lay.setSpacing(0);
+
+    int a, b, c, d;
+    getContentsMargins(&a, &b, &c, &d);
+    setContentsMargins(0, b, 0, 0);
     setLayout(&lay);
     for (auto& w : widgets)
         lay.addWidget(w.get());

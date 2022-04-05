@@ -36,7 +36,7 @@ namespace UI
 			QWidget* widget = nullptr) override;
 		QRectF boundingRect()const override;
 	public:
-		void Move(QPointF deltapos, PortSide ty)override;
+		void Move(QPointF deltapos, ver::PortSide ty)override;
 		void ResetSink()
 		{
 			connector.second = nullptr;
@@ -61,7 +61,7 @@ namespace UI
 		void PlaceConnection(Port& port);
 		bool HasCycle(INode* with)const noexcept;
 
-		PortSide Requires()const;
+		ver::PortSide Requires()const;
 
 		Port*& rpSink() { return connector.second; }
 		Port*& rpSource() { return connector.first; }
@@ -121,11 +121,11 @@ UI::Connection::Connection(Port& port)
 	sink = source = port.CenterScene();
 	switch (port.GetType())
 	{
-	case PortSide::Sink:
+	case ver::PortSide::Sink:
 		// If this node is the connection Sink
 		rpSink() = &port;
 		break;
-	case PortSide::Source:
+	case ver::PortSide::Source:
 		// If this node is the connection Source
 		rpSource() = &port;
 		break;
@@ -171,15 +171,15 @@ QRectF UI::Connection::boundingRect() const
 	commonRect.setBottomRight(commonRect.bottomRight() + 2 * cornerOffset);
 	return commonRect;
 }
-void UI::Connection::Move(QPointF deltapos, PortSide ty)
+void UI::Connection::Move(QPointF deltapos, ver::PortSide ty)
 {
 	prepareGeometryChange();
 	switch (ty)
 	{
-	case PortSide::Sink:
+	case ver::PortSide::Sink:
 		sink += deltapos;
 		break;
-	case PortSide::Source:
+	case ver::PortSide::Source:
 		source += deltapos;
 		break;
 	default:
@@ -262,14 +262,14 @@ void UI::Connection::PlaceConnection(Port& port)
 	// Extrapolates missing Sink or Source
 	switch (Requires())
 	{
-	case PortSide::Sink:
+	case ver::PortSide::Sink:
 	{
 		rpSink() = &port;
 		static_cast<Sink&>(port).connection = std::move(ConnectionMap::DetachTemporary());
 		sink = port.CenterScene();
 		break;
 	}
-	case PortSide::Source:
+	case ver::PortSide::Source:
 		rpSource() = &port;
 		static_cast<Sink&>(*rpSink()).connection = std::move(ConnectionMap::DetachTemporary());
 		source = port.CenterScene();
@@ -294,7 +294,7 @@ bool UI::Connection::HasCycle(INode* with) const noexcept
 
 	const INode* root = nullptr;
 	const INode* searched = nullptr;
-	if (Requires() == PortSide::Sink){
+	if (Requires() == ver::PortSide::Sink){
 		root = with;
 		searched = &SourceNode();
 	}
@@ -354,11 +354,11 @@ std::pair<QPointF, QPointF> UI::Connection::PointsC1C2() const
 	};
 }
 
-PortSide UI::Connection::Requires() const
+ver::PortSide UI::Connection::Requires() const
 {
-	if (!connector.first) return PortSide::Source;
-	if (!connector.second) return PortSide::Sink;
-	return PortSide::None;
+	if (!connector.first) return ver::PortSide::Source;
+	if (!connector.second) return ver::PortSide::Sink;
+	return ver::PortSide::None;
 }
 const INode& UI::Connection::SinkNode()const
 {

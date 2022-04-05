@@ -2,6 +2,7 @@
 #include <QBoxLayout>
 #include <QToolButton>
 #include <QListWidget>
+#include <QLabel>
 #include <Logic/PortType.h>
 
 #include <unordered_map>
@@ -19,14 +20,9 @@ namespace UI
 	class PortContainer
 	{
 	public:
-		struct PortDesc
-		{
-			QString name;
-			PortType type;
-		};
-	public:
 		PortContainer();
 	public:
+		bool Validate()const noexcept;
 		Adder* AddEmpty();
 		void ClearEmpty(QWidget* box);
 		QLayout* Layout()
@@ -38,7 +34,7 @@ namespace UI
 			heading.setText(head);
 		}
 
-		std::vector<PortDesc> GetPorts()const noexcept;
+		std::vector<ver::PortDesc> GetPorts()const noexcept;
 	private:
 		QVBoxLayout vl;
 		QHBoxLayout hl;

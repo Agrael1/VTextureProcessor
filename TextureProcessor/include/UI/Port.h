@@ -19,12 +19,12 @@ namespace UI
 	{
 		static constexpr QPointF center = { PortStyle::port_bbox / 2, PortStyle::port_bbox / 2 };
 	public:
-		Port(INode& parent, uint8_t port_num);
+		Port(INode& parent, uint8_t port_num, ver::PortType ty);
 		Port(Port&& in)noexcept;
 	public:
-		constexpr virtual PortSide GetType()const noexcept
+		constexpr virtual ver::PortSide GetType()const noexcept
 		{
-			return PortSide::None;
+			return ver::PortSide::None;
 		}
 		auto& Node() const noexcept
 		{
@@ -55,6 +55,7 @@ namespace UI
 	protected:
 		INode& parent;
 		uint8_t port_num;
+		ver::PortType ty;
 	};
 
 	class Sink : public Port
@@ -70,9 +71,9 @@ namespace UI
 		{
 			if (connection)connection->UpdatePosition();
 		}
-		constexpr virtual PortSide GetType()const noexcept override
+		constexpr virtual ver::PortSide GetType()const noexcept override
 		{
-			return PortSide::Sink;
+			return ver::PortSide::Sink;
 		}
 	protected:
 		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;
@@ -85,16 +86,14 @@ namespace UI
 	{
 		friend class Connection;
 	public:
-		Source(INode& parent, uint8_t port_num, ver::Source& model)
-			:Port(parent, port_num), model(model)
-		{}
+		Source(INode& parent, uint8_t port_num, ver::Source& model);
 		Source(Source&& in)noexcept :Port(std::move(in)), model(in.model){}
 	public:
 		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 		void MoveConnections(QPointF delta);
-		constexpr virtual PortSide GetType()const noexcept override
+		constexpr virtual ver::PortSide GetType()const noexcept override
 		{
-			return PortSide::Source;
+			return ver::PortSide::Source;
 		}
 	protected:
 		void mousePressEvent(QGraphicsSceneMouseEvent* event)override;

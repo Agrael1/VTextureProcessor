@@ -13,6 +13,7 @@
 //}
 
 
+
 bool NodeParser::Parse()
 {
 	using enum token::type;
@@ -27,9 +28,6 @@ bool NodeParser::Parse()
 				types.emplace(x->value);
 			continue;
 		}
-
-		if (x->xtype == open_sq && !block)
-			TryParseProperty(*x);
 
 		if (x->xtype == keyword || types.contains(std::wstring{ x->value }))
 			if(!block)TryParseFunction();
@@ -86,63 +84,18 @@ void NodeParser::TryParseFunction()
 	funcs.emplace(x->value, x->line);
 }
 
-void NodeParser::TryParseProperty(token& tok)
+
+token::type GetType(const token& tk)
 {
 	using enum token::type;
-
-	
-	auto x = GetTokenInternal();
-	if (!x || x->xtype!=open_br)return;
-	x = GetTokenInternal();
-	if (!x || x->xtype != keyword || x->value != L"property")return;
-	x = GetTokenInternal();
-	if (!x) return;
-
-	PropertyDesc pdesc;
-	bool finished = false;
-
-	while (!finished)
+	if (tk.xtype == keyword && tk.value == L"property")
+		return tt_property;
+	if (tk.xtype == identifier)
 	{
-		if (!x) return;
-		switch (x->xtype)
-		{
-		case close_br:
-			finished = true; break;
-		case comma:
-			GetPropertyVal(pdesc);
-		}
-		x = GetTokenInternal();
+		if (tk.value == L"min")return tt_min;
+		if (tk.value == L"max")return tt_max;
+		if (tk.value == L"name")return tt_name;
 	}
-	if (!x || x->xtype!=close_sq) return;
-
-	x = GetTokenInternal();
-	if (!x || x->xtype != keyword || x->value != L"uniform")return;
-	x = GetTokenInternal();
-	if (!x || x->xtype != keyword)return;
-
-	ver::dc::LayoutElement r(x->value);
-	if (!r)return;
-	pdesc.ty = r.Get();
-
-	x = GetTokenInternal();
-	if (!x || x->xtype != identifier)return;
-
-	pdesc.code_name = x->value;
-	properties.push_back(pdesc);
+	return tk.xtype;
 }
 
-void NodeParser::GetPropertyVal(PropertyDesc& pd)
-{
-	using enum token::type;
-	auto x = GetTokenInternal();
-	if (!x) return;
-	if (x->value == L"name")
-	{
-		x = GetTokenInternal();
-		if (!x || x->xtype != eq) return;
-
-		x = GetTokenInternal();
-		if (!x || x->xtype != str_literal) return;
-		pd.name = x->value;
-	}
-}

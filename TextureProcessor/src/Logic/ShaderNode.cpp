@@ -3,8 +3,10 @@
  * @author Ilya Doroshenko (xdoros01)
  * @brief ShaderNode model logic
  */
+#include <ranges>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QFileDialog>
 
 #include <Logic/ShaderNode.h>
 #include <Logic/SourcesT.h>
@@ -12,146 +14,33 @@
 #include <Logic/Engine.h>
 #include <utils/utils.h>
 
-#include <Windows/Properties.h>
+#include <UI/PropertyGenerator.h>
 
 using namespace ver;
 
-constexpr uint32_t nullcolor = 0;
 
-/**
- * @brief Construct a new Shader Node:: Node Private:: Node Private object
- *
- * @param code GLSL source code
- */
-ShaderNode::NodePrivate::NodePrivate(QString&& code)
-	:shader(QOpenGLShader::Fragment), shadercode(code.toStdString())
+ver::ShaderNode::ShaderNode(TextureDescriptor& td)
+	:desc(td), Node(std::format("{}_{}", td.style.StyleName().toStdString(), td.use_count())), buf(td.buffer, td.params)
 {
-	if (!shader.compileSourceCode(code))
-		throw RGC_EXCEPTION("Failed to compile shader code");
-}
+	sinks.reserve(desc.sinks.size());
+	sources.reserve(desc.sources.size());
 
-/**
- * @brief Construct a new Shader Node:: Shader Node object
- *
- * @param document JSON specification of the shader node
- * @param e Engine for compiling textures
- */
-ShaderNode::ShaderNode(QJsonObject document)
-{
-	auto node = document["Node"].toObject();
-	QString xshader{ "#version 420 \n" };
-
-	if (node.contains("Properties"))
-		SetProperties(node["Properties"].toArray(), xshader);
-
-	auto sinks = node["Sinks"].toArray();
-	inputs.reserve(sinks.size());
-	// Register all sinks
-	for (auto it : sinks)
-	{
-		auto sink = it.toObject();
-		auto type = from_str(sink["Type"].toString().toStdString());
-
-		switch (type)
-		{
-		case PortType::None:
-			break;
-		case PortType::Grayscale:
-		{
-			auto sname = sink["Name"].toString().toStdString();
-			xshader += std::format("layout(binding = {})uniform sampler2D {};\n", inputs.size(), sname).c_str();
-			RegisterSink(GrayscaleSink::Make(sname, inputs.emplace_back()));
-		}
-		break;
-		case PortType::Color:
-			break;
-		case PortType::Normal:
-			break;
-		default:
-			break;
-		}
-	}
-
-	auto sources = node["Sources"].toArray();
-	outputs.reserve(sources.size());
-
-	// Register all sources
-	for (auto it : sources)
-	{
-		auto source = it.toObject();
-		auto type = from_str(source["Type"].toString().toStdString()); //TODO: switch
-
-		switch (type)
-		{
-		case PortType::None:
-			break;
-		case PortType::Grayscale:
-		{
-			auto sname = source["Name"].toString().toStdString();
-			xshader += std::format("layout(location={})out vec4 {};\n", outputs.size(), sname).c_str();
-			RegisterSource(GrayscaleSource::Make(sname,
-				"", outputs.emplace_back(std::make_shared<QImage>())));
-			break;
-		}
-		case PortType::Color:
-			break;
-		case PortType::Normal:
-			break;
-		default:
-			break;
-		}
-	}
-	xshader += "in vec2 sv_texc;\n"; //load texture coordinates
-
-	auto val = document["Value"];
-	for (auto x : val.toArray())
-		xshader += x.toString();
-
-	shader = std::make_shared<NodePrivate>(std::move(xshader));
-}
-
-/**
- * @brief Construct a new Shader Node:: Shader Node object
- *
- * @param other Shader node to be duplicated (without recompiling shader)
- */
-ShaderNode::ShaderNode(const ShaderNode& other)
-	:shader(other.shader), buf(other.buf)
-{
-	sinks.reserve(other.SinksCount());
-	sources.reserve(other.SourcesCount());
-	outputs.reserve(other.SourcesCount());
-	inputs.reserve(other.SinksCount());
+	inputs.reserve(desc.sinks.size());
+	outputs.reserve(desc.sources.size());
 
 	// Copies and registers sources
-	for (auto& s : other.sources)
+	for (auto&& s : desc.sources | std::views::filter([](const ver::PortDesc& pd) ->bool {return any(pd.type); }))
 	{
-		switch (s->GetType())
-		{
-		case PortType::Grayscale:
-		{
-			auto r = std::make_shared<QImage>();
-			RegisterSource(GrayscaleSource::Make(s->GetName(),
-				shader->shadercode, outputs.emplace_back(std::move(r))));
-			break;
-		}
-		default:
-			break;
-		}
+		auto r = std::make_shared<QImage>();
+		RegisterSource(DirectTextureSource::Make(s.name.toStdString(),
+			outputs.emplace_back(std::move(r)), s.type));
 	}
 
 	// Copies and registers sinks
-	for (auto& s : other.sinks)
+	for (auto& s : desc.sinks | std::views::filter([](const ver::PortDesc& pd) ->bool {return any(pd.type); }))
 	{
-		switch (s->GetType())
-		{
-		case PortType::Grayscale:
-			RegisterSink(GrayscaleSink::Make(s->GetRegisteredName(),
-				inputs.emplace_back()));
-			break;
-		default:
-			break;
-		}
+		RegisterSink(DirectTextureSink::Make(s.name.toStdString(),
+			inputs.emplace_back(), s.type));
 	}
 }
 
@@ -162,13 +51,55 @@ ShaderNode::ShaderNode(const ShaderNode& other)
  */
 void ver::ShaderNode::Update()
 {
-	Engine::Instance().Render(shader->shader, inputs, tiling, outputs, buf);
+	Engine::Instance().Render(desc.shader, inputs, tiling, outputs, buf);
 }
 
-void ver::ShaderNode::ExportSilent(std::string_view name) 
+void ver::ShaderNode::GetProperties(UI::Windows::PropertyElement& props)
+{
+	UI::PropertyBuffer(props, buf, desc.params);
+
+}
+
+QJsonObject ver::ShaderNode::Serialize()
+{
+	QJsonObject node = Node::Serialize();
+	node.insert("Tiling", tiling);
+	node.insert("BufferState", buffer);
+
+	QJsonObject buffer;
+	for (auto&& x : buf)
+		buffer.insert(x.GetName().data(), QJsonValue::fromVariant(x.ToVariant()));
+	node.insert("Buffer", buffer);
+	return node;
+}
+
+void ver::ShaderNode::Deserialize(QJsonObject in)
+{
+	Node::Deserialize(in);
+	if (in.contains("Buffer"))
+	{
+		auto v = in["Buffer"].toObject();
+		auto keys = v.keys();
+		for (const auto& k : keys)
+		{
+			auto sk = k.toStdString();
+			buf[sk].SetIfExists(v[k].toVariant());
+		}
+	}
+	if (in.contains("Tiling"))
+	{
+		tiling = in["Tiling"].toBool(false);
+	}
+	if (in.contains("Buffer"))
+	{
+		buffer = in["Buffer"].toBool(true);
+	}
+}
+
+void ver::ShaderNode::ExportSilent(std::string_view name)
 {}
-std::string ver::ShaderNode::Export() 
-{ 
+std::string ver::ShaderNode::Export()
+{
 	auto str = QFileDialog::getSaveFileName(nullptr,
 		"Export As",
 		"",
@@ -180,73 +111,104 @@ std::string ver::ShaderNode::Export()
 	return str.toStdString();
 }
 
-/**
- * @brief Sets properties of the shader node
- *
- * @param props List of properties to be added
- * @param scode Source code for dynamic replacement
- */
-void ShaderNode::SetProperties(const QJsonArray& props, QString& scode)
+ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view styleName)
+	:style(document, styleName)
 {
-	if (props.isEmpty())return;
-	dc::Layout lay;
+	auto node = document["Node"].toObject();
 
-	std::vector<std::string> tags;
-	std::vector<QVariant> vars;
-	for (auto it : props)
+	if (node.contains("Properties"))
+		SetProperties(node["Properties"].toArray());
+
+	auto xsinks = node["Sinks"].toArray();
+	sinks.reserve(xsinks.size());
+	// Register all sinks
+	for (auto it : xsinks)
 	{
-		auto p = it.toObject();
-		scode += "uniform ";
-		auto qtype = p["Type"].toString();
-		scode += qtype + " ";
-		auto qtag = p["Tag"].toString();
-		scode += qtag + ";\n";
-		lay += { tags.emplace_back(qtag.toStdString()), dc::LayoutElement{ qtype.toStdString() }};
+		auto sink = it.toObject();
+		auto type = from_str(sink["Type"].toString().toStdString());
+		auto xname = sink["Name"].toString();
+		auto sname = xname.toStdString();
+		auto& s = sinks.emplace_back();
+		s.name = std::move(xname);
+		s.type = type;
 	}
 
-	buf.Replace(std::move(lay));
+	auto xsources = node["Sources"].toArray();
+	sources.reserve(xsources.size());
+
+	// Register all sources
+	for (auto it : xsources)
+	{
+		auto source = it.toObject();
+		auto type = from_str(source["Type"].toString().toStdString());
+		auto xname = source["Name"].toString();
+		auto sname = xname.toStdString();
+		auto& s = sources.emplace_back();
+		s.name = std::move(xname);
+		s.type = type;
+	}
+
+	auto val = document["Value"];
+
+	for (auto x : val.toArray())
+		shader_body += x.toString();
+
+	Assemble();
+}
+
+std::unique_ptr<Node> ver::TextureDescriptor::MakeModel()
+{
+	refcount++;
+	return std::make_unique<ShaderNode>(*this);
+}
+
+bool ver::TextureDescriptor::Assemble()
+{
+	QString xshader{ "#version 420 \n" };
+	for (auto& i : buffer.Get())
+		xshader += std::format("uniform {} {};\n",
+			i.second.GetSignature().data(), i.first).c_str();
+
+	for (auto i = 0; i < sinks.size(); i++)
+		xshader += std::format("layout(binding = {})uniform sampler2D {};\n", i, sinks[i].name.toStdString()).c_str();
+	for (auto i = 0; i < sources.size(); i++)
+		xshader += std::format("layout(location = {})out vec4 {};\n", i, sources[i].name.toStdString()).c_str();
+	xshader += "in vec2 sv_texc;\n"; //load texture coordinates
+	xshader += shader_body;
+	return CompileShader(xshader);
+}
+
+void ver::TextureDescriptor::SetProperties(const QJsonArray& props)
+{
 	for (size_t i = 0; auto it : props)
 	{
 		auto p = it.toObject();
+		auto type = dc::LayoutElement{ p["Type"].toString().toStdString() };
+		buffer += { p["Tag"].toString().toStdString(), type};
 		if (p.contains("Val"))
-			buf[tags[i]] = p["Val"].toVariant();
+		{
+			auto& r = params.emplace_back(type.Get());
+			r.index = i;
+			if (p["Val"].isObject())
+				SetOptions(p["Val"].toObject(), r);
+			else
+			{
+				r.enable_def = 1;
+				r.param.set_default(p["Val"].toVariant());
+			}
+		}
 		i++;
 	}
 }
-
-ver::OutputNode::OutputNode(QJsonObject document)
+void ver::TextureDescriptor::SetOptions(QJsonObject obj, dc::Options& opt)
 {
-	RegisterSink(GrayscaleSink::Make("Out", in));
-}
-
-ver::OutputNode::OutputNode(const OutputNode& in)
-{
-	out = std::make_shared<QImage>();
-	RegisterSink(GrayscaleSink::Make("Out", this->in));
-}
-
-void ver::OutputNode::Update()
-{
-	if (in)
-		*out = *in;
-	else
-		*out = QImage((const uchar*)(&nullcolor), 1, 1, QImage::Format::Format_ARGB32);
-}
-
-std::string ver::OutputNode::Export()
-{
-	auto str = QFileDialog::getSaveFileName(nullptr,
-		"Export As",
-		"",
-		"PNG (*.png);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm);;All files (*.*);;"
-	);
-	if (str.isEmpty())return"";
-	out->mirrored().save(str);
-	return str.toStdString();
-}
-
-inline void ver::OutputNode::ExportSilent(std::string_view name)
-{
-	if (name.empty())return;
-	out->save(name.data());
+	auto def = obj.find("default");
+	if (opt.enable_def = def != obj.end())
+		opt.param.set_default(def->toVariant());
+	auto min = obj.find("min");
+	if (opt.enable_min = min != obj.end())
+		opt.param.set_min(min->toVariant());
+	auto max = obj.find("max");
+	if (opt.enable_max = max != obj.end())
+		opt.param.set_max(max->toVariant());
 }

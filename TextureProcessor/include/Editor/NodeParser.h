@@ -12,7 +12,9 @@ class NodeParser
 		std::wstring_view name;
 		std::wstring_view code_name;
 		ver::dc::Type ty;//min max
+		std::optional<ver::dc::param_storage> params;
 	};
+	
 public:
 	NodeParser(std::wstring_view code);
 public:
@@ -23,8 +25,6 @@ public:
 private:
 	std::optional<token> GetTokenInternal();
 	void TryParseFunction();
-	void TryParseProperty(token& tok);
-	void GetPropertyVal(PropertyDesc& pd);
 private:
 	ver::generator<token> gen;
 	std::unordered_set<std::wstring> types;

@@ -15,9 +15,14 @@ public:
 	Editor();
 public:
 	void LoadText(const QString& in);
+	void SetConstants(std::vector<QString> c);
 	QString GetText()const noexcept
 	{
 		return code.toPlainText();
+	}
+	void SetCBufInfo(std::unordered_set<std::wstring> cbuf)
+	{
+		hl.SetCBufInfo(std::move(cbuf));
 	}
 	void SetInfo(
 		std::unordered_set<std::wstring> types, 

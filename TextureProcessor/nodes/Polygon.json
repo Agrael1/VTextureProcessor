@@ -7,12 +7,19 @@
         {
           "Tag": "Sides",
           "Type": "int",
-          "Val": 3
+          "Val": {
+            "default": 3,
+            "min": 2
+          }
         },
         {
           "Tag": "Shade",
           "Type": "float",
-          "Val": 1.0
+          "Val": {
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+          }
         }
       ],
       "Sources": [
