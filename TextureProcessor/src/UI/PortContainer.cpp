@@ -4,10 +4,6 @@
 #include <QLineEdit>
 #include <QStylePainter>
 
-#include <Logic/Node.h>
-#include <Logic/Sink.h>
-#include <Logic/Source.h>
-
 class ComboBox :public QComboBox
 {
 public:
@@ -65,9 +61,9 @@ public:
 		connect(&bclose, &QToolButton::clicked, [parent, this]() {parent->ClearEmpty(this); });
 	}
 public:
-	void SetName(std::string_view xname)
+	void SetName(const QString& xname)
 	{
-		name.setText(xname.data());
+		name.setText(xname);
 	}
 	void SetType(ver::PortType pt)
 	{
@@ -136,34 +132,32 @@ std::vector<ver::PortDesc> UI::PortContainer::GetPorts() const noexcept
 	for (size_t i = 0; i < length; i++)
 	{
 		auto* x = static_cast<Adder*>(props.itemWidget(props.item(i)));
-		out.emplace_back(x->Name(), x->Type());
+		if(any(x->Type()) && !x->Name().isEmpty())
+			out.emplace_back(x->Name(), x->Type());
 	}
 	return out;
 }
 
-UI::PortsProperty::PortsProperty()
+UI::PortsProperty::PortsProperty(std::span<ver::PortDesc> xsinks, std::span<ver::PortDesc> xsources)
 {
+	for (auto& i : xsinks)
+	{
+		auto* x = sinks.AddEmpty();
+		x->SetName(i.name);
+		x->SetType(i.type);
+	}
+	for (auto& i : xsources)
+	{
+		auto* x = sources.AddEmpty();
+		x->SetName(i.name);
+		x->SetType(i.type);
+	}
+
 	vl.addLayout(sinks.Layout());
 	vl.addLayout(sources.Layout());
 
 	sinks.SetHeader("Inputs:");
 	sources.SetHeader("Outputs:");
 	setLayout(&vl);
-}
-
-void UI::PortsProperty::LoadPorts(ver::Node& model)
-{
-	for (auto& i : model.GetSinks())
-	{
-		auto* x = sinks.AddEmpty();
-		x->SetName(i->GetRegisteredName());
-		x->SetType(i->GetType());
-	}
-	for (auto& i : model.GetSources())
-	{
-		auto* x = sources.AddEmpty();
-		x->SetName(i->GetName());
-		x->SetType(i->GetType());
-	}
 }
 

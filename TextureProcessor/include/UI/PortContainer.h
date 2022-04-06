@@ -12,7 +12,6 @@ namespace ver
 {
 	class Node;
 }
-
 class Adder;
 
 namespace UI
@@ -22,7 +21,6 @@ namespace UI
 	public:
 		PortContainer();
 	public:
-		bool Validate()const noexcept;
 		Adder* AddEmpty();
 		void ClearEmpty(QWidget* box);
 		QLayout* Layout()
@@ -48,7 +46,7 @@ namespace UI
 	class PortsProperty :public QWidget
 	{
 	public:
-		PortsProperty();
+		PortsProperty(std::span<ver::PortDesc> sinks, std::span<ver::PortDesc> sources);
 	public:
 		void LoadPorts(ver::Node& model);
 		auto GetSinks()const noexcept

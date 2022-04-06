@@ -55,14 +55,14 @@ void ver::DynamicNode::GetProperties(UI::Windows::PropertyElement& props)
 }
 
 ver::DynamicDescriptor::DynamicDescriptor()
-	:prop(std::make_shared<UI::PortsProperty>())
+	:prop(std::make_shared<UI::PortsProperty>(sinks, sources))
 	, pcont(std::make_shared<UI::PropertyContainer>(buffer, params))
 {
 }
 
 ver::DynamicDescriptor::DynamicDescriptor(QJsonObject document, std::string_view styleName)
 	: TextureDescriptor(document, styleName)
-	, prop(std::make_shared<UI::PortsProperty>())
+	, prop(std::make_shared<UI::PortsProperty>(sinks, sources))
 	, pcont(std::make_shared<UI::PropertyContainer>(buffer, params))
 {
 }
