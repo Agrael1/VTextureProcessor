@@ -2,6 +2,7 @@
 #include <QComboBox>
 #include <QToolButton>
 #include <Logic/DynamicConstant.h>
+#include <functional>
 
 
 namespace UI
@@ -69,12 +70,12 @@ namespace UI
 		template <class Func>
 		void SetSaveCallback(Func&& f)
 		{
-			connect(&saver.save, &QToolButton::pressed, std::forward<Func>(f));
+			saver.c_save = f;
 		}
 		template <class Func>
 		void SetDiscardCallback(Func&& f)
 		{
-			connect(&saver.discard, &QToolButton::pressed, std::forward<Func>(f));
+			saver.c_discard = f;
 		}
 		std::vector<ver::dc::Options> GatherOptions();
 		ver::dc::Layout GatherLayout();
@@ -93,6 +94,8 @@ namespace UI
 			QHBoxLayout hl;
 			QToolButton save;
 			QToolButton discard;
+			std::function<void()> c_save;
+			std::function<void()> c_discard;
 		}saver;
 	};
 }

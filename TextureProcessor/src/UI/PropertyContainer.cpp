@@ -216,29 +216,33 @@ void UI::PropertyContainer::RemoveElement(size_t xposition)
 UI::Editor::Editor(size_t position)
 	:opt(nullptr), position(position)
 {
+	type.addItem("Empty");
+	std::ranges::for_each(ver::dc::type_strings, [&](auto x) {type.addItem(x); });
 	Init();
 }
 UI::Editor::Editor(const ver::dc::Layout::Entry& entry, ver::dc::Options* xopt, size_t position)
 	:opt(xopt), position(position)
 {
-	Init();
+	type.addItem("Empty");
+	std::ranges::for_each(ver::dc::type_strings, [&](auto x) {type.addItem(x); });
 	type.setCurrentIndex(int(entry.second.Get()));
-	name.setText(entry.first.c_str());
-	code_name.setText(opt && opt->enable_alias ? opt->alias.c_str() : entry.first.c_str());
+	code_name.setText(entry.first.c_str());
+	name.setText(opt && opt->enable_alias ? opt->alias.c_str() : entry.first.c_str());
+	Init();
 }
 
 ver::dc::Options* UI::Editor::GetOption() const noexcept
 {
-	if (!editor)return opt;
-	auto& o = editor->GetOption();
 	auto n = name.text();
 	auto cn = code_name.text();
+	ver::dc::Options* o = !editor?opt:&editor->GetOption();
 
-	o.enable_alias = n != cn && !n.isEmpty();
-	if (o.enable_alias)
-		o.alias = n.toStdString();
-	if (!o.flags)return nullptr;
-	return &o;
+	o->enable_alias = n != cn && !n.isEmpty();
+	if (o->enable_alias)
+		o->alias = n.toStdString();
+
+	if (!o->flags)return nullptr;
+	return o;
 }
 ver::dc::Layout::Entry UI::Editor::GetEntry() const noexcept
 {
@@ -254,8 +258,6 @@ bool UI::Editor::Accept()
 }
 void UI::Editor::Init()
 {
-	type.addItem("Empty");
-	std::ranges::for_each(ver::dc::type_strings, [&](auto x) {type.addItem(x); });
 	hl.addWidget(&type);
 	remove.setIcon(QIcon{ ":/icon_window_close.png" });
 	hl.addWidget(&remove);
@@ -302,5 +304,8 @@ UI::PropertyContainer::Saver::Saver()
 	hl.addWidget(&discard);
 	hl.setContentsMargins(0, 0, 11, 0);
 	hl.setAlignment(Qt::AlignRight);
+
+	connect(&discard, &QToolButton::pressed, [this]() {if (c_discard)c_discard(); });
+	connect(&save, &QToolButton::pressed, [this]() {if (c_save)c_save(); });
 	setLayout(&hl);
 }

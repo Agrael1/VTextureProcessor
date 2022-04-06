@@ -48,7 +48,6 @@ namespace UI
 	public:
 		PortsProperty(std::span<ver::PortDesc> sinks, std::span<ver::PortDesc> sources);
 	public:
-		void LoadPorts(ver::Node& model);
 		auto GetSinks()const noexcept
 		{
 			return sinks.GetPorts();

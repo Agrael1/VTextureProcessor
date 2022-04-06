@@ -47,6 +47,7 @@ void ver::DynamicNode::GetProperties(UI::Windows::PropertyElement& props)
 				bchange = false;
 				d.GatherPropertyInfo();
 				d.prop_callback();
+				d.ResetContainer();
 				d.UpdateProperties(props);
 			});
 		props.Attach(d.pcont);

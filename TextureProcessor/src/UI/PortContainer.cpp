@@ -46,12 +46,12 @@ protected:
 
 class Adder : public QWidget
 {
-	static const QRegularExpression varname;
 public:
 	Adder(UI::PortContainer* parent)
 	{
 		bclose.setIcon(QIcon{ ":/icon_window_close.png" });
 
+		name.setValidator(&rev);
 		hl.addWidget(&name);
 		hl.addWidget(&cbox);
 		hl.addWidget(&bclose);
@@ -82,9 +82,8 @@ private:
 	QLineEdit name;
 	QToolButton bclose;
 	ComboBox cbox;
+	QRegularExpressionValidator rev{ QRegularExpression{ "^[_a-zA-Z]\\w*$" } };
 };
-
-const QRegularExpression Adder::varname{ "^[_a-z]\\w*$" };
 
 
 
