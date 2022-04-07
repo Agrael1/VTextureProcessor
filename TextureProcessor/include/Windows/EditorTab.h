@@ -10,25 +10,41 @@
 #include <UI/UINode.h>
 #include <Logic/DynamicNode.h>
 
+#include <DockManager.h>
+
+
 namespace UI::Windows
 {
 	class EditorTab : public Tab, public QMainWindow
 	{
-		struct SceneDock : public QDockWidget
+		struct SceneDock : public ads::CDockWidget
 		{
+			using base_class = ads::CDockWidget;
 			SceneDock(Properties& props);
 			~SceneDock();
 			FlowScene scene;
 			FlowView view;
 		};
-		struct EditorDock : public QDockWidget
+		struct EditorDock : public ads::CDockWidget
 		{
-			EditorDock() { setWidget(&edit); }
+			using base_class = ads::CDockWidget;
+			EditorDock();
 			Editor edit;
 		};
-
+		struct ConsoleDock : public ads::CDockWidget
+		{
+			using base_class = ads::CDockWidget;
+			ConsoleDock();
+			QPlainTextEdit console;
+		};
 	public:
 		EditorTab(std::filesystem::path&& p, Properties& props);
+		~EditorTab()
+		{
+			docker.removeDockWidget(&scene);
+			docker.removeDockWidget(&edit);
+			docker.removeDockWidget(&con);
+		}
 		std::pair<QJsonObject, std::string> Parse(const std::filesystem::path& p);
 	public:
 		QWidget* Widget() noexcept override
@@ -49,9 +65,11 @@ namespace UI::Windows
 		void SetCBufInfo();
 		void Compile();
 	private:
+		ads::CDockManager docker;
 		TableProperties tp;
 		SceneDock scene;
 		EditorDock edit;
+		ConsoleDock con;
 		std::optional<ver::DynamicDescriptor> tdesc;
 		std::optional<UI::NodeUI> node;
 	};

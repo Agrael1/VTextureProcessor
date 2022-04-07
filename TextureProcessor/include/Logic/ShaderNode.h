@@ -27,10 +27,11 @@ namespace ver
 		TextureDescriptor(QJsonObject document, std::string_view styleName);
 	public:
 		virtual std::unique_ptr<Node> MakeModel() override;
-		bool Assemble();
+		void Assemble();
 		bool CompileShader(const QString& xshader) {
 			return shader.compileSourceCode(xshader);
 		}
+		
 		virtual bool valid()const noexcept{
 			return shader.isCompiled();
 		}
@@ -45,6 +46,7 @@ namespace ver
 		std::vector<PortDesc> sources;
 		ver::dc::Layout buffer;
 		std::vector<dc::Options> params;
+		QString last_error;
 	};
 
 	class ShaderNode : public Node

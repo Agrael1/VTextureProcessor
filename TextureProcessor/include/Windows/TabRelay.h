@@ -9,7 +9,7 @@ namespace UI::Windows
 	class TabRelay : public QTabWidget
 	{
 	public:
-		TabRelay(QWidget* parent, SceneTab*&);
+		TabRelay(QWidget* parent);
 		~TabRelay();
 	public:
 		template<class T, class... Args> requires std::derived_from<T, Tab>
@@ -65,7 +65,6 @@ namespace UI::Windows
 	private:
 		std::unordered_map<std::string, std::unique_ptr<Tab>> temp_tabs;
 		std::unordered_map<std::string, std::unique_ptr<Tab>> tabs;
-		SceneTab*& cur_scene;
 		Tab* prev_tab = nullptr;
 	};
 }

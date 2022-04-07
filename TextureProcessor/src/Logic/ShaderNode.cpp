@@ -162,7 +162,7 @@ std::unique_ptr<Node> ver::TextureDescriptor::MakeModel()
 	return std::make_unique<ShaderNode>(*this);
 }
 
-bool ver::TextureDescriptor::Assemble()
+void ver::TextureDescriptor::Assemble()
 {
 	QString xshader{ "#version 420 \n" };
 	for (auto& i : buffer.Get())
@@ -174,8 +174,12 @@ bool ver::TextureDescriptor::Assemble()
 	for (auto i = 0; i < sources.size(); i++)
 		xshader += std::format("layout(location = {})out vec4 {};\n", i, sources[i].name.toStdString()).c_str();
 	xshader += "in vec2 sv_texc;\n"; //load texture coordinates
-	xshader += shader_body;
-	return CompileShader(xshader);
+	//xshader += shader_body;
+	if (!CompileShader(xshader + shader_body))
+	{
+		last_error = shader.log();
+		CompileShader(xshader + "void main(){}");
+	}
 }
 
 void ver::TextureDescriptor::SetProperties(const QJsonArray& props)

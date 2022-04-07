@@ -88,3 +88,17 @@ void UI::Windows::SceneTab::OnEnter() noexcept
 	Engine::SwitchScene(&scene);
 	scene.OnSelectionChanged();
 }
+
+void UI::Windows::SceneTab::Request(UI::Request rq)
+{
+	switch (rq)
+	{
+	case UI::Request::Save:return Save();
+	case UI::Request::Delete: return scene.DeleteSelected();
+	case UI::Request::Clear: return scene.Clear();
+	case UI::Request::ClearSel: return scene.clearSelection();
+	case UI::Request::Compile:
+	case UI::Request::Export: return scene.ExportAll();
+	default:break;
+	}
+}

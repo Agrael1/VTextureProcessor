@@ -21,18 +21,7 @@ namespace UI::Windows
 		void Load()override;
 		void OnEnter()noexcept override;
 
-		void DeleteSelected()
-		{
-			scene.DeleteSelected();
-		}
-		void ClearSelection()
-		{
-			scene.clearSelection();
-		}
-		void Export()
-		{
-			scene.ExportAll();
-		}
+		void Request(UI::Request rq) override;
 	private:
 		FlowScene scene;
 		FlowView view;

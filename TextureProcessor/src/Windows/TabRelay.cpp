@@ -5,8 +5,8 @@
 
 using namespace UI::Windows;
 
-TabRelay::TabRelay(QWidget* parent, SceneTab*& sc)
-	:QTabWidget(parent), cur_scene(sc)
+TabRelay::TabRelay(QWidget* parent)
+	:QTabWidget(parent)
 {
 	setMovable(true);
 	setTabsClosable(true);
@@ -24,7 +24,6 @@ void TabRelay::OnCurrentChanged(int index)
 	if (prev_tab)prev_tab->OnLeave();
 	prev_tab = GetCurrent();
 	if (!prev_tab)return;
-	cur_scene = dynamic_cast<SceneTab*>(prev_tab);
 	prev_tab->OnEnter();
 }
 

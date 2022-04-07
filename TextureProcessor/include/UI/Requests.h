@@ -5,6 +5,10 @@ namespace UI
 	enum class Request
 	{
 		Save,
-		Compile
+		Compile,
+		Delete,
+		Clear,
+		ClearSel,
+		Export,
 	};
 }
