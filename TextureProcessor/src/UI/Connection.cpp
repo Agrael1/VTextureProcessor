@@ -50,8 +50,8 @@ namespace UI
 			sink = rpSink()->CenterScene();
 			source = rpSource()->CenterScene();
 		}
-		virtual QJsonObject Serialize()override;
-		virtual void Deserialize(QJsonObject)override {}
+		virtual void Serialize(QJsonObject& doc)override;
+		virtual bool Deserialize(QJsonObject)override { return true; }
 		void RemoveForce()noexcept;
 
 	private:
@@ -193,7 +193,7 @@ void UI::Connection::Update()
 	node.Update();
 }
 
-QJsonObject UI::Connection::Serialize()
+void UI::Connection::Serialize(QJsonObject& doc)
 {
 	/*
 	The returned JSON has the following structure:
@@ -203,20 +203,16 @@ QJsonObject UI::Connection::Serialize()
 		"Sink": ["Node_name", sink_index]
 	}
 	*/
-	QJsonObject top;
 
 	QJsonArray source;
 	source.append(SourceNode().Name().data());
 	source.append(rpSource()->Index());
-	top.insert("Source", source);
+	doc.insert("Source", source);
 
 	QJsonArray sink;
-
 	sink.append(SinkNode().Name().data());
 	sink.append(rpSink()->Index());
-	top.insert("Sink", sink);
-
-	return top;
+	doc.insert("Sink", sink);
 }
 
 void UI::Connection::Init()

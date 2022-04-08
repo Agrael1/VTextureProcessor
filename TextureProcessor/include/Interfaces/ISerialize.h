@@ -6,6 +6,6 @@
 struct NOVTABLE ISerialize
 {
 	virtual ~ISerialize() = default;
-	virtual QJsonObject Serialize() = 0;
-	virtual void Deserialize(QJsonObject) = 0;
+	virtual void Serialize(QJsonObject& doc) = 0;
+	virtual bool Deserialize(QJsonObject doc) = 0;
 };

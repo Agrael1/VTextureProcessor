@@ -27,8 +27,8 @@ namespace UI
 		void OnSelectionChanged();
 		QSize Dimensions(QJsonObject)const noexcept;
 
-		virtual QJsonObject Serialize()override;
-		virtual void Deserialize(QJsonObject)override;
+		virtual void Serialize(QJsonObject& doc)override;
+		virtual bool Deserialize(QJsonObject doc)override;
 	protected:
 		bool event(QEvent* e)override;
 		UI::INode* CreateNode(std::string_view name);

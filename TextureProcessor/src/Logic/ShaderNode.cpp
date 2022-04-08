@@ -15,12 +15,13 @@
 #include <utils/utils.h>
 
 #include <UI/PropertyGenerator.h>
+#include <unordered_set>
 
 using namespace ver;
 
 
 ver::ShaderNode::ShaderNode(TextureDescriptor& td)
-	:desc(td), Node(std::format("{}_{}", td.style.StyleName().toStdString(), td.use_count())), buf(td.buffer, td.params)
+	:desc(td), Node(std::format("{}_{}", td.style.StyleName().toString().toStdString(), td.use_count())), buf(td.buffer, td.params)
 {
 	sinks.reserve(desc.sinks.size());
 	sources.reserve(desc.sources.size());
@@ -57,23 +58,21 @@ void ver::ShaderNode::Update()
 void ver::ShaderNode::GetProperties(UI::Windows::PropertyElement& props)
 {
 	UI::PropertyBuffer(props, buf, desc.params);
-
 }
 
-QJsonObject ver::ShaderNode::Serialize()
+void ver::ShaderNode::Serialize(QJsonObject& doc)
 {
-	QJsonObject node = Node::Serialize();
-	node.insert("Tiling", tiling);
-	node.insert("BufferState", buffer);
+	Node::Serialize(doc);
+	doc.insert("Tiling", tiling);
+	doc.insert("BufferState", buffer);
 
 	QJsonObject buffer;
 	for (auto&& x : buf)
 		buffer.insert(x.GetName().data(), QJsonValue::fromVariant(x.ToVariant()));
-	node.insert("Buffer", buffer);
-	return node;
+	doc.insert("Buffer", buffer);
 }
 
-void ver::ShaderNode::Deserialize(QJsonObject in)
+bool ver::ShaderNode::Deserialize(QJsonObject in)
 {
 	Node::Deserialize(in);
 	if (in.contains("Buffer"))
@@ -94,6 +93,7 @@ void ver::ShaderNode::Deserialize(QJsonObject in)
 	{
 		buffer = in["Buffer"].toBool(true);
 	}
+	return true;
 }
 
 void ver::ShaderNode::ExportSilent(std::string_view name)
@@ -111,48 +111,46 @@ std::string ver::ShaderNode::Export()
 	return str.toStdString();
 }
 
-ver::TextureDescriptor::TextureDescriptor(QJsonObject document, std::string_view styleName)
-	:style(document, styleName)
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+ver::TextureDescriptor::TextureDescriptor(QJsonObject node)
+	:style(node)
 {
-	auto node = document["Node"].toObject();
+	if (node.contains(u"Properties"))
+		SetProperties(node[u"Properties"].toArray());
 
-	if (node.contains("Properties"))
-		SetProperties(node["Properties"].toArray());
-
-	auto xsinks = node["Sinks"].toArray();
+	auto xsinks = node[u"Sinks"].toArray();
 	sinks.reserve(xsinks.size());
 	// Register all sinks
 	for (auto it : xsinks)
 	{
 		auto sink = it.toObject();
-		auto type = from_str(sink["Type"].toString().toStdString());
-		auto xname = sink["Name"].toString();
-		auto sname = xname.toStdString();
+		auto type = from_str(sink[u"Type"].toString());
 		auto& s = sinks.emplace_back();
-		s.name = std::move(xname);
+		s.name = sink[u"Name"].toString();
 		s.type = type;
 	}
 
-	auto xsources = node["Sources"].toArray();
+	auto xsources = node[u"Sources"].toArray();
 	sources.reserve(xsources.size());
 
 	// Register all sources
 	for (auto it : xsources)
 	{
 		auto source = it.toObject();
-		auto type = from_str(source["Type"].toString().toStdString());
-		auto xname = source["Name"].toString();
-		auto sname = xname.toStdString();
+		auto type = from_str(source[u"Type"].toString());
 		auto& s = sources.emplace_back();
-		s.name = std::move(xname);
+		s.name = source[u"Name"].toString();
 		s.type = type;
 	}
 
-	auto val = document["Value"];
+	auto val = node[u"Value"];
 
-	for (auto x : val.toArray())
-		shader_body += x.toString();
-
+	if (val.isArray())
+		for (auto x : val.toArray())
+			shader_body += x.toString();
+	else
+		shader_body = val.toString();
 	Assemble();
 }
 
@@ -164,7 +162,7 @@ std::unique_ptr<Node> ver::TextureDescriptor::MakeModel()
 
 void ver::TextureDescriptor::Assemble()
 {
-	QString xshader{ "#version 420 \n" };
+	QString xshader{ QStringLiteral("#version 420 \n") };
 	for (auto& i : buffer.Get())
 		xshader += std::format("uniform {} {};\n",
 			i.second.GetSignature().data(), i.first).c_str();
@@ -173,46 +171,63 @@ void ver::TextureDescriptor::Assemble()
 		xshader += std::format("layout(binding = {})uniform sampler2D {};\n", i, sinks[i].name.toStdString()).c_str();
 	for (auto i = 0; i < sources.size(); i++)
 		xshader += std::format("layout(location = {})out vec4 {};\n", i, sources[i].name.toStdString()).c_str();
-	xshader += "in vec2 sv_texc;\n"; //load texture coordinates
+	xshader += u"in vec2 sv_texc;\n"; //load texture coordinates
 	//xshader += shader_body;
 	if (!CompileShader(xshader + shader_body))
 	{
 		last_error = shader.log();
-		CompileShader(xshader + "void main(){}");
+		CompileShader(xshader + QStringLiteral("void main(){}"));
 	}
 }
-
 void ver::TextureDescriptor::SetProperties(const QJsonArray& props)
 {
 	for (size_t i = 0; auto it : props)
 	{
 		auto p = it.toObject();
-		auto type = dc::LayoutElement{ p["Type"].toString().toStdString() };
-		buffer += { p["Tag"].toString().toStdString(), type};
-		if (p.contains("Val"))
+		auto type = dc::LayoutElement{ p[u"Type"].toString().toStdString() };
+		buffer += { p[u"Tag"].toString().toStdString(), type};
+		if (p.contains(u"Val"))
 		{
 			auto& r = params.emplace_back(type.Get());
 			r.index = i;
-			if (p["Val"].isObject())
-				SetOptions(p["Val"].toObject(), r);
+			if (p[u"Val"].isObject())
+				SetOptions(p[u"Val"].toObject(), r);
 			else
 			{
 				r.enable_def = 1;
-				r.param.set_default(p["Val"].toVariant());
+				r.param.set_default(p[u"Val"].toVariant());
 			}
 		}
 		i++;
 	}
 }
+bool ver::TextureDescriptor::valid() const noexcept {
+	std::unordered_set<QStringView> distinct;
+	std::ranges::for_each(sinks, [&distinct](const ver::PortDesc& a) {distinct.emplace(a.name); });
+	if (distinct.size() != sinks.size()) 
+	{ 
+		last_error = QStringLiteral("Sink names are not unique");
+		return false; 
+	}
+	distinct.clear();
+	std::ranges::for_each(sources, [&distinct](const ver::PortDesc& a) {distinct.emplace(a.name); });
+	if (distinct.size() != sources.size()) {
+		last_error = QStringLiteral("Sources names are not unique"); return false;
+	}
+	if(!buffer.is_distinct()) {
+		last_error = QStringLiteral("Buffer Layout is not distinct"); return false;
+	}
+	return shader.isCompiled();
+}
 void ver::TextureDescriptor::SetOptions(QJsonObject obj, dc::Options& opt)
 {
-	auto def = obj.find("default");
+	auto def = obj.find(u"default");
 	if (opt.enable_def = def != obj.end())
 		opt.param.set_default(def->toVariant());
-	auto min = obj.find("min");
+	auto min = obj.find(u"min");
 	if (opt.enable_min = min != obj.end())
 		opt.param.set_min(min->toVariant());
-	auto max = obj.find("max");
+	auto max = obj.find(u"max");
 	if (opt.enable_max = max != obj.end())
 		opt.param.set_max(max->toVariant());
 }

@@ -12,6 +12,7 @@
 #include <vector>
 #include <variant>
 #include <span>
+#include <unordered_set>
 
 
 namespace ver::dc
@@ -130,6 +131,12 @@ namespace ver::dc
 				if (key == x.first)
 					return true;
 			return false;
+		}
+		bool is_distinct()const
+		{
+			std::unordered_set<std::string_view> distinct;
+			std::ranges::for_each(lay, [&distinct](const auto& a) {distinct.emplace(a.first); });
+			return distinct.size() == lay.size();
 		}
 	public:
 		std::pair<size_t, LayoutElement> GetOffsetAndType(std::string_view key) const

@@ -5,7 +5,7 @@
 #include <QLabel>
 #include <QJsonArray>
 #include <QGraphicsProxyWidget>
-
+#include <Logic/Node.h>
 
 
 using namespace UI;
@@ -32,15 +32,13 @@ UI::NodeUI::NodeUI(std::unique_ptr<ver::Node> xmodel)
 	l_main->addItem(&l_right);
 	setLayout(l_main);
 
-	auto& stn = model->GetStyle().StyleName();
-	if (stn == "Output") {
+	auto stn = model->GetStyle().StyleName();
+	if (stn == u"Output") {
 		type = Type::Output;
 	}
-	else if (stn == "Input") {
+	else if (stn == u"Input") {
 		type = Type::Input;
 	}
-
-
 
 	l_main->setContentsMargins(0.0, 0.0, 0.0, 0.0);
 	l_main->setSpacing(0.0);
@@ -50,7 +48,6 @@ UI::NodeUI::NodeUI(std::unique_ptr<ver::Node> xmodel)
 
 	Init();
 }
-
 UI::NodeUI::~NodeUI()
 {
 	b_destroyed = true;
@@ -62,11 +59,11 @@ void UI::NodeUI::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 	DrawBackground(painter);
 	QGraphicsWidget::paint(painter, option, widget);
 }
-
 void UI::NodeUI::DrawBackground(QPainter* painter)
 {
 	constexpr qreal edge_size = 10.0;
 	constexpr qreal offset = PortStyle::port_bbox / 2;
+	auto& style = model->GetStyle();
 
 	auto xwidth = geometry().width() - PortStyle::port_bbox;
 	auto xheight = Header().height();
@@ -77,7 +74,7 @@ void UI::NodeUI::DrawBackground(QPainter* painter)
 	path_title.addRoundedRect(QRectF(offset, 0, xwidth, xheight), edge_size, edge_size);
 	path_title.addRect(offset, xheight - edge_size, xwidth, edge_size);
 	painter->setPen(Qt::NoPen);
-	painter->setBrush(GetModel().GetStyle().Title());
+	painter->setBrush(style.brTitle);
 	painter->drawPath(path_title.simplified());
 
 
@@ -86,16 +83,10 @@ void UI::NodeUI::DrawBackground(QPainter* painter)
 	path_content.setFillRule(Qt::WindingFill);
 	path_content.addRoundedRect(QRectF(offset, xheight, xwidth, geometry().height() - xheight), edge_size, edge_size);
 	path_content.addRect(offset, xheight, xwidth, edge_size);
-	painter->setPen(Qt::NoPen);
-	painter->setBrush(GetModel().GetStyle().Background());
+	painter->setBrush(style.brBackground);
 	painter->drawPath(path_content.simplified());
 
-	if (isSelected()) {
-		painter->setPen({ { "#FFFFFFFF" },2.0 });
-	}
-	else {
-		painter->setPen(Qt::NoPen);
-	}
+	painter->setPen(style.Boundary(isSelected()));
 	painter->setBrush(Qt::BrushStyle::NoBrush);
 	painter->drawPath((path_title + path_content).simplified());
 }
@@ -111,23 +102,17 @@ QVariant UI::NodeUI::itemChange(GraphicsItemChange change, const QVariant& value
 	return INode::itemChange(change, value);
 }
 
-void UI::NodeUI::ReplaceModel(std::unique_ptr<ver::Node> xmodel)
-{
-	model = std::move(xmodel);
-	Init();
-}
-
 void UI::NodeUI::MakeHeader()
 {
 	if (proxy)return UpdateHeader();
 	auto& style = GetModel().GetStyle();
 	proxy = std::make_unique<QGraphicsProxyWidget>();
-	auto xlab = new QLabel(style.StyleName());
+	auto xlab = new QLabel(style.StyleName().toString());
 	QFont a{}; a.setBold(true);
 	QFontMetrics m{ a };
 	auto sz = m.height() >> 1;
 	QPalette p;
-	p.setColor(xlab->foregroundRole(), style.FontColor());
+	p.setColor(xlab->foregroundRole(), style.font_color);
 	xlab->setFont(a);
 	xlab->setAutoFillBackground(true);
 	xlab->setPalette(p);
@@ -141,27 +126,33 @@ void UI::NodeUI::MakeHeader()
 void UI::NodeUI::UpdateHeader()
 {
 	auto& h = Header();
-	h.setText(model->GetStyle().StyleName());
+	h.setText(model->GetStyle().StyleName().toString());
 	h.adjustSize();
 	h.setMinimumSize(h.size());
 }
 void UI::NodeUI::MakeSinks()
 {
 	size_t sk = model->SinksCount();
-	sinks.clear();
 	sinks.reserve(sk);
 	for (uint8_t i = 0; i < sk; i++)
 		l_left.addItem(&sinks.emplace_back(*this, i, model->GetSink(i)));
-	l_left.activate();
 }
 void UI::NodeUI::MakeSources()
 {
 	size_t sk = model->SourcesCount();
-	sources.clear();
 	sources.reserve(sk);
 	for (uint8_t i = 0; i < sk; i++)
 		l_right.addItem(&sources.emplace_back(*this, i, model->GetSource(i)));
-	l_right.activate();
+}
+void UI::NodeUI::ConstructModules()
+{
+	//make probe
+	modules.clear();
+	auto r = model->GetLayout();
+	modules.reserve(r.size());
+	for (const auto& x : r)
+		l_central.addItem(&modules.emplace_back(x));
+	l_central.activate();
 }
 
 void UI::NodeUI::Init()
@@ -172,18 +163,8 @@ void UI::NodeUI::Init()
 	MakeSinks();
 	MakeSources();
 
-	Update();
 	UpdateLayouts();
-}
-
-void UI::NodeUI::ConstructModules()
-{
-	modules.clear();
-	auto r = GetModel().GetLayout();
-	modules.reserve(r.size());
-	for (const auto& x : r)
-		l_central.addItem(&modules.emplace_back(x));
-	l_central.activate();
+	Update();
 }
 
 void UI::NodeUI::UpdateLayouts()
@@ -204,35 +185,36 @@ void UI::NodeUI::UpdateLayouts()
 	l_right.setSpacing(source_delta);
 	l_main->activate();
 }
-
 QLabel& UI::NodeUI::Header()
 {
 	return *static_cast<QLabel*>(proxy->widget());
 }
 
-QJsonObject UI::NodeUI::Serialize()
+void UI::NodeUI::Serialize(QJsonObject& doc)
 {
-	QJsonObject j;
 	QJsonArray xpos;
-	QJsonObject node = GetModel().Serialize();
+	QJsonObject node;
 
+	GetModel().Serialize(node);
 	xpos.append(scenePos().x());
 	xpos.append(scenePos().y());
 	node.insert("Position", xpos);
 
-	j.insert(GetModel().GetStyle().StyleName(), node);
-	return j;
+	doc.insert(GetModel().GetStyle().StyleName(), node);
 }
-
-void UI::NodeUI::Deserialize(QJsonObject in)
+bool UI::NodeUI::Deserialize(QJsonObject in)
 {
 	if (in.contains("Position"))
 	{
-		auto v = in["Position"].toArray();
+		auto vx = in["Position"];
+		if (vx.isArray()) return false;
+		auto v = vx.toArray();
+		if (v.size() < 2) return false;
 		setPos(QPointF{ v[0].toDouble(), v[1].toDouble() });
 	}
 	GetModel().Deserialize(in);
 	Update();
+	return true;
 }
 
 std::string_view UI::NodeUI::Name() const

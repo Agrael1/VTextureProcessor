@@ -228,7 +228,7 @@ QSize UI::FlowScene::Dimensions(QJsonObject in) const noexcept
  *
  * @return QJsonObject
  */
-QJsonObject FlowScene::Serialize()
+void FlowScene::Serialize(QJsonObject& doc)
 {
 	/*
 	Output JSON is in the following format:
@@ -242,7 +242,6 @@ QJsonObject FlowScene::Serialize()
 		]
 	}
 	*/
-	QJsonObject sc;
 	QJsonArray xdims;
 	QJsonArray xnodes;
 	QJsonArray conns;
@@ -252,16 +251,13 @@ QJsonObject FlowScene::Serialize()
 
 	for (auto& x : nodes)
 	{
-		xnodes.append(x.second->Serialize());
-		auto* node = &*(x.second);
-		for (auto* c : ConnectionMap::Get(*node))
-			conns.append(Query(c).Serialize());
+		QJsonObject a, b;
+		x.second->Serialize(a);
+		xnodes.append(a);
 	}
-	sc.insert("Dimensions", xdims);
-	sc.insert("Nodes", xnodes);
-	sc.insert("Connections", conns);
-
-	return sc;
+	doc.insert("Dimensions", xdims);
+	doc.insert("Nodes", xnodes);
+	doc.insert("Connections", conns);
 }
 
 /**
@@ -269,10 +265,10 @@ QJsonObject FlowScene::Serialize()
  *
  * @param obj
  */
-void FlowScene::Deserialize(QJsonObject xobj)
+bool FlowScene::Deserialize(QJsonObject xobj)
 {
 	// Nothing to draw if no Nodes
-	if (!xobj.contains("Nodes")) return;
+	if (!xobj.contains("Nodes")) return true;
 
 	std::unordered_map<QString, QString> names;
 
@@ -301,7 +297,7 @@ void FlowScene::Deserialize(QJsonObject xobj)
 		xnode->Deserialize(node);
 	}
 
-	if (!xobj.contains("Connections")) return;
+	if (!xobj.contains("Connections")) return true;
 
 	QJsonArray conns = xobj["Connections"].toArray();
 	for (auto c : conns)
@@ -358,6 +354,7 @@ void FlowScene::Deserialize(QJsonObject xobj)
 	if (missing)
 		QMessageBox{ QMessageBox::Warning, "Warning", "Some nodes were missing, because their type was not loaded properly",
 		QMessageBox::Ok }.exec();
+	return true;
 }
 
 UI::INode* GetNode(const auto& in)

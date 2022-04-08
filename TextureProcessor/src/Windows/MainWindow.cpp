@@ -43,7 +43,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	file.addAction("Clear", [this]() { tab->RequestActive(UI::Request::Clear); });
 	file.addAction("Load", [this]() { OnLoad(); });
 	file.addAction("Save", [this]() {tab->RequestActive(UI::Request::Save); }, { QKeySequence::StandardKey::Save });
-	file.addAction("Save As", [this]() {tab->OnSaveAs(); }, { tr("Ctrl+Shift+S") });
+	file.addAction("Save As", [this]() {tab->RequestActive(UI::Request::SaveAs); }, { tr("Ctrl+Shift+S") });
 	file.addSeparator();
 	file.addAction("Export", [this]() {tab->RequestActive(UI::Request::Export); });
 

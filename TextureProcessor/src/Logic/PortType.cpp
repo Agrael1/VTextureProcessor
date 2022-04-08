@@ -2,5 +2,5 @@
 
 using namespace UI;
 const PortStyle PortStyle::Grayscale;
-const PortStyle PortStyle::Color{ .brSink{"#1fff35"},.brSource{"#15b024"} };
-const PortStyle PortStyle::Normal{ .brSink{"#a87dff"},.brSource{"#906ed4"} };
+const PortStyle PortStyle::Color{ .brSink{QColor{u"#1fff35"}},.brSource{QColor{u"#15b024"}} };
+const PortStyle PortStyle::Normal{ .brSink{QColor{u"#a87dff"}},.brSource{QColor{u"#906ed4"}} };

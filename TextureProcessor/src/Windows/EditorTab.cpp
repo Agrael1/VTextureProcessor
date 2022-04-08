@@ -1,6 +1,7 @@
 #include <Windows/EditorTab.h>
 #include <Windows/Properties.h>
 #include <Logic/Engine.h>
+#include <Logic/Constants.h>
 #include <UI/ProjectEvent.h>
 #include <Editor/NodeParser.h>
 
@@ -8,8 +9,12 @@
 #include <DockWidgetTab.h>
 
 #include <fstream>
+#include <filesystem>
 #include <iterator>
 #include <ranges>
+
+
+namespace fs = std::filesystem;
 
 using namespace UI::Windows;
 
@@ -45,6 +50,33 @@ void UI::Windows::EditorTab::OnLeave() noexcept
 {
 	tp.hide();
 }
+void UI::Windows::EditorTab::Save()
+{
+	std::fstream f;
+	f.open(Path(), std::ios::out);
+	QJsonDocument doc{ tdesc->Save() };
+	f << doc.toJson().constData();
+}
+void UI::Windows::EditorTab::SaveAs()
+{
+	fs::path proj_path{ QFileDialog::getSaveFileName(
+	nullptr,
+	"Save Node As",
+	"",
+	ver::node_filter.c_str()).toStdString() };
+
+	if (proj_path.empty()) return;
+
+	if (!proj_path.has_extension()) {
+		proj_path.replace_extension(ver::proj_ext.c_str());
+	}
+
+	std::fstream f;
+	f.open(proj_path, std::ios::out);
+	QJsonDocument doc{ tdesc->Save() };
+	f << doc.toJson().constData();
+	SetPath(proj_path);
+}
 void UI::Windows::EditorTab::Init(Properties& props) noexcept
 {
 	docker.setStyleSheet("");
@@ -76,10 +108,9 @@ UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 	:Tab(std::move(p)), scene(props), tp(this), docker(this)
 {
 	Engine::SwitchScene(&scene.scene);
-	auto [a, b] = Parse(Path());
 
 	con.console.setPlainText("---------------------Compiling Node Shader----------------------");
-	tdesc.emplace(a, b);
+	tdesc.emplace(Parse(Path()));
 	tdesc->prop_callback = [this]() {SetCBufInfo(); };
 
 	auto rx = std::move(tdesc->last_error);
@@ -93,11 +124,11 @@ UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 	SetCBufInfo();
 
 	Init(props);
-	auto& x = tdesc->style.StyleName();
-	tp.SetName(x.isEmpty() ? "Node" : x);
+	auto x = tdesc->style.StyleName();
+	tp.SetName(x.isEmpty() ? QStringLiteral("Node") : x.toString());
 	scene.scene.addItem(&*node);
 }
-std::pair<QJsonObject, std::string> UI::Windows::EditorTab::Parse(const std::filesystem::path& p)
+QJsonObject UI::Windows::EditorTab::Parse(const std::filesystem::path& p)
 {
 	if (p.empty())return{};
 
@@ -115,20 +146,12 @@ std::pair<QJsonObject, std::string> UI::Windows::EditorTab::Parse(const std::fil
 	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e);
 	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return{}; }
 
-	QJsonObject topLevelObject = json.object();
+	QJsonObject node = json.object();
 
-	auto key = topLevelObject.keys()[0];
-	{
-		QJsonObject obj = topLevelObject[key].toObject();
-		// Name of the node style
-		auto wkey = key.toStdString();
-		auto node = obj["Node"].toObject();
-
-		// Loads texture Node style
-		if (node["Class"].toString() == "Texture")
-			return { obj, wkey };
-		return {};
-	}
+	// Loads texture Node style
+	if (node[u"Class"].toString() == u"Texture")
+		return node;
+	return {};
 }
 
 void UI::Windows::EditorTab::Compile()
@@ -139,7 +162,7 @@ void UI::Windows::EditorTab::Compile()
 	tdesc->Recompile();
 	auto x = std::move(tdesc->last_error);
 	con.console.appendPlainText(x);
-	if(x.isEmpty())
+	if (x.isEmpty())
 		con.console.appendPlainText("---------------------Compilation Successful-----------------------");
 	else
 		con.console.appendPlainText("---------------------Compilation Failed---------------------------");
@@ -162,7 +185,8 @@ void UI::Windows::EditorTab::Request(UI::Request rq)
 {
 	switch (rq)
 	{
-	case UI::Request::Save:return Save();
+	case UI::Request::Save:if (IsTemporary())return SaveAs(); return Save();
+	case UI::Request::SaveAs:return SaveAs();
 	case UI::Request::Compile:return Compile();
 	case UI::Request::Delete:return scene.scene.DeleteSelected();
 	case UI::Request::Clear:return scene.scene.Clear();
@@ -172,13 +196,12 @@ void UI::Windows::EditorTab::Request(UI::Request rq)
 }
 
 UI::Windows::EditorTab::EditorDock::EditorDock() :base_class("Editor") { setFeatures(QFlags{ base_class::DockWidgetFeature::DefaultDockWidgetFeatures } &= ~base_class::DockWidgetFeature::DockWidgetClosable); setWidget(&edit); }
-
 UI::Windows::EditorTab::ConsoleDock::ConsoleDock() :base_class("Console")
 {
 	console.setReadOnly(true);
 	QFont a{};
 	a.setPixelSize(14);
 	console.setFont(a);
-	setFeatures(QFlags{ base_class::DockWidgetFeature::DefaultDockWidgetFeatures } &= ~base_class::DockWidgetFeature::DockWidgetClosable); 
+	setFeatures(QFlags{ base_class::DockWidgetFeature::DefaultDockWidgetFeatures } &= ~base_class::DockWidgetFeature::DockWidgetClosable);
 	setWidget(&console);
 }

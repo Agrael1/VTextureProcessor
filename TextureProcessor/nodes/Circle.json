@@ -1,50 +1,47 @@
 {
-  "Circle": {
-    "Node": {
-      "Class": "Texture",
-      "Group": "Shapes",
-      "Properties": [
-        {
-          "Tag": "Shade",
-          "Type": "float",
-          "Val": {
-            "default": 1.0,
-            "min": 0.0,
-            "max": 2.0
-          }
-        },
-        {
-          "Tag": "Radius",
-          "Type": "float",
-          "Val": {
-            "default": 1.0,
-            "min": 0.0,
-            "max": 2.0
-          }
-        }
-      ],
-      "Sources": [
-        {
-          "Name": "Shape",
-          "Type": "Grayscale"
-        }
-      ]
+  "Name": "Circle",
+  "Class": "Texture",
+  "Group": "Shapes",
+
+  "TitleColor": [ 128, 0, 0 ],
+  "FontColor": "white",
+
+  "Properties": [
+    {
+      "Tag": "Shade",
+      "Type": "float",
+      "Val": {
+        "default": 1.0,
+        "min": 0.0,
+        "max": 2.0
+      }
     },
-    "NodeStyle": {
-      "TitleColor": [ 128, 0, 0 ],
-      "FontColor": "white"
-    },
-    "Value": [
-      "float circle(in vec2 _st){\n",
-      " vec2 dist = _st-vec2(0.5);       \n",
-      " return Shade - smoothstep(Radius-(Radius*0.01),  \n",
-      "   Radius+(Radius*0.01),      \n",
-      "   dot(dist,dist)*4.0);       \n",
-      "}              \n",
-      "void main() {           \n",
-      " vec3 xcolor = vec3(circle(sv_texc));    \n",
-      " Shape = vec4(xcolor, 1.0);       \n",
-      "}"
-    ]
-  }
+    {
+      "Tag": "Radius",
+      "Type": "float",
+      "Val": {
+        "default": 1.0,
+        "min": 0.0,
+        "max": 2.0
+      }
+    }
+  ],
+  "Sources": [
+    {
+      "Name": "Shape",
+      "Type": "Grayscale"
+    }
+  ],
+  "Value": [
+    "float circle(in vec2 _st){\n",
+    " vec2 dist = _st-vec2(0.5);       \n",
+    " return Shade - smoothstep(Radius-(Radius*0.01),  \n",
+    "   Radius+(Radius*0.01),      \n",
+    "   dot(dist,dist)*4.0);       \n",
+    "}              \n",
+    "void main() {           \n",
+    " vec3 xcolor = vec3(circle(sv_texc));    \n",
+    " Shape = vec4(xcolor, 1.0);       \n",
+    "}"
+  ]
 }

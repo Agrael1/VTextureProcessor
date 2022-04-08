@@ -16,7 +16,7 @@ namespace ver
 		friend class DynamicNode;
 	public:
 		DynamicDescriptor();
-		DynamicDescriptor(QJsonObject document, std::string_view styleName);
+		DynamicDescriptor(QJsonObject document);
 		~DynamicDescriptor();
 	public:
 		virtual std::unique_ptr<Node> MakeModel() override;
@@ -24,6 +24,7 @@ namespace ver
 		void ModifySinks();
 		void ModifySources();
 		void Recompile();
+		QJsonObject Save();
 
 		void ResetContainer();
 		bool AcceptContainer();

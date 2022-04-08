@@ -14,7 +14,7 @@
 
 using namespace ver;
 
-ver::Node::~Node(){}
+ver::Node::~Node() {}
 
 std::string_view Node::GetName() const noexcept
 {
@@ -44,17 +44,16 @@ Sink& Node::GetSink(size_t index)
 	return *sinks.at(index);
 }
 
-void Node::RegisterSink(std::unique_ptr<Sink>&& in)
+void Node::RegisterSink(std::unique_ptr<Sink> in)
 {
-	// check for overlap of input names
-	for (auto& si : sinks)
-		if (si->GetRegisteredName() == in->GetRegisteredName())
-			throw RGC_EXCEPTION(std::format("Registered sink overlaps with existing: {}", in->GetRegisteredName()));
-
+	if (!ValidateSink(*in))
+		throw RGC_EXCEPTION(std::format("Registered sink overlaps with existing: {}", in->GetRegisteredName()));
 	sinks.push_back(std::move(in));
 }
-void Node::RegisterSource(std::unique_ptr<Source>&& in)
+void Node::RegisterSource(std::unique_ptr<Source> in)
 {
+	if (!ValidateSource(*in))
+		throw RGC_EXCEPTION(std::format("Registered source overlaps with existing: {}", in->GetName()));
 	sources.push_back(std::move(in));
 }
 
@@ -65,7 +64,6 @@ bool ver::Node::ValidateSink(Sink& in)
 			return false;
 	return true;
 }
-
 bool ver::Node::ValidateSource(Source& in)
 {
 	// check for overlap of output names
@@ -84,14 +82,11 @@ void ver::Node::SetSinkLinkage(size_t index, std::string_view to_node, std::stri
 	GetSink(index).SetTarget(to_node, source);
 }
 
-QJsonObject ver::Node::Serialize()
+void ver::Node::Serialize(QJsonObject& doc)
 {
-	QJsonObject node;
 	auto name = GetName();
 	auto unders = name.find_last_of('_');
 	int ref;
 	std::from_chars(name.data() + unders + 1, name.data() + name.size(), ref);
-	node.insert("Ref", ref);
-	return node;
+	doc.insert("Ref", ref);
 }
-

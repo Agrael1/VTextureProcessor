@@ -1,6 +1,6 @@
 /**
  * @file NodeStyle.cpp
- * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @author Ilya Doroshenko (xdoros01)
  * @brief Node header color specification
  */
 
@@ -22,22 +22,20 @@ const ConnectionStyle ConnectionStyle::Grayscale;
  * @param varname Target color name
  * @return QColor Found target color
  */
-static inline QColor ReadColor(QJsonObject values, std::string_view varname) noexcept
+static inline QColor ReadColor(QJsonValueRef value) noexcept
 {
-    auto valueRef = values[varname.data()];
-    // RGB color name
-    if (valueRef.isArray())
-    {
-        auto colorArray = valueRef.toArray();
-        std::array<int, 3> rgb;
-        for (size_t i = 0; const auto & it : colorArray)
-            rgb[i++] = it.toInt();
-        return { rgb[0], rgb[1], rgb[2] };
-    }
-    // Non-RGB color name ('green', 'red', etc.)
+	if (value.isString())
+		return value.toString();
 
-    auto s = valueRef.toString();
-    return { s };
+	if (value.isArray())
+	{
+		auto colorArray = value.toArray();
+		std::array<int, 3> rgb;
+		for (size_t i = 0; i < 3; i++)
+			rgb[i] = colorArray[i].toInt();
+		return { rgb[0], rgb[1], rgb[2] };
+	}
+	return Qt::black;
 }
 
 /**
@@ -46,13 +44,24 @@ static inline QColor ReadColor(QJsonObject values, std::string_view varname) noe
  * @param document Node JSON data
  * @param name Name of the Node style
  */
-NodeStyle::NodeStyle(QJsonObject document, std::string_view name)
-    :styleName(name.data())
+NodeStyle::NodeStyle(QJsonObject document)
 {
-	QJsonValueRef nodeStyleValues = document["NodeStyle"];
-	QJsonObject obj = nodeStyleValues.toObject();
-    if (obj.empty())return;
+	Deserialize(document);
+}
 
-    brTitle.setColor(ReadColor(obj, "TitleColor"));
-    font_color = ReadColor(obj, "FontColor");
+void UI::NodeStyle::Serialize(QJsonObject& doc)
+{
+	doc.insert(u"TitleColor", brTitle.color().name());
+	doc.insert(u"FontColor", font_color.name());
+}
+
+bool UI::NodeStyle::Deserialize(QJsonObject doc)
+{
+	if (!doc.contains(u"Name"))return false;
+	styleName = doc[u"Name"].toString();
+	if (doc.contains(u"TitleColor"))
+		brTitle.setColor(ReadColor(doc[u"TitleColor"]));
+	if (doc.contains(u"TitleColor"))
+		font_color = ReadColor(doc[u"FontColor"]);
+	return true;
 }

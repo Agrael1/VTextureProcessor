@@ -3,6 +3,7 @@
 #include <QJsonDocument>
 #include <Logic/ShaderNode.h>
 #include <Logic/OutputNode.h>
+#include <Logic/Constants.h>
 #include <filesystem>
 #include <fstream>
 
@@ -33,7 +34,7 @@ FlowCodex::FlowCodex()
 		if (!p.is_regular_file())
 			continue;
 
-		if (p.path().extension() == ".json")
+		if (p.path().extension() == ver::node_ext.c_str())
 		{
 			std::ifstream t(p.path());
 			std::string str;
@@ -79,24 +80,17 @@ void UI::FlowCodex::ClearCounts()
 
 void UI::FlowCodex::ParseJson(const QJsonDocument& json)
 {
-	QJsonObject topLevelObject = json.object();
+	QJsonObject node = json.object();
+	
+	// Loads texture Node style
+	std::unique_ptr<ver::Descriptor> p;
+	if (node[u"Class"].toString() == u"Texture")
+		p = std::make_unique<ver::TextureDescriptor>(node);
+	if (!p || !p->valid())
+		return;
 
-	for (auto key : topLevelObject.keys())
-	{
-		QJsonObject obj = topLevelObject[key].toObject();
-		// Name of the node style
-		auto wkey = key.toStdString();
-		auto node = obj["Node"].toObject();
-
-		// Loads texture Node style
-		std::unique_ptr<ver::Descriptor> p;
-		if (node["Class"].toString() == "Texture")
-			p = std::make_unique<ver::TextureDescriptor>(obj, wkey);
-		if (!p || !p->valid())continue;
-
-		// Adds new group to the context menu
-		auto pair = codex.emplace(wkey, std::move(p));
-		auto x = node["Group"].toString().toStdString();
-		cats[x].emplace_back((*pair.first).first);
-	}
+	// Adds new group to the context menu
+	auto pair = codex.emplace(((ver::TextureDescriptor*)p.get())->style.StyleName().toString().toStdString(), std::move(p));
+	auto x = node[u"Group"].toString().toStdString();
+	cats[x].emplace_back((*pair.first).first);
 }

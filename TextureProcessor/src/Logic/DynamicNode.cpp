@@ -9,6 +9,18 @@
 #include <UI/PropertyContainer.h>
 
 
+//constexpr auto qsa()
+//{
+//	([]() noexcept -> QString {
+//		enum { Size = sizeof(QT_UNICODE_LITERAL(str)) / 2 - 1 };
+//		static const QStaticStringData<Size> qstring_literal = {
+//			Q_STATIC_STRING_DATA_HEADER_INITIALIZER(Size),
+//			QT_UNICODE_LITERAL(str) };
+//		QStringDataPtr holder = { qstring_literal.data_ptr() };
+//		return QString(holder);
+//		}());
+//}
+
 void ver::DynamicNode::GetProperties(UI::Windows::PropertyElement& props)
 {
 	auto& d = Desc();
@@ -61,8 +73,8 @@ ver::DynamicDescriptor::DynamicDescriptor()
 {
 }
 
-ver::DynamicDescriptor::DynamicDescriptor(QJsonObject document, std::string_view styleName)
-	: TextureDescriptor(document, styleName)
+ver::DynamicDescriptor::DynamicDescriptor(QJsonObject document)
+	: TextureDescriptor(document)
 	, prop(std::make_shared<UI::PortsProperty>(sinks, sources))
 	, pcont(std::make_shared<UI::PropertyContainer>(buffer, params))
 {
@@ -89,6 +101,20 @@ void ver::DynamicDescriptor::Recompile()
 	ModifySinks();
 	ModifySources();
 	Assemble();
+}
+
+QJsonObject ver::DynamicDescriptor::Save()
+{
+	QJsonObject top;
+	QJsonObject obj;
+	QJsonObject obj2;
+
+	style.Serialize(obj2);
+	obj.insert("NodeStyle", obj2);
+	obj.insert("Value", shader_body);
+
+	top.insert(style.StyleName(), obj);
+	return top;
 }
 
 void ver::DynamicDescriptor::ResetContainer()

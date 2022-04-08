@@ -5,10 +5,12 @@
 
 constexpr uint32_t nullcolor = 0;
 
+
+
 ver::OutputNode::OutputNode()
-	:out(std::make_shared<QImage>()),
-	style({}, "Output")
+	:out(std::make_shared<QImage>())
 {
+	style.SetStyleName(QStringView{ u"Output"}.toString());
 	RegisterSink(DirectTextureSink::Make("Out", in, PortType::Grayscale));
 }
 
@@ -23,9 +25,9 @@ void ver::OutputNode::Update()
 std::string ver::OutputNode::Export()
 {
 	auto str = QFileDialog::getSaveFileName(nullptr,
-		"Export As",
+		QStringLiteral("Export As"),
 		"",
-		"PNG (*.png);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm);;All files (*.*);;"
+		QStringLiteral("PNG (*.png);;BMP (*.bmp);;CUR (*.cur);;GIF (*.gif);;ICNS (*.icns);;ICO (*.ico);;JPEG (*.jpeg);;JPG (*.jpg);;PBM (*.pbm);;PGM (*.pgm);;PPM (*.ppm);;SVG (*.svg);;SVGZ (*.svgz);;TGA (*.tga);;TIF (*.tif);;TIFF (*.tiff);;WBMP (*.wbmp);;WEBP (*.webp);;XBM (*.xbm);;XPM (*.xpm);;All files (*.*);;")
 	);
 	if (str.isEmpty())return"";
 	out->mirrored().save(str);

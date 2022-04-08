@@ -25,7 +25,7 @@ namespace ver
 	{
 	public:
 		Node() = default;
-		Node(std::string name):name(name){};
+		Node(std::string name):name(std::move(name)){};
 		virtual ~Node();
 	public:
 		std::span<const std::unique_ptr<Source>> GetSources()const noexcept	{return sources;}
@@ -43,8 +43,8 @@ namespace ver
 		size_t SourcesCount()const noexcept { return sources.size(); }
 		size_t SinksCount()const noexcept { return sinks.size(); }
 
-		void RegisterSink(std::unique_ptr<Sink>&& in);
-		void RegisterSource(std::unique_ptr<Source>&& in);
+		void RegisterSink(std::unique_ptr<Sink> in);
+		void RegisterSource(std::unique_ptr<Source> in);
 
 		bool ValidateSink(Sink& in);
 		bool ValidateSource(Source& in);
@@ -57,8 +57,8 @@ namespace ver
 		virtual std::string Export() = 0;
 		virtual void Update() = 0;
 		virtual void ExportSilent(std::string_view name) = 0;
-		virtual QJsonObject Serialize()override;
-		virtual void Deserialize(QJsonObject in)override {};
+		virtual void Serialize(QJsonObject& doc)override;
+		virtual bool Deserialize(QJsonObject in)override { return true; };
 		virtual std::span<std::shared_ptr<QImage>> GetLayout() = 0;
 	protected:
 		std::vector<std::unique_ptr<Sink>> sinks;

@@ -3,18 +3,18 @@
 #include <UI/NodeModules.h>
 #include <UI/Port.h>
 #include <Interfaces/INode.h>
-#include <Logic/Node.h>
-#include <UI/PropertyHandler.h>
 
 class QGraphicsProxyWidget;
 class QLabel;
 
+namespace ver
+{
+	class Node;
+}
+
 namespace UI
 {
-	class Sink;
-	class Source;
-
-	class NodeUI : public INode
+	class NodeUI final: public INode
 	{
 	public:
 		enum class Type :uint8_t
@@ -27,22 +27,7 @@ namespace UI
 		NodeUI(std::unique_ptr<ver::Node> model);
 		~NodeUI();
 	public:
-		virtual void paint(QPainter* painter,
-			const QStyleOptionGraphicsItem* option,
-			QWidget* widget = nullptr) override;
-		void DrawBackground(QPainter* painter);
-		virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value)override;
-	public:
-		void ReplaceModel(std::unique_ptr<ver::Node> model);
-		void MakeHeader();
 		void UpdateHeader();
-		void MakeSinks();
-		void MakeSources();
-		void Init();
-		void ConstructModules();
-		void UpdateLayouts();
-		QLabel& Header();
-	public:
 		const ver::Node& GetModel()const noexcept
 		{
 			return const_cast<ver::Node&>(const_cast<NodeUI*>(this)->GetModel());
@@ -50,8 +35,8 @@ namespace UI
 		ver::Node& GetModel() noexcept { return *model; };
 		Type GetType()const noexcept { return type; }
 	public:
-		virtual QJsonObject Serialize()override;
-		virtual void Deserialize(QJsonObject in)override;
+		virtual void Serialize(QJsonObject& doc)override;
+		virtual bool Deserialize(QJsonObject in)override;
 
 		virtual std::string_view Name()const override;
 		virtual void Update()override;
@@ -61,7 +46,22 @@ namespace UI
 		virtual void FinishConnection(uint8_t index)override;
 		virtual void UpdateProperties(Windows::PropertyElement& properties) override;
 		virtual void Disconnect()override;
-	protected:
+
+	private:
+		virtual void paint(QPainter* painter,
+			const QStyleOptionGraphicsItem* option,
+			QWidget* widget = nullptr) override;
+		virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value)override;
+	private:
+		void MakeHeader();
+		void MakeSinks();
+		void MakeSources();
+		void Init();
+		void ConstructModules();
+		void UpdateLayouts();
+		void DrawBackground(QPainter* painter);
+		QLabel& Header();
+	private:
 		std::unique_ptr<ver::Node> model;
 		GraphicsLinearLayout* l_main = nullptr;
 		GraphicsLinearLayout l_left;
@@ -72,6 +72,7 @@ namespace UI
 		std::unique_ptr<QGraphicsProxyWidget> proxy;
 		std::vector<Source> sources;
 		std::vector<Sink> sinks;
+
 		bool b_destroyed = false;
 		Type type = Type::Other;
 	};

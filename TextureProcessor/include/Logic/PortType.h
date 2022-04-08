@@ -6,6 +6,7 @@
  */
 #pragma once 
 #include <QString>
+#include <QPen>
 #include <array>
 
 #define ENUMERATE()\
@@ -34,6 +35,14 @@ namespace ver
 	{
 		using enum PortType;
 #define X(x) if(i == #x)return x;
+		ENUMERATE()
+#undef X
+			return None;
+	}
+	inline PortType from_str(QStringView i)
+	{
+		using enum PortType;
+#define X(x) if(i == u#x)return x;
 		ENUMERATE()
 #undef X
 			return None;
@@ -85,10 +94,10 @@ namespace UI
 			}
 		}
 	public:
-		QPen port{ {"#FFFFFFFF"}, pen_width };
-		QBrush brSink{ "#FF828282" };
-		QBrush brSinkUsed{ "#FFD9DDDC" };
-		QBrush brSource{ "#FF909090" };
+		QPen port{ QColor{u"#FFFFFFFF"}, pen_width };
+		QBrush brSink{ QColor{u"#FF828282"} };
+		QBrush brSinkUsed{ QColor{u"#FFD9DDDC"} };
+		QBrush brSource{ QColor{u"#FF909090"} };
 	public:
 		static const PortStyle Grayscale;
 		static const PortStyle Color;

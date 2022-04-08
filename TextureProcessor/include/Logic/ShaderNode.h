@@ -24,7 +24,7 @@ namespace ver
 	{
 	public:
 		TextureDescriptor() = default;
-		TextureDescriptor(QJsonObject document, std::string_view styleName);
+		TextureDescriptor(QJsonObject document);
 	public:
 		virtual std::unique_ptr<Node> MakeModel() override;
 		void Assemble();
@@ -32,9 +32,7 @@ namespace ver
 			return shader.compileSourceCode(xshader);
 		}
 		
-		virtual bool valid()const noexcept{
-			return shader.isCompiled();
-		}
+		virtual bool valid()const noexcept;
 	private:
 		void SetOptions(QJsonObject obj, dc::Options& opt);
 		void SetProperties(const QJsonArray& props);
@@ -46,7 +44,7 @@ namespace ver
 		std::vector<PortDesc> sources;
 		ver::dc::Layout buffer;
 		std::vector<dc::Options> params;
-		QString last_error;
+		mutable QString last_error;
 	};
 
 	class ShaderNode : public Node
@@ -64,8 +62,8 @@ namespace ver
 		
 		void GetProperties(UI::Windows::PropertyElement& props);
 
-		virtual QJsonObject Serialize()override;
-		virtual void Deserialize(QJsonObject in)override;
+		virtual void Serialize(QJsonObject& doc)override;
+		virtual bool Deserialize(QJsonObject in)override;
 		virtual void ExportSilent(std::string_view name)override;
 		virtual std::string Export()override;
 		virtual UI::NodeStyle& GetStyle()override

@@ -8,35 +8,35 @@
 #include <QPen>
 #include <QBrush>
 #include <QJsonObject>
+#include <Interfaces/ISerialize.h>
 
 namespace UI
 {
-	class NodeStyle
+	class NodeStyle : public ISerialize
 	{
+		friend class NodeUI;
 	public:
 		constexpr static const qreal h_offset = 10.0;
 		constexpr static const qreal pen_width = 1.0;
 		constexpr static const qreal item_padding = 10.0;
-		constexpr static const qreal min_width = 150.0;
-		constexpr static const qreal min_height = 120.0;
 	public:
 		NodeStyle() = default;
-		NodeStyle(QJsonObject document, std::string_view styleName);
+		NodeStyle(QJsonObject document);
 	public:
-		auto Background()const noexcept { return brBackground; }
-		auto Title()const noexcept { return brTitle; }
-		auto FontColor()const noexcept { return font_color; }
-		void SetFontColor(QColor c)noexcept { font_color = c; }
-		const QString& StyleName()const noexcept {return styleName;}
-		void SetStyleName(const QString& name)noexcept { styleName = name; }
+		virtual void Serialize(QJsonObject& doc)override;
+		virtual bool Deserialize(QJsonObject doc)override;
+
+		QStringView StyleName()const noexcept { return styleName; }
+		void SetStyleName(QString name)noexcept { styleName = std::move(name); }
+		const QPen& Boundary(bool selected)const noexcept { return selected ? boundary.Selected : boundary.Normal; }
 	private:
 		struct
 		{
-			QColor Selected{ "#FFFF36A7" };
-			QColor Normal{ "#7F000000" };
+			QPen Selected{ QColor{u"#FFFF36A7"}, pen_width };
+			QPen Normal{ QColor{u"#7F000000"} , pen_width };
 		}boundary;
-		QBrush brTitle{ "#E3212121" };
-		QBrush brBackground{ "#E31a1a1a" };
+		QBrush brTitle{ QColor{u"#E3212121"} };
+		QBrush brBackground{ QColor{u"#E31a1a1a"} };
 		QColor font_color{ Qt::white };
 		QString styleName;
 	};
@@ -45,9 +45,9 @@ namespace UI
 	{
 		constexpr static const int line_width = 3;
 	public:
-		QPen sketch{ {"#FF878787"}, line_width, Qt::DashLine };
-		QPen connected{ {"#FFD9DDDC"}, line_width };
-		QPen selected{ Qt::white, line_width*2 };
+		QPen sketch{ QColor{u"#FF878787"}, line_width, Qt::DashLine };
+		QPen connected{ QColor{u"#FFD9DDDC"}, line_width };
+		QPen selected{ Qt::white, line_width * 2 };
 	public:
 		static const ConnectionStyle Grayscale;
 	};

@@ -45,14 +45,14 @@ namespace UI::Windows
 			docker.removeDockWidget(&edit);
 			docker.removeDockWidget(&con);
 		}
-		std::pair<QJsonObject, std::string> Parse(const std::filesystem::path& p);
+		QJsonObject Parse(const std::filesystem::path& p);
 	public:
 		QWidget* Widget() noexcept override
 		{
 			return this;
 		}
-		void Save() override {};
-		void SaveAs() override {};
+		void Save() override;
+		void SaveAs() override;
 		void Clear() override {};
 		void Load() override;
 		void OnEnter()noexcept override;

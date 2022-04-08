@@ -25,7 +25,9 @@ void SceneTab::Save()
 {
 	std::fstream f;
 	f.open(Path(), std::ios::out);
-	QJsonDocument doc{ scene.Serialize() };
+	QJsonObject o;
+	scene.Serialize(o);
+	QJsonDocument doc{ o };
 	f << doc.toJson().constData();
 }
 void SceneTab::SaveAs()
@@ -46,7 +48,9 @@ void SceneTab::SaveAs()
 	std::fstream f;
 	f.open(proj_path, std::ios::out);
 	if (!f.is_open()) return;
-	QJsonDocument doc{ scene.Serialize() };
+	QJsonObject o;
+	scene.Serialize(o);
+	QJsonDocument doc{ o };
 	f << doc.toJson().constData();
 }
 
@@ -93,7 +97,8 @@ void UI::Windows::SceneTab::Request(UI::Request rq)
 {
 	switch (rq)
 	{
-	case UI::Request::Save:return Save();
+	case UI::Request::Save:if (IsTemporary())return SaveAs(); return Save();
+	case UI::Request::SaveAs:return Save();
 	case UI::Request::Delete: return scene.DeleteSelected();
 	case UI::Request::Clear: return scene.Clear();
 	case UI::Request::ClearSel: return scene.clearSelection();
