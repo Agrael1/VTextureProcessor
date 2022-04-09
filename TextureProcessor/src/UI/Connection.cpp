@@ -139,7 +139,7 @@ UI::Connection::~Connection()
 {
 	// Only unmaps if the nodes were correctly connected
 	if (bFinished)
-		ConnectionMap::Unmap(SourceNode(), *this);
+		QueryConnectionMap(scene()).Unmap(SourceNode(), *this);
 }
 
 void UI::Connection::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -248,12 +248,13 @@ void UI::Connection::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	if (port && !HasCycle(&port->Node()) && port->GetType() == Requires())
 		return PlaceConnection(*port);
 
-	if (any(Requires()))ConnectionMap::ClearTemporary();
+	if (any(Requires()))QueryConnectionMap(scene()).ClearTemporary();
 }
 
 void UI::Connection::PlaceConnection(Port& port)
 {
 	prepareGeometryChange();
+	auto& conm = QueryConnectionMap(scene());
 
 	// Extrapolates missing Sink or Source
 	switch (Requires())
@@ -261,17 +262,17 @@ void UI::Connection::PlaceConnection(Port& port)
 	case ver::PortSide::Sink:
 	{
 		rpSink() = &port;
-		static_cast<Sink&>(port).connection = std::move(ConnectionMap::DetachTemporary());
+		static_cast<Sink&>(port).connection = std::move(conm.DetachTemporary());
 		sink = port.CenterScene();
 		break;
 	}
 	case ver::PortSide::Source:
 		rpSource() = &port;
-		static_cast<Sink&>(*rpSink()).connection = std::move(ConnectionMap::DetachTemporary());
+		static_cast<Sink&>(*rpSink()).connection = std::move(conm.DetachTemporary());
 		source = port.CenterScene();
 		break;
 	}
-	ConnectionMap::Map(SourceNode(), *this);
+	conm.Map(SourceNode(), *this);
 	Connect();
 
 	// Set connection as properly terminated (for cleanup)
@@ -281,16 +282,16 @@ bool UI::Connection::HasCycle(INode* with) const noexcept
 {
 	std::array<INode*, 128> place;
 	std::array<std::byte, 1024> place2;
-	std::pmr::monotonic_buffer_resource rsrc{ place.data(), place.size()*sizeof(INode*) };
+	std::pmr::monotonic_buffer_resource rsrc{ place.data(), place.size() * sizeof(INode*) };
 	std::pmr::monotonic_buffer_resource rsrc2{ place2.data(), place2.size() };
-	std::pmr::vector<const INode*> nodes{&rsrc};
+	std::pmr::vector<const INode*> nodes{ &rsrc };
 	std::pmr::unordered_set<const INode*> visited(&rsrc2);
 
 	auto trans = [this](Connection* in)->const INode& {return in->SinkNode(); };
 
 	const INode* root = nullptr;
 	const INode* searched = nullptr;
-	if (Requires() == ver::PortSide::Sink){
+	if (Requires() == ver::PortSide::Sink) {
 		root = with;
 		searched = &SourceNode();
 	}
@@ -307,11 +308,11 @@ bool UI::Connection::HasCycle(INode* with) const noexcept
 		auto* node = nodes.back();
 		nodes.pop_back();
 
-		if (!visited.contains(node)){
+		if (!visited.contains(node)) {
 			if (node == searched)return true;
 			visited.emplace(node);
 		}
-		for (auto& x : ConnectionMap::Get(*node) | std::views::transform(trans))
+		for (auto& x : QueryConnectionMap(scene()).Get(*node) | std::views::transform(trans))
 			if (!visited.contains(&x))
 				nodes.push_back(&x);
 	}
@@ -360,7 +361,7 @@ const INode& UI::Connection::SinkNode()const
 {
 	return const_cast<Connection*>(this)->SinkNode();
 }
-const INode& UI::Connection::SourceNode()const 
+const INode& UI::Connection::SourceNode()const
 {
 	return const_cast<Connection*>(this)->SourceNode();
 }
@@ -386,29 +387,22 @@ void UI::Connection::Disconnect()
 }
 
 
-
-ConnectionMap& UI::ConnectionMap::Instance()
-{
-	static ConnectionMap mapper;
-	return mapper;
-}
-
 void UI::ConnectionMap::MakeTemporary(Port& port)
 {
-	Instance().tmp.reset(new Connection{ port });
-	Instance().tmp->grabMouse();
+	tmp.reset(new Connection{ port });
+	((Connection*)tmp.get())->grabMouse();
 }
 void UI::ConnectionMap::ConnectTemporary(Port& port)
 {
-	auto* tmp = Instance().tmp.get();
 	if (!tmp)return;
-	Instance().tmp->ungrabMouse();
-	Instance().tmp->PlaceConnection(port);
+	((Connection*)tmp.get())->ungrabMouse();
+	((Connection*)tmp.get())->PlaceConnection(port);
 }
 void UI::ConnectionMap::AttachTemporary(std::unique_ptr<IConnection>&& in)
 {
-	auto& x = Instance().tmp;
-	x = static_unique_pointer_cast<Connection>(std::move(in));
+	tmp = std::move(in);
+
+	auto* x = ((Connection*)tmp.get());
 	Unmap(x->SourceNode(), *x);
 	x->Disconnect();
 	x->ResetSink();
@@ -416,11 +410,11 @@ void UI::ConnectionMap::AttachTemporary(std::unique_ptr<IConnection>&& in)
 }
 void UI::ConnectionMap::ClearTemporary()
 {
-	Instance().tmp.reset();
+	tmp.reset();
 }
-std::unique_ptr<Connection> UI::ConnectionMap::DetachTemporary()
+std::unique_ptr<IConnection> UI::ConnectionMap::DetachTemporary()
 {
-	return std::move(Instance().tmp);
+	return std::move(tmp);
 }
 void UI::ConnectionMap::UpdateGraph(INode& from)
 {
@@ -431,27 +425,39 @@ void UI::ConnectionMap::UpdateGraph(INode& from)
 
 void UI::ConnectionMap::Map(INode& n, Connection& c)
 {
-	auto& i = Instance();
-	i.map[&n].push_back(&c);
+	map[&n].push_back(&c);
 }
 void UI::ConnectionMap::Unmap(INode& n, Connection& c)
 {
-	auto& x = Instance().map.at(&n);
+	auto& x = map.at(&n);
 	auto it = std::find(x.begin(), x.end(), &c);
 	if (it != x.end())x.erase(it);
 }
 void UI::ConnectionMap::Trim(INode& n)
 {
-	auto x = std::move(Instance().map[&n]);
+	auto x = std::move(map[&n]);
 	for (auto* i : x)
 		i->RemoveForce();
-	Instance().map.erase(&n);
+	map.erase(&n);
 }
 std::span<Connection*> UI::ConnectionMap::Get(const INode& n)
 {
-	return Instance().map[&n];
+	return map[&n];
 }
 
 UI::ConnectionMap::~ConnectionMap()
 {
+}
+
+void UI::ConnectionMap::Serialize(QJsonObject& doc)
+{
+	QJsonArray c;
+	for (auto& i : map)
+		for (auto* j : i.second)
+		{
+			QJsonObject a;
+			j->Serialize(a);
+			c.append(a);
+		}
+	doc.insert(u"Connections", c);
 }

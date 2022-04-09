@@ -1,12 +1,13 @@
 ﻿/**
  * @file FlowScene.h
- * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @author Ilya Doroshenko (xdoros01)
  * @brief Logic behind Node editor canvas
  */
 #pragma once
 #include <UI/FlowCodex.h>
 #include <UI/ContextMenu.h>
 #include <UI/NodeMenu.h>
+#include <UI/Connection.h>
 
 #include <QGraphicsScene>
 
@@ -22,6 +23,7 @@ namespace UI
 		FlowScene(QObject* parent, Windows::Properties& props, QSize dims);
 	public:
 		void DeleteSelected();
+		ConnectionMap& Connections() { return connections; }
 		void Clear();
 		void ExportAll();
 		void OnSelectionChanged();
@@ -47,6 +49,7 @@ namespace UI
 		UI::Windows::Properties& props;
 		UI::FlowCodex codex;
 
+		ConnectionMap connections;
 		std::unordered_map<std::string, std::unique_ptr<INode>> nodes;
 		std::vector<INode*> outputs;
 

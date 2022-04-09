@@ -51,7 +51,7 @@ UI::NodeUI::NodeUI(std::unique_ptr<ver::Node> xmodel)
 UI::NodeUI::~NodeUI()
 {
 	b_destroyed = true;
-	ConnectionMap::Trim(*this);
+	Disconnect();
 }
 
 void UI::NodeUI::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -226,7 +226,8 @@ void UI::NodeUI::Update()
 	GetModel().Update();
 	for (auto& x : modules)
 		x.Update();
-	ConnectionMap::UpdateGraph(*this);
+	if(scene())
+		QueryConnectionMap(scene()).UpdateGraph(*this);
 	update();
 }
 
@@ -242,12 +243,12 @@ void UI::NodeUI::ExportSilent(std::string_view in)
 
 void UI::NodeUI::StartConnection(uint8_t index)
 {
-	ConnectionMap::MakeTemporary(sources[index]);
+	QueryConnectionMap(scene()).MakeTemporary(sources[index]);
 }
 
 void UI::NodeUI::FinishConnection(uint8_t index)
 {
-	ConnectionMap::ConnectTemporary(sinks[index]);
+	QueryConnectionMap(scene()).ConnectTemporary(sinks[index]);
 }
 
 void UI::NodeUI::UpdateProperties(Windows::PropertyElement& properties)
@@ -257,7 +258,7 @@ void UI::NodeUI::UpdateProperties(Windows::PropertyElement& properties)
 
 void UI::NodeUI::Disconnect()
 {
-	ConnectionMap::Trim(*this);
+	QueryConnectionMap(scene()).Trim(*this);
 }
 
 

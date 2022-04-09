@@ -1,12 +1,12 @@
 /**
  * @file FlowScene.cpp
- * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @author Ilya Doroshenko (xdoros01)
  * @brief Logic behind Node editor canvas
  */
 #include <UI/FlowScene.h>
 #include <UI/SceneEvent.h>
 #include <UI/UINode.h>
-#include <UI/Connection.h>
+ //#include <UI/Connection.h>
 
 #include <Windows/Properties.h>
 #include <QMessageBox>
@@ -214,8 +214,8 @@ void FlowScene::ExportAll()
 QSize UI::FlowScene::Dimensions(QJsonObject in) const noexcept
 {
 	if (dims != QSize{}) return dims;
-	if (!in.contains("Dimensions")) return{ 0,0 };
-	QJsonArray arr = in["Dimensions"].toArray();
+	if (!in.contains(u"Dimensions")) return{ 0,0 };
+	QJsonArray arr = in[u"Dimensions"].toArray();
 	if (arr.count() != 2) {
 		qDebug() << "Bad Dimensions";
 		return{ 0,0 };
@@ -244,7 +244,6 @@ void FlowScene::Serialize(QJsonObject& doc)
 	*/
 	QJsonArray xdims;
 	QJsonArray xnodes;
-	QJsonArray conns;
 
 	xdims.append(dims.width());
 	xdims.append(dims.height());
@@ -255,9 +254,9 @@ void FlowScene::Serialize(QJsonObject& doc)
 		x.second->Serialize(a);
 		xnodes.append(a);
 	}
+	connections.Serialize(doc);
 	doc.insert("Dimensions", xdims);
 	doc.insert("Nodes", xnodes);
-	doc.insert("Connections", conns);
 }
 
 /**
@@ -278,8 +277,8 @@ bool FlowScene::Deserialize(QJsonObject xobj)
 	for (auto&& ref : arr)
 	{
 		QJsonObject obj = ref.toObject();
-		if (obj.isEmpty()||!obj.contains(u"Name")||!obj.contains(u"Type"))continue;
-		
+		if (obj.isEmpty() || !obj.contains(u"Name") || !obj.contains(u"Type"))continue;
+
 		auto name = obj[u"Name"].toString();
 		auto type = obj[u"Type"].toString();
 		if (name.isEmpty() || type.isEmpty())continue;
@@ -293,57 +292,61 @@ bool FlowScene::Deserialize(QJsonObject xobj)
 		names.emplace(name, xnode->Name().data());
 	}
 
-	if (!xobj.contains("Connections")) return true;
+	if (!xobj.contains(u"Connections")) return true;
 
-	QJsonArray conns = xobj["Connections"].toArray();
-	for (auto c : conns)
+	QJsonArray conns = xobj[u"Connections"].toArray();
+	for (auto&& c : conns)
 	{
 		auto o = c.toObject();
 		// Skip incomplete connections
-		if (!(o.contains("Sink") && o.contains("Source"))) continue;
-		auto source = o["Source"].toArray();
+		if (!o.contains(u"Sink") || !o.contains(u"Source")) continue;
+		auto source = o[u"Source"].toArray();
 		UI::INode* node = nullptr;
 		uint8_t sourceN = 0;
 
 		// Lookup source index
-		for (auto v : source)
+		for (auto&& v : source)
 		{
-			if (v.isString())
+			if (!v.isString())
 			{
-				auto xkey = names.find(v.toString());
-				if (xkey == names.end()) break;
-				auto key = xkey->second.toStdString();
-				auto xnode = nodes.find(key);
-				if (xnode == nodes.end()) break;
-				node = xnode->second.get();
+				sourceN = v.toInt(-1);
+				if (sourceN == -1)break;
 				continue;
 			}
-			sourceN = v.toInt();
+
+			auto xkey = names.find(v.toString());
+			if (xkey == names.end())break;
+			auto key = xkey->second.toStdString();
+			auto xnode = nodes.find(key);
+			if (xnode == nodes.end()) break;
+			node = xnode->second.get();
 		}
 
 		if (!node) continue;
 		// Similar to manual drag and drop connection
 		node->StartConnection(sourceN);
 
-		auto sink = o["Sink"].toArray();
+		auto sink = o[u"Sink"].toArray();
 		node = nullptr;
 		uint8_t sinkN = 0;
 		// Lookup sink index
-		for (auto v : sink)
+		for (auto&& v : sink)
 		{
-			if (v.isString())
+			if (!v.isString())
 			{
-				auto xkey = names.find(v.toString());
-				if (xkey == names.end()) break;
-				auto key = xkey->second.toStdString();
-				auto xnode = nodes.find(key);
-				if (xnode == nodes.end()) break;
-				node = xnode->second.get();
+				sinkN = v.toInt(-1);
+				if (sinkN == -1)break;
 				continue;
 			}
-			sinkN = v.toInt();
+
+			auto xkey = names.find(v.toString());
+			if (xkey == names.end())break;
+			auto key = xkey->second.toStdString();
+			auto xnode = nodes.find(key);
+			if (xnode == nodes.end()) break;
+			node = xnode->second.get();
 		}
-		if (!node) { ConnectionMap::ClearTemporary(); continue; }
+		if (!node) { connections.ClearTemporary(); continue; }
 		node->FinishConnection(sinkN);
 	}
 

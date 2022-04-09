@@ -53,8 +53,8 @@ void UI::Sink::MoveConnections(QPointF delta)
 void UI::Sink::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
 	if (connection)
-		return ConnectionMap::AttachTemporary(std::move(connection));
-	ConnectionMap::MakeTemporary(*this);
+		return QueryConnectionMap(scene()).AttachTemporary(std::move(connection));
+	QueryConnectionMap(scene()).MakeTemporary(*this);
 }
 
 UI::Source::Source(INode& parent, uint8_t port_num, ver::Source& model)
@@ -70,11 +70,11 @@ void UI::Source::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 
 void UI::Source::MoveConnections(QPointF delta)
 {
-	for (auto& s : ConnectionMap::Get(Node()) | std::views::transform([](Connection* x)->IConnection& {return Query(x); }))
+	for (auto& s : QueryConnectionMap(scene()).Get(Node()) | std::views::transform([](Connection* x)->IConnection& {return Query(x); }))
 		s.Move(delta, ver::PortSide::Source);
 }
 
 void UI::Source::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-	ConnectionMap::MakeTemporary(*this);
+	QueryConnectionMap(scene()).MakeTemporary(*this);
 }
