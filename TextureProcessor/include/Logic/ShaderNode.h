@@ -53,7 +53,6 @@ namespace ver
 		ShaderNode(TextureDescriptor& td);
 	public:
 		dc::Buffer& GetBuffer() { return buf; }
-		bool& Tiling() { return tiling; }
 		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
 		{
 			return outputs;
@@ -76,8 +75,6 @@ namespace ver
 		TextureDescriptor& desc;
 
 		dc::Buffer buf;
-		bool tiling = false;
-		bool buffer = true;
 	};
 }
 

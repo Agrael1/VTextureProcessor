@@ -84,7 +84,7 @@ void MainWindow::OnLoad()
 
 	if (proj_path.empty()) return;
 	proj_path = proj_path.make_preferred();
-	auto& cs = tab->LoadTab<SceneTab>(std::move(proj_path), proj_path.filename().string(), property_dock, QSize(256, 256));
+	tab->LoadTab<SceneTab>(std::move(proj_path), proj_path.filename().string(), property_dock, QSize(256, 256));
 }
 
 void MainWindow::OnCreateNode()
@@ -102,6 +102,6 @@ void MainWindow::OnLoadNode()
 
 	if (node_path.empty()) return;
 	node_path = node_path.make_preferred();
-	auto& cs = tab->LoadTab<EditorTab>(std::move(node_path), node_path.filename().string(), property_dock);
+	tab->LoadTab<EditorTab>(std::move(node_path), node_path.filename().string(), property_dock);
 }
 

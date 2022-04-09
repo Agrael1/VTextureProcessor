@@ -59,11 +59,12 @@ void SceneTab::Clear()
 	scene.Clear();
 }
 
-void SceneTab::Load()
+bool SceneTab::Load()
 {
 	using namespace std::string_literals;
-	std::fstream t;
-	t.open(Path(), std::ios::in);
+	std::ifstream t;
+	t.open(Path());
+	if (!t.is_open())return false;
 
 	std::string str;
 	t.seekg(0, std::ios::end);
@@ -76,15 +77,15 @@ void SceneTab::Load()
 	str.assign((std::istreambuf_iterator<char>(t)),
 		std::istreambuf_iterator<char>());
 
-	if (str.empty())return;
+	if (str.empty())return false;
 
 	QJsonParseError e;
 
 	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e).object();
-	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return; }
+	if (e.error != QJsonParseError::NoError) { qDebug() << e.errorString(); return false; }
 	Engine::Instance().BindScene(&scene, scene.Dimensions(json));
-	OnEnter();
-	scene.Deserialize(json);
+	Engine::SwitchScene(&scene);
+	return scene.Deserialize(json);
 }
 
 void UI::Windows::SceneTab::OnEnter() noexcept

@@ -81,12 +81,3 @@ void ver::Node::SetSinkLinkage(size_t index, std::string_view to_node, std::stri
 {
 	GetSink(index).SetTarget(to_node, source);
 }
-
-void ver::Node::Serialize(QJsonObject& doc)
-{
-	auto name = GetName();
-	auto unders = name.find_last_of('_');
-	int ref;
-	std::from_chars(name.data() + unders + 1, name.data() + name.size(), ref);
-	doc.insert("Ref", ref);
-}

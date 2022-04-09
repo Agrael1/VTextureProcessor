@@ -251,7 +251,7 @@ void FlowScene::Serialize(QJsonObject& doc)
 
 	for (auto& x : nodes)
 	{
-		QJsonObject a, b;
+		QJsonObject a;
 		x.second->Serialize(a);
 		xnodes.append(a);
 	}
@@ -268,33 +268,29 @@ void FlowScene::Serialize(QJsonObject& doc)
 bool FlowScene::Deserialize(QJsonObject xobj)
 {
 	// Nothing to draw if no Nodes
-	if (!xobj.contains("Nodes")) return true;
+	if (!xobj.contains(u"Nodes")) return true;
 
 	std::unordered_map<QString, QString> names;
-
 	bool missing = false;
+	bool incomplete = false;
 
-	QJsonArray arr = xobj["Nodes"].toArray();
-	for (auto ref : arr)
+	QJsonArray arr = xobj[u"Nodes"].toArray();
+	for (auto&& ref : arr)
 	{
 		QJsonObject obj = ref.toObject();
-
-		if (obj.isEmpty())continue;
-		auto stype = obj.keys().first();
-		auto type = stype.toStdString();
-		auto node = obj[stype].toObject();
-
-		// Skip if Node is not uniquely identifiable
-		if (!node.contains("Ref")) continue;
-		auto xref = node["Ref"].toInt();
+		if (obj.isEmpty()||!obj.contains(u"Name")||!obj.contains(u"Type"))continue;
+		
+		auto name = obj[u"Name"].toString();
+		auto type = obj[u"Type"].toString();
+		if (name.isEmpty() || type.isEmpty())continue;
 
 		// Create unique name from Ref and Type
-		auto* xnode = CreateNode(type);
+		auto* xnode = CreateNode(type.toStdString());
 		if (!xnode) { missing = true; continue; }
-		names.emplace(stype + node["Ref"].toString(), xnode->Name().data());
 
 		// Load config from JSON into the new Node
-		xnode->Deserialize(node);
+		incomplete |= !xnode->Deserialize(obj);
+		names.emplace(name, xnode->Name().data());
 	}
 
 	if (!xobj.contains("Connections")) return true;
@@ -353,6 +349,9 @@ bool FlowScene::Deserialize(QJsonObject xobj)
 
 	if (missing)
 		QMessageBox{ QMessageBox::Warning, "Warning", "Some nodes were missing, because their type was not loaded properly",
+		QMessageBox::Ok }.exec();
+	if (incomplete)
+		QMessageBox{ QMessageBox::Warning, "Warning", "Some node information was not loaded properly",
 		QMessageBox::Ok }.exec();
 	return true;
 }

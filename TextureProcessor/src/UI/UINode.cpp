@@ -193,26 +193,24 @@ QLabel& UI::NodeUI::Header()
 void UI::NodeUI::Serialize(QJsonObject& doc)
 {
 	QJsonArray xpos;
-	QJsonObject node;
-
-	GetModel().Serialize(node);
 	xpos.append(scenePos().x());
 	xpos.append(scenePos().y());
-	node.insert("Position", xpos);
 
-	doc.insert(GetModel().GetStyle().StyleName(), node);
+	doc.insert(u"Type", model->GetStyle().StyleName().toString());
+	model->Serialize(doc);
+	doc.insert(u"Position", xpos);
 }
 bool UI::NodeUI::Deserialize(QJsonObject in)
 {
-	if (in.contains("Position"))
+	if (in.contains(u"Position"))
 	{
-		auto vx = in["Position"];
-		if (vx.isArray()) return false;
+		auto vx = in[u"Position"];
+		if (!vx.isArray()) return false;
 		auto v = vx.toArray();
 		if (v.size() < 2) return false;
 		setPos(QPointF{ v[0].toDouble(), v[1].toDouble() });
 	}
-	GetModel().Deserialize(in);
+	if (!GetModel().Deserialize(in))return false;
 	Update();
 	return true;
 }

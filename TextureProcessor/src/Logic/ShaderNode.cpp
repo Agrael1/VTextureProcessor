@@ -52,7 +52,7 @@ ver::ShaderNode::ShaderNode(TextureDescriptor& td)
  */
 void ver::ShaderNode::Update()
 {
-	Engine::Instance().Render(desc.shader, inputs, tiling, outputs, buf);
+	Engine::Instance().Render(desc.shader, inputs, outputs, buf);
 }
 
 void ver::ShaderNode::GetProperties(UI::Windows::PropertyElement& props)
@@ -62,36 +62,25 @@ void ver::ShaderNode::GetProperties(UI::Windows::PropertyElement& props)
 
 void ver::ShaderNode::Serialize(QJsonObject& doc)
 {
-	Node::Serialize(doc);
-	doc.insert("Tiling", tiling);
-	doc.insert("BufferState", buffer);
-
 	QJsonObject buffer;
 	for (auto&& x : buf)
 		buffer.insert(x.GetName().data(), QJsonValue::fromVariant(x.ToVariant()));
-	doc.insert("Buffer", buffer);
+	doc.insert(u"Buffer", buffer);
+	doc.insert(u"Type", desc.style.StyleName().toString());
+	doc.insert(u"Name", GetName().data());
 }
 
 bool ver::ShaderNode::Deserialize(QJsonObject in)
 {
-	Node::Deserialize(in);
-	if (in.contains("Buffer"))
+	if (in.contains(u"Buffer"))
 	{
-		auto v = in["Buffer"].toObject();
+		auto v = in[u"Buffer"].toObject();
 		auto keys = v.keys();
 		for (const auto& k : keys)
 		{
 			auto sk = k.toStdString();
 			buf[sk].SetIfExists(v[k].toVariant());
 		}
-	}
-	if (in.contains("Tiling"))
-	{
-		tiling = in["Tiling"].toBool(false);
-	}
-	if (in.contains("Buffer"))
-	{
-		buffer = in["Buffer"].toBool(true);
 	}
 	return true;
 }

@@ -15,10 +15,10 @@ namespace UI::Windows
 		{
 			return &view;
 		}
-		void Save()override;
-		void SaveAs()override;
-		void Clear()override;
-		void Load()override;
+		void Save();
+		void SaveAs();
+		void Clear();
+		bool Load();
 		void OnEnter()noexcept override;
 
 		void Request(UI::Request rq) override;

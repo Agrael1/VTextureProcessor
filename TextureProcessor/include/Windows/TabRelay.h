@@ -13,27 +13,22 @@ namespace UI::Windows
 		~TabRelay();
 	public:
 		template<class T, class... Args> requires std::derived_from<T, Tab>
-		T& LoadTab(std::filesystem::path&& path, std::string_view name, Args&&... args)
-			{
-				auto pstr = path.string();
-				if (!tabs.contains(pstr))
-				{
-					auto x = tabs.emplace(pstr, std::make_unique<T>(std::move(path), std::forward<Args>(args)...));
-					auto* w = x.first->second->Widget();
-					addTab(w, name.data());
-					setCurrentWidget(w);
-					setTabToolTip(currentIndex(), pstr.c_str());
-					x.first->second->Load();
-					OnCurrentChanged();
-					return (T&)*x.first->second;
-				}
-				auto& x = tabs.at(pstr);
-				setCurrentWidget(x->Widget());
-				OnCurrentChanged();
-				return (T&)*x;
-			}
+		void LoadTab(std::filesystem::path&& path, std::string_view name, Args&&... args)
+		{
+			auto pstr = path.string();
+			if (tabs.contains(pstr))
+				return setCurrentWidget(tabs.at(pstr)->Widget());
+
+			auto rtab = std::make_unique<T>(std::move(path), std::forward<Args>(args)...);
+			if (!rtab->Load())return;
+			auto* w = rtab->Widget();
+			addTab(w, name.data());
+			setCurrentWidget(w);
+			setTabToolTip(currentIndex(), pstr.c_str());
+			tabs.emplace(pstr, std::move(rtab));
+		}
 		template<class T, class... Args> requires std::derived_from<T, Tab>
-		T& TempTab(std::string_view name, Args&&... args)
+		void TempTab(std::string_view name, Args&&... args)
 		{
 			auto xname = UKeyTemp(name);
 			auto x = temp_tabs.emplace(xname, std::make_unique<T>("", std::forward<Args>(args)...));
@@ -41,18 +36,8 @@ namespace UI::Windows
 			addTab(w, xname.data());
 			setCurrentWidget(w);
 			setTabToolTip(currentIndex(), xname.c_str());
-			OnCurrentChanged();
-			return (T&)*x.first->second;
 		}
 		void OnCurrentChanged(int index = 0);
-		void OnSave()
-		{
-			if (auto x = GetCurrent(); x)x->Save();
-		}
-		void OnSaveAs()
-		{
-			if (auto x = GetCurrent(); x)x->SaveAs();
-		}
 		void OnTabClosed(int prev_i);
 		void RequestActive(Request rq)
 		{

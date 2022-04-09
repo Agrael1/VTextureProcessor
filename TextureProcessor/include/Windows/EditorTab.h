@@ -51,10 +51,9 @@ namespace UI::Windows
 		{
 			return this;
 		}
-		void Save() override;
-		void SaveAs() override;
-		void Clear() override {};
-		void Load() override;
+		void Save();
+		void SaveAs();
+		bool Load();
 		void OnEnter()noexcept override;
 		void OnLeave()noexcept override;
 

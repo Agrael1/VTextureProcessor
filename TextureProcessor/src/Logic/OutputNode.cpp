@@ -7,8 +7,9 @@ constexpr uint32_t nullcolor = 0;
 
 
 
-ver::OutputNode::OutputNode()
-	:out(std::make_shared<QImage>())
+ver::OutputNode::OutputNode(size_t ref)
+	:Node(std::format("{}_{}", "Output", ref))
+	,out(std::make_shared<QImage>())
 {
 	style.SetStyleName(QStringView{ u"Output"}.toString());
 	RegisterSink(DirectTextureSink::Make("Out", in, PortType::Grayscale));
@@ -40,8 +41,13 @@ void ver::OutputNode::ExportSilent(std::string_view name)
 	out->save(name.data());
 }
 
+void ver::OutputNode::Serialize(QJsonObject& doc)
+{
+	doc.insert(u"Type", QStringLiteral("Output"));
+	doc.insert(u"Name", GetName().data());
+}
+
 std::unique_ptr<ver::Node> ver::OutputDescriptor::MakeModel()
 {
-	refcount++;
-	return std::make_unique<OutputNode>();
+	return std::make_unique<OutputNode>(refcount++);
 }

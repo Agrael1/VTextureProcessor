@@ -35,9 +35,10 @@ UI::Windows::EditorTab::SceneDock::~SceneDock()
 	Engine::UnbindScene(&scene);
 }
 
-void EditorTab::Load()
+bool EditorTab::Load()
 {
 	edit.edit.LoadText(tdesc->shader_body);
+	return true;
 }
 
 void UI::Windows::EditorTab::OnEnter() noexcept
@@ -133,6 +134,8 @@ QJsonObject UI::Windows::EditorTab::Parse(const std::filesystem::path& p)
 	if (p.empty())return{};
 
 	std::ifstream t(p);
+	if(!t.is_open())return{};
+
 	std::string str;
 
 	t.seekg(0, std::ios::end);
@@ -141,6 +144,8 @@ QJsonObject UI::Windows::EditorTab::Parse(const std::filesystem::path& p)
 
 	str.assign((std::istreambuf_iterator<char>(t)),
 		std::istreambuf_iterator<char>());
+	if(str.empty())return{};
+
 	QJsonParseError e{};
 	// Deserialize loaded JSON
 	auto json = QJsonDocument::fromJson(QByteArray::fromStdString(str), &e);

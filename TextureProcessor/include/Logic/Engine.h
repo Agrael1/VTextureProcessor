@@ -53,7 +53,7 @@ public:
 	static void UnbindScene(UI::FlowScene* scene);
 	static void SwitchScene(UI::FlowScene* scene);
 
-	void Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs, bool tile, std::span<std::shared_ptr<QImage>> outputs, ver::dc::Buffer& buffer);
+	void Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs, std::span<std::shared_ptr<QImage>> outputs, ver::dc::Buffer& buffer);
 	QOpenGLFunctions& Functions() { return con.funcs; }
 	QOpenGLTexture& Empty();
 private:

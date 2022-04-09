@@ -58,6 +58,7 @@ void Engine::BindScene(UI::FlowScene* scene, QSize size)
 void Engine::UnbindScene(UI::FlowScene* const scene)
 {
 	auto& i = Instance();
+	if (!i.frames.contains(scene))return;
 	if (i.current == &i.frames.at(scene))
 		i.current = nullptr;
 	i.frames.erase(scene);
@@ -96,7 +97,7 @@ QOpenGLTexture& Engine::Empty()
  * @param buffer constant buffer
  * @return Image to be drawn to the node
 */
-void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs, bool tile, std::span<std::shared_ptr<QImage>> outputs, ver::dc::Buffer& buffer)
+void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs, std::span<std::shared_ptr<QImage>> outputs, ver::dc::Buffer& buffer)
 {
 	if (!current)return;
 
@@ -116,7 +117,7 @@ void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs
 	{
 		if (i)
 		{
-			if (tile)i->setWrapMode(QOpenGLTexture::Repeat);
+			if (false)i->setWrapMode(QOpenGLTexture::Repeat);
 			else i->setWrapMode(QOpenGLTexture::ClampToEdge);
 			i->bind(s++);
 		}

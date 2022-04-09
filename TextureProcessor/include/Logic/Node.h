@@ -57,9 +57,10 @@ namespace ver
 		virtual std::string Export() = 0;
 		virtual void Update() = 0;
 		virtual void ExportSilent(std::string_view name) = 0;
-		virtual void Serialize(QJsonObject& doc)override;
-		virtual bool Deserialize(QJsonObject in)override { return true; };
 		virtual std::span<std::shared_ptr<QImage>> GetLayout() = 0;
+
+
+		virtual bool Deserialize(QJsonObject in)override { return true; };
 	protected:
 		std::vector<std::unique_ptr<Sink>> sinks;
 		std::vector<std::unique_ptr<Source>> sources;

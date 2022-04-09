@@ -1,15 +1,15 @@
 #pragma once
-#include <Interfaces/IEditable.h>
 #include <UI/Requests.h>
 #include <filesystem>
 
 namespace UI::Windows
 {
-	class Tab : public IEditable
+	class Tab
 	{
 	public:
 		Tab() = default;
 		Tab(std::filesystem::path&& p):save_path(std::move(p)){}
+		virtual ~Tab() = default;
 	public:
 		void SetPath(const std::filesystem::path& p)
 		{
@@ -35,6 +35,7 @@ namespace UI::Windows
 		{
 
 		}
+		virtual QWidget* Widget() noexcept = 0;
 	private:
 		std::filesystem::path save_path;
 	};

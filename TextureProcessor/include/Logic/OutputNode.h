@@ -17,7 +17,7 @@ namespace ver
 	class OutputNode : public Node
 	{
 	public:
-		OutputNode();
+		OutputNode(size_t ref);
 	public:
 		std::span<std::shared_ptr<QImage>> GetLayout()noexcept
 		{
@@ -30,6 +30,7 @@ namespace ver
 		void Update();
 		std::string Export()override;
 		virtual void ExportSilent(std::string_view name);
+		virtual void Serialize(QJsonObject& doc)override;
 	private:
 		std::shared_ptr<QImage> in;
 		std::shared_ptr<QImage> out;
