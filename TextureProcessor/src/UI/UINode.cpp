@@ -107,7 +107,7 @@ void UI::NodeUI::MakeHeader()
 	if (proxy)return UpdateHeader();
 	auto& style = GetModel().GetStyle();
 	proxy = std::make_unique<QGraphicsProxyWidget>();
-	auto xlab = new QLabel(style.StyleName().toString());
+	auto xlab = new QLabel(style.StyleName());
 	QFont a{}; a.setBold(true);
 	QFontMetrics m{ a };
 	auto sz = m.height() >> 1;
@@ -126,7 +126,7 @@ void UI::NodeUI::MakeHeader()
 void UI::NodeUI::UpdateHeader()
 {
 	auto& h = Header();
-	h.setText(model->GetStyle().StyleName().toString());
+	h.setText(model->GetStyle().StyleName());
 	h.adjustSize();
 	h.setMinimumSize(h.size());
 }
@@ -196,7 +196,7 @@ void UI::NodeUI::Serialize(QJsonObject& doc)
 	xpos.append(scenePos().x());
 	xpos.append(scenePos().y());
 
-	doc.insert(u"Type", model->GetStyle().StyleName().toString());
+	doc.insert(u"Type", model->GetStyle().StyleName());
 	model->Serialize(doc);
 	doc.insert(u"Position", xpos);
 }

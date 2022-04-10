@@ -69,7 +69,7 @@ namespace UI
 		INode& SourceNode();
 		const INode& SinkNode()const;
 		const INode& SourceNode()const;
-		void Connect();
+		bool Connect();
 		void Disconnect();
 
 		std::pair<QPointF, QPointF> PointsC1C2()const;
@@ -262,18 +262,19 @@ void UI::Connection::PlaceConnection(Port& port)
 	case ver::PortSide::Sink:
 	{
 		rpSink() = &port;
+		if(!Connect())return conm.ClearTemporary();
 		static_cast<Sink&>(port).connection = std::move(conm.DetachTemporary());
 		sink = port.CenterScene();
 		break;
 	}
 	case ver::PortSide::Source:
 		rpSource() = &port;
+		if (!Connect())return conm.ClearTemporary();
 		static_cast<Sink&>(*rpSink()).connection = std::move(conm.DetachTemporary());
 		source = port.CenterScene();
 		break;
 	}
 	conm.Map(SourceNode(), *this);
-	Connect();
 
 	// Set connection as properly terminated (for cleanup)
 	bFinished = true;
@@ -373,11 +374,12 @@ INode& UI::Connection::SourceNode()
 {
 	return rpSource()->Node();
 }
-void UI::Connection::Connect()
+bool UI::Connection::Connect()
 {
 	auto& xsink = static_cast<Sink&>(*rpSink());
-	xsink.model.Link(static_cast<Source&>(*rpSource()).model);
+	if(!xsink.model.Link(static_cast<Source&>(*rpSource()).model))return false;
 	Update();
+	return true;
 }
 void UI::Connection::Disconnect()
 {

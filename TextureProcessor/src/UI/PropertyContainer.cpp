@@ -152,7 +152,7 @@ UI::PropertyContainer::PropertyContainer(ver::dc::Layout buffer, std::span<ver::
 	ver::dc::Options* opt = nullptr;
 	for (size_t r = 0; auto & i : buffer.Get())
 	{
-		opt = it != params.end() && it->index == r ? std::addressof(*it) : nullptr;
+		opt = std::addressof(*it);
 
 		auto& x = editors.emplace_back(std::make_unique<Editor>(i, opt, r));
 		x->SetDesctructCallback([this](size_t x) {RemoveElement(x); });
@@ -180,12 +180,11 @@ std::vector<ver::dc::Options> UI::PropertyContainer::GatherOptions()
 {
 	std::vector<ver::dc::Options> out;
 	out.reserve(editors.size());
-	for (size_t r = 0; auto & i : editors)
+	for (auto & i : editors)
 	{
 		auto* x = i->GetOption();
 		if (!x)continue;
-		auto& a = out.emplace_back(*x);
-		a.index = r++;
+		out.emplace_back(*x);
 	}
 	return out;
 }

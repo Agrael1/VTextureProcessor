@@ -26,7 +26,7 @@ namespace UI
 		virtual void Serialize(QJsonObject& doc)override;
 		virtual bool Deserialize(QJsonObject doc)override;
 
-		QStringView StyleName()const noexcept { return styleName; }
+		const QString& StyleName()const noexcept { return styleName; }
 		void SetStyleName(QString name)noexcept { styleName = std::move(name); }
 		const QPen& Boundary(bool selected)const noexcept { return selected ? boundary.Selected : boundary.Normal; }
 	private:

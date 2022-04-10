@@ -55,6 +55,7 @@ void UI::Windows::EditorTab::Save()
 {
 	std::fstream f;
 	f.open(Path(), std::ios::out);
+	tdesc->group = tp.GetCategory();
 	QJsonDocument doc{ tdesc->Save() };
 	f << doc.toJson().constData();
 }
@@ -74,6 +75,7 @@ void UI::Windows::EditorTab::SaveAs()
 
 	std::fstream f;
 	f.open(proj_path, std::ios::out);
+	tdesc->group = tp.GetCategory();
 	QJsonDocument doc{ tdesc->Save() };
 	f << doc.toJson().constData();
 	SetPath(proj_path);
@@ -85,7 +87,6 @@ void UI::Windows::EditorTab::Init(Properties& props) noexcept
 	docker.addDockWidget(ads::RightDockWidgetArea, &scene);
 	docker.addDockWidget(ads::BottomDockWidgetArea, &con);
 	((QMainWindow*)props.parentWidget())->addDockWidget(Qt::RightDockWidgetArea, &tp, Qt::Vertical);
-	tp.hide();
 }
 bool UI::Windows::EditorTab::event(QEvent* e)
 {
@@ -126,7 +127,9 @@ UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 
 	Init(props);
 	auto x = tdesc->style.StyleName();
-	tp.SetName(x.isEmpty() ? QStringLiteral("Node") : x.toString());
+	tp.SetName(x.isEmpty() ? QStringLiteral("Node") : x);
+	tp.SetCatList(scene.scene.GetCategories());
+	tp.SetCategory(tdesc->group);
 	scene.scene.addItem(&*node);
 }
 QJsonObject UI::Windows::EditorTab::Parse(const std::filesystem::path& p)

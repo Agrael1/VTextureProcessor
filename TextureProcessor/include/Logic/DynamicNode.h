@@ -25,6 +25,7 @@ namespace ver
 		void ModifySources();
 		void Recompile();
 		QJsonObject Save();
+		QJsonArray SaveOptions();
 
 		void ResetContainer();
 		bool AcceptContainer();
@@ -35,6 +36,7 @@ namespace ver
 		std::shared_ptr<UI::PortsProperty> prop;
 		std::shared_ptr<UI::PropertyContainer> pcont;
 		std::function<void()> prop_callback;
+		QString group;
 	};
 
 

@@ -22,6 +22,7 @@ namespace UI
 	public:
 		FlowScene(QObject* parent, Windows::Properties& props, QSize dims);
 	public:
+		std::vector<QString> GetCategories()const noexcept;
 		void DeleteSelected();
 		ConnectionMap& Connections() { return connections; }
 		void Clear();

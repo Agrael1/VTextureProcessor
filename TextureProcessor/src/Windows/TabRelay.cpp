@@ -26,6 +26,11 @@ void TabRelay::OnCurrentChanged(int index)
 	if (!prev_tab)return;
 	prev_tab->OnEnter();
 }
+void TabRelay::OnTabCreated()
+{
+	prev_tab = GetCurrent();
+	prev_tab->OnEnter();
+}
 
 void UI::Windows::TabRelay::OnTabClosed(int prev_i)
 {

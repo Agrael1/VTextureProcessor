@@ -15,11 +15,11 @@ void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, st
 	auto it = params.begin();
 	Options* opt = nullptr;
 
-	for (size_t i = 0; auto&& ref : buf)
+	for (auto&& ref : buf)
 	{
-		opt = it != params.end() && it->index == i ? std::addressof(*it) : nullptr;
+		opt = std::addressof(*it);
 		auto t = ref.GetType();
-		QString name = opt && opt->enable_alias ? opt->alias.c_str() : ref.GetName().data();
+		QString name = opt->enable_alias ? opt->alias.c_str() : ref.GetName().data();
 
 		switch (t)
 		{
@@ -27,7 +27,6 @@ void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, st
 		{
 			elem.AppendWidget<QLabel>(name);
 			auto& s = elem.AppendWidget<FloatSlider>((float&)ref);
-			if (!opt)break;
 			auto& par = opt->param.get<Float>();
 			if (opt->enable_min) s.SetMin(par.min);
 			if (opt->enable_max) s.SetMax(par.max);
@@ -38,7 +37,6 @@ void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, st
 		{
 			elem.AppendWidget<QLabel>(name);
 			auto& s = elem.AppendWidget<Vec2Slider>((QVector2D&)ref);
-			if (!opt)break;
 			auto& par = opt->param.get<Float2>();
 			if (opt->enable_min) s.SetMin(par.min);
 			if (opt->enable_max) s.SetMax(par.max);
@@ -57,7 +55,6 @@ void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, st
 		{
 			elem.AppendWidget<QLabel>(name);
 			auto& s = elem.AppendWidget<IntSlider>((int&)ref);
-			if (!opt)break;
 			auto& par = opt->param.get<Integer>();
 			if (opt->enable_min) s.SetMin(par.min);
 			if (opt->enable_max) s.SetMax(par.max);
@@ -67,7 +64,6 @@ void UI::PropertyBuffer(Windows::PropertyElement& elem, ver::dc::Buffer& buf, st
 		default:
 			break;
 		}
-		i++;
 		if (opt) { it++; opt = nullptr; }
 	}
 }

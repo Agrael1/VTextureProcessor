@@ -83,14 +83,18 @@ void UI::FlowCodex::ParseJson(const QJsonDocument& json)
 	QJsonObject node = json.object();
 	
 	// Loads texture Node style
-	std::unique_ptr<ver::Descriptor> p;
+	std::unique_ptr<ver::TextureDescriptor> p;
 	if (node[u"Class"].toString() == u"Texture")
 		p = std::make_unique<ver::TextureDescriptor>(node);
 	if (!p || !p->valid())
 		return;
+	auto x = node[u"Group"].toString();
+	auto y = p->StyleName().toStdString();
+	if (codex.contains(y))
+		p->style.SetStyleName(x + u':' + p->StyleName());
 
 	// Adds new group to the context menu
-	auto pair = codex.emplace(((ver::TextureDescriptor*)p.get())->style.StyleName().toString().toStdString(), std::move(p));
-	auto x = node[u"Group"].toString().toStdString();
-	cats[x].emplace_back((*pair.first).first);
+	auto pair = codex.emplace(p->StyleName().toStdString(), std::move(p));
+	auto rx = x.toStdString();
+	cats[rx].emplace_back((*pair.first).first);
 }

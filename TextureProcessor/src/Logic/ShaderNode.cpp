@@ -21,7 +21,7 @@ using namespace ver;
 
 
 ver::ShaderNode::ShaderNode(TextureDescriptor& td)
-	:desc(td), Node(std::format("{}_{}", td.style.StyleName().toString().toStdString(), td.use_count())), buf(td.buffer, td.params)
+	:desc(td), Node(std::format("{}_{}", td.style.StyleName().toStdString(), td.use_count())), buf(td.buffer, td.params)
 {
 	sinks.reserve(desc.sinks.size());
 	sources.reserve(desc.sources.size());
@@ -66,7 +66,7 @@ void ver::ShaderNode::Serialize(QJsonObject& doc)
 	for (auto&& x : buf)
 		buffer.insert(x.GetName().data(), QJsonValue::fromVariant(x.ToVariant()));
 	doc.insert(u"Buffer", buffer);
-	doc.insert(u"Type", desc.style.StyleName().toString());
+	doc.insert(u"Type", desc.style.StyleName());
 	doc.insert(u"Name", GetName().data());
 }
 
@@ -170,24 +170,27 @@ void ver::TextureDescriptor::Assemble()
 }
 void ver::TextureDescriptor::SetProperties(const QJsonArray& props)
 {
-	for (size_t i = 0; auto it : props)
+	for (auto it : props)
 	{
 		auto p = it.toObject();
 		auto type = dc::LayoutElement{ p[u"Type"].toString().toStdString() };
-		buffer += { p[u"Tag"].toString().toStdString(), type};
+		buffer += { p[u"CName"].toString().toStdString(), type};
+		auto& opt = params.emplace_back(type.Get());
+
+		auto al = p.find(u"Tag");
+		if (opt.enable_alias = al != p.end())
+			opt.alias = al->toString().toStdString();
+
 		if (p.contains(u"Val"))
 		{
-			auto& r = params.emplace_back(type.Get());
-			r.index = i;
 			if (p[u"Val"].isObject())
-				SetOptions(p[u"Val"].toObject(), r);
+				SetOptions(p[u"Val"].toObject(), opt);
 			else
 			{
-				r.enable_def = 1;
-				r.param.set_default(p[u"Val"].toVariant());
+				opt.enable_def = 1;
+				opt.param.set_default(p[u"Val"].toVariant());
 			}
 		}
-		i++;
 	}
 }
 bool ver::TextureDescriptor::valid() const noexcept {

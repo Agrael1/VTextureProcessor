@@ -156,6 +156,16 @@ void UI::FlowScene::OnItemSelected(QTreeWidgetItem* item, int)
 	menu.close();
 }
 
+std::vector<QString> UI::FlowScene::GetCategories() const noexcept
+{
+	auto& r = codex.CatMap();
+	std::vector<QString> out;
+	out.reserve(r.size());
+	for (auto&& x : r | std::views::keys)
+		out.push_back(x.c_str());
+	return out;
+}
+
 /**
  * @brief Deletes the object in focus
  *

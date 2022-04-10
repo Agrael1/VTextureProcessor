@@ -12,7 +12,6 @@
 
 class ContextMenu : public QMenu
 {
-	friend class MenuBuilder;
 public:
 	ContextMenu(QWidget* parent = nullptr);
 public:

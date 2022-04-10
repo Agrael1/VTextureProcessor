@@ -26,6 +26,7 @@ namespace UI::Windows
 			setCurrentWidget(w);
 			setTabToolTip(currentIndex(), pstr.c_str());
 			tabs.emplace(pstr, std::move(rtab));
+			OnTabCreated();
 		}
 		template<class T, class... Args> requires std::derived_from<T, Tab>
 		void TempTab(std::string_view name, Args&&... args)
@@ -36,8 +37,10 @@ namespace UI::Windows
 			addTab(w, xname.data());
 			setCurrentWidget(w);
 			setTabToolTip(currentIndex(), xname.c_str());
+			OnTabCreated();
 		}
 		void OnCurrentChanged(int index = 0);
+		void OnTabCreated();
 		void OnTabClosed(int prev_i);
 		void RequestActive(Request rq)
 		{

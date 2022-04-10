@@ -377,9 +377,9 @@ namespace ver::dc
 			:lay(std::move(xlay))
 		{
 			bytes.resize(lay.GetSizeInBytes());
-			for (auto& i : def)
+			for (size_t r = 0; auto& i : def)
 				if(i.enable_def)
-					Get(i.index) = i.param;
+					Get(r++) = i.param;
 		}
 	public:
 		ElementRef operator[](std::string_view key) noexcept
@@ -404,9 +404,9 @@ namespace ver::dc
 		{
 			lay = std::move(xlay);
 			bytes.resize(lay.GetSizeInBytes());
-			for (auto& i : def)
+			for (size_t r = 0; auto & i : def)
 				if (i.enable_def)
-					Get(i.index) = i.param;
+					Get(r++) = i.param;
 		}
 		constexpr std::span<const std::byte> GetData() const noexcept
 		{

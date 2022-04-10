@@ -38,7 +38,7 @@ namespace ver::dc
 		template <Type t>
 		void set_min_impl(QVariant v)
 		{}
-		template <Type t> requires has_min<t>
+		template <Type t> requires has_max<t>
 		void set_max_impl(QVariant v)
 		{
 			get<t>().max = v.value<typename Map<t>::SysType>();
@@ -46,6 +46,26 @@ namespace ver::dc
 		template <Type t>
 		void set_max_impl(QVariant v)
 		{}
+		template <Type t> requires has_min<t>
+		QVariant get_min_impl()const
+		{
+			return get<t>().min;
+		}
+		template <Type t>
+		QVariant get_min_impl()const
+		{
+			return {};
+		}
+		template <Type t> requires has_max<t>
+		QVariant get_max_impl()const
+		{
+			return get<t>().max;
+		}
+		template <Type t>
+		QVariant get_max_impl()const
+		{
+			return {};
+		}
 	public:
 		void set_default(QVariant v)
 		{
@@ -80,7 +100,42 @@ namespace ver::dc
 				break;
 			}
 		}
-
+		QVariant get_def()const
+		{
+			switch (t)
+			{
+#define X(el) case Type::el: return get<Type::el>().def;
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+			return {};
+		}
+		QVariant get_min()const
+		{
+			switch (t)
+			{
+#define X(el) case Type::el: return get_min_impl<Type::el>();
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+			return {};
+		}
+		QVariant get_max()const
+		{
+			switch (t)
+			{
+#define X(el) case Type::el: return get_max_impl<Type::el>();
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+			return {};
+		}
 
 	public:
 #define X(el) typename Map<Type::el>::param
@@ -97,7 +152,6 @@ namespace ver::dc
 	struct Options
 	{
 		Options(Type t) :param(t) {}
-		uint16_t index = 0;
 		union
 		{
 			struct

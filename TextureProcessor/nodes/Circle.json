@@ -8,7 +8,7 @@
 
   "Properties": [
     {
-      "Tag": "Shade",
+      "CName": "Shade",
       "Type": "float",
       "Val": {
         "default": 1.0,
@@ -17,7 +17,7 @@
       }
     },
     {
-      "Tag": "Radius",
+      "CName": "Radius",
       "Type": "float",
       "Val": {
         "default": 1.0,

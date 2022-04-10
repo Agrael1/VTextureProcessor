@@ -70,6 +70,7 @@ void ver::DynamicNode::GetProperties(UI::Windows::PropertyElement& props)
 ver::DynamicDescriptor::DynamicDescriptor()
 	:prop(std::make_shared<UI::PortsProperty>(sinks, sources))
 	, pcont(std::make_shared<UI::PropertyContainer>(buffer, params))
+	, group(QStringLiteral("Ungrouped"))
 {
 }
 
@@ -77,6 +78,7 @@ ver::DynamicDescriptor::DynamicDescriptor(QJsonObject document)
 	: TextureDescriptor(document)
 	, prop(std::make_shared<UI::PortsProperty>(sinks, sources))
 	, pcont(std::make_shared<UI::PropertyContainer>(buffer, params))
+	, group(document.contains(u"Group")? document[u"Group"].toString():QStringLiteral("Ungrouped"))
 {
 }
 
@@ -106,15 +108,67 @@ void ver::DynamicDescriptor::Recompile()
 QJsonObject ver::DynamicDescriptor::Save()
 {
 	QJsonObject top;
-	QJsonObject obj;
-	QJsonObject obj2;
+	QJsonObject xstyle;
 
-	style.Serialize(obj2);
-	obj.insert("NodeStyle", obj2);
-	obj.insert("Value", shader_body);
+	style.Serialize(top);
+	top.insert(u"Name", style.StyleName());
+	top.insert(u"Value", shader_body);
+	top.insert(u"Class", QStringLiteral("Texture"));
+	top.insert(u"Group", group.isEmpty()?QStringLiteral("Ungrouped"): group);
 
-	top.insert(style.StyleName(), obj);
+	QJsonArray xsinks;
+	for (auto& i : sinks)
+	{
+		QJsonObject a;
+		a.insert(u"Name", i.name);
+		a.insert(u"Type", to_str(i.type).data());
+		xsinks.append(a);
+	}
+	if (!xsinks.isEmpty()) top.insert(u"Sinks", xsinks);
+
+	QJsonArray xsources;
+	for (auto& i : sources)
+	{
+		QJsonObject a;
+		a.insert(u"Name", i.name);
+		a.insert(u"Type", to_str(i.type).data());
+		xsources.append(a);
+	}
+	if (!xsources.isEmpty()) top.insert(u"Sources", xsources);
+	if (auto x = SaveOptions(); !x.isEmpty())
+		top.insert(u"Properties", x);
+
 	return top;
+}
+
+QJsonArray ver::DynamicDescriptor::SaveOptions()
+{
+	QJsonArray out;
+
+	auto it = params.begin();
+	for (auto& i : buffer.Get())
+	{
+		QJsonObject o;
+		o.insert(u"CName", i.first.data());
+		o.insert(u"Type", i.second.GetSignature().data());
+		if (it == params.end())break;
+		QJsonObject o2;
+
+		if(it->enable_alias)
+			o.insert(u"Tag", it->alias.c_str());
+		if (it->enable_def)
+			o2.insert(u"default", QJsonValue::fromVariant(it->param.get_def()));
+		if (it->enable_min)
+			o2.insert(u"min", QJsonValue::fromVariant(it->param.get_min()));
+		if (it->enable_max)
+			o2.insert(u"max", QJsonValue::fromVariant(it->param.get_max()));
+
+		o.insert(u"Val", o2);
+		out.append(o);
+		it++;
+	}
+
+	return out;
 }
 
 void ver::DynamicDescriptor::ResetContainer()

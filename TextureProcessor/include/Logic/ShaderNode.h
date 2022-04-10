@@ -31,7 +31,7 @@ namespace ver
 		bool CompileShader(const QString& xshader) {
 			return shader.compileSourceCode(xshader);
 		}
-		
+		const QString& StyleName()const noexcept { return style.StyleName(); }
 		virtual bool valid()const noexcept;
 	private:
 		void SetOptions(QJsonObject obj, dc::Options& opt);
