@@ -13,6 +13,7 @@ else(MSVC)
 endif()
 
 set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 # Include Qt deployment helper function

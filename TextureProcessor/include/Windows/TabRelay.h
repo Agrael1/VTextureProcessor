@@ -13,35 +13,41 @@ namespace UI::Windows
 		~TabRelay();
 	public:
 		template<class T, class... Args> requires std::derived_from<T, Tab>
-		void LoadTab(std::filesystem::path&& path, std::string_view name, Args&&... args)
+		void LoadTab(std::filesystem::path path, QString name, Args&&... args)
 		{
-			auto pstr = path.string();
-			if (tabs.contains(pstr))
-				return setCurrentWidget(tabs.at(pstr)->Widget());
+			namespace fs = std::filesystem;
+			if (auto it = tabs.find(path.wstring()); it!=tabs.end())
+				return setCurrentWidget(it->second);
 
-			auto rtab = std::make_unique<T>(std::move(path), std::forward<Args>(args)...);
-			if (!rtab->Load())return;
-			auto* w = rtab->Widget();
-			addTab(w, name.data());
-			setCurrentWidget(w);
-			setTabToolTip(currentIndex(), pstr.c_str());
-			tabs.emplace(pstr, std::move(rtab));
-			OnTabCreated();
-		}
-		template<class T, class... Args> requires std::derived_from<T, Tab>
-		void TempTab(std::string_view name, Args&&... args)
-		{
-			auto xname = UKeyTemp(name);
-			auto x = temp_tabs.emplace(xname, std::make_unique<T>("", std::forward<Args>(args)...));
-			auto* w = x.first->second->Widget();
-			addTab(w, xname.data());
-			setCurrentWidget(w);
-			setTabToolTip(currentIndex(), xname.c_str());
-			OnTabCreated();
+			auto* xtab = new T(std::move(path), std::forward<Args>(args)...);
+			xtab->SetName(name);
+			xtab->Load();
+			auto pname = xtab->Path().wstring();
+
+			// Temporary
+			if (pname.empty())
+			{
+				auto xname = UKeyTemp(name);
+				addTab(xtab, xname);
+			}
+			else
+			{
+				tabs.emplace(pname, xtab);
+				addTab(xtab, name);
+			}
+			connect(xtab, &Tab::NameChanged, [this, xtab](const QString& nam) {setTabText(indexOf(xtab), nam); });
+			connect(xtab, &Tab::PathChanged, [this, xtab](const fs::path& one, const fs::path& other)
+				{
+					tabs.erase(one.wstring());
+					tabs.emplace(other.wstring(), xtab);
+					setTabToolTip(currentIndex(), QString::fromStdWString(other.wstring()));
+				});
+			setCurrentWidget(xtab);
+
+			setTabToolTip(currentIndex(), QString::fromStdWString(pname));
 		}
 		void OnCurrentChanged(int index = 0);
 		void OnTabCreated();
-		void OnTabClosed(int prev_i);
 		void RequestActive(Request rq)
 		{
 			auto* tab = GetCurrent();
@@ -49,10 +55,10 @@ namespace UI::Windows
 		}
 	private:
 		Tab* GetCurrent();
-		std::string UKeyTemp(std::string_view pattern);
+		QString UKeyTemp(QStringView pattern);
 	private:
-		std::unordered_map<std::string, std::unique_ptr<Tab>> temp_tabs;
-		std::unordered_map<std::string, std::unique_ptr<Tab>> tabs;
+		std::unordered_map<std::filesystem::path::string_type, Tab*> tabs;
+		size_t temp_index = 0u;
 		Tab* prev_tab = nullptr;
 	};
 }

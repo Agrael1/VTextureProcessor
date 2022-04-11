@@ -64,7 +64,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	toolbar.setIconSize({ 16,16 });
 	toolbar.addAction(QIcon(":/build.png"), "Compile", [this]() {tab->RequestActive(UI::Request::Compile); });
 
-	tab->LoadTab<SceneTab>(std::move(xprojPath), xprojPath.filename().string(), property_dock, resolution);
+	tab->LoadTab<SceneTab>(std::move(xprojPath), xprojPath.filename().string().c_str(), property_dock, resolution);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -84,12 +84,12 @@ void MainWindow::OnLoad()
 
 	if (proj_path.empty()) return;
 	proj_path = proj_path.make_preferred();
-	tab->LoadTab<SceneTab>(std::move(proj_path), proj_path.filename().string(), property_dock, QSize(256, 256));
+	tab->LoadTab<SceneTab>(std::move(proj_path), proj_path.filename().string().c_str(), property_dock, QSize(256, 256));
 }
 
 void MainWindow::OnCreateNode()
 {
-	tab->TempTab<EditorTab>("New Node", property_dock);
+	tab->LoadTab<EditorTab>({}, QStringLiteral("New Node"), property_dock);
 }
 void MainWindow::OnLoadNode()
 {
@@ -102,6 +102,6 @@ void MainWindow::OnLoadNode()
 
 	if (node_path.empty()) return;
 	node_path = node_path.make_preferred();
-	tab->LoadTab<EditorTab>(std::move(node_path), node_path.filename().string(), property_dock);
+	tab->LoadTab<EditorTab>(std::move(node_path), node_path.filename().string().c_str(), property_dock);
 }
 

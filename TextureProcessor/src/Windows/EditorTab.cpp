@@ -22,7 +22,7 @@ constexpr QSize EditSize{ 128,128 };
 
 
 EditorTab::SceneDock::SceneDock(Properties& props)
-	:base_class("scene"), scene(nullptr, props, EditSize), view(&scene)
+	:base_class(QStringLiteral("scene")), scene(nullptr, props, EditSize), view(&scene)
 {
 	scene.setSceneRect(-32000, -32000, 64000, 64000);
 	setFeatures(QFlags{ base_class::DockWidgetFeature::DefaultDockWidgetFeatures } &= ~base_class::DockWidgetFeature::DockWidgetClosable);
@@ -63,7 +63,7 @@ void UI::Windows::EditorTab::SaveAs()
 {
 	fs::path proj_path{ QFileDialog::getSaveFileName(
 	nullptr,
-	"Save Node As",
+	QStringLiteral("Save Node As"),
 	"",
 	ver::node_filter.c_str()).toStdString() };
 
@@ -79,6 +79,7 @@ void UI::Windows::EditorTab::SaveAs()
 	QJsonDocument doc{ tdesc->Save() };
 	f << doc.toJson().constData();
 	SetPath(proj_path);
+	SetName(QString::fromStdWString(proj_path.filename().wstring()));
 }
 void UI::Windows::EditorTab::Init(Properties& props) noexcept
 {
@@ -96,7 +97,7 @@ bool UI::Windows::EditorTab::event(QEvent* e)
 		tdesc->style.SetStyleName(((NameChangedEvent*)e)->name);
 		node->UpdateHeader();
 		return true;
-	default:return QMainWindow::event(e);
+	default:return QWidget::event(e);
 	}
 }
 void UI::Windows::EditorTab::SetCBufInfo()
@@ -124,6 +125,8 @@ UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 
 	node.emplace(tdesc->MakeModel());
 	SetCBufInfo();
+
+	tdesc->SetParent(&node.value());
 
 	Init(props);
 	auto x = tdesc->style.StyleName();
@@ -203,7 +206,7 @@ void UI::Windows::EditorTab::Request(UI::Request rq)
 	}
 }
 
-UI::Windows::EditorTab::EditorDock::EditorDock() :base_class("Editor") { setFeatures(QFlags{ base_class::DockWidgetFeature::DefaultDockWidgetFeatures } &= ~base_class::DockWidgetFeature::DockWidgetClosable); setWidget(&edit); }
+UI::Windows::EditorTab::EditorDock::EditorDock() :base_class(QStringLiteral("Editor")) { setFeatures(QFlags{ base_class::DockWidgetFeature::DefaultDockWidgetFeatures } &= ~base_class::DockWidgetFeature::DockWidgetClosable); setWidget(&edit); }
 UI::Windows::EditorTab::ConsoleDock::ConsoleDock() :base_class("Console")
 {
 	console.setReadOnly(true);

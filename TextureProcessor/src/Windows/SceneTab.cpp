@@ -14,6 +14,9 @@ SceneTab::SceneTab(std::filesystem::path&& p, Properties& props, QSize resolutio
 {
 	scene.setSceneRect(-32000, -32000, 64000, 64000);
 	if (resolution != QSize{})Save();
+	vl.addWidget(&view);
+	vl.setContentsMargins(0, 0, 0, 0);
+	setLayout(&vl);
 }
 
 UI::Windows::SceneTab::~SceneTab()

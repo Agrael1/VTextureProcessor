@@ -15,7 +15,7 @@
 
 namespace UI::Windows
 {
-	class EditorTab : public Tab, public QMainWindow
+	class EditorTab : public Tab
 	{
 		struct SceneDock : public ads::CDockWidget
 		{
@@ -47,10 +47,6 @@ namespace UI::Windows
 		}
 		QJsonObject Parse(const std::filesystem::path& p);
 	public:
-		QWidget* Widget() noexcept override
-		{
-			return this;
-		}
 		void Save();
 		void SaveAs();
 		bool Load();

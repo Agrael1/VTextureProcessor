@@ -11,10 +11,6 @@ namespace UI::Windows
 		SceneTab(std::filesystem::path&& p, Properties& props, QSize resolution);
 		~SceneTab();
 	public:
-		QWidget* Widget()noexcept override
-		{
-			return &view;
-		}
 		void Save();
 		void SaveAs();
 		void Clear();
@@ -23,6 +19,7 @@ namespace UI::Windows
 
 		void Request(UI::Request rq) override;
 	private:
+		QVBoxLayout vl;
 		FlowScene scene;
 		FlowView view;
 	};

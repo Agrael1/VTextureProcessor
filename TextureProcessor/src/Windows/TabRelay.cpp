@@ -10,8 +10,16 @@ TabRelay::TabRelay(QWidget* parent)
 {
 	setMovable(true);
 	setTabsClosable(true);
-	connect(this, &QTabWidget::tabCloseRequested, this, &TabRelay::OnTabClosed);
 	connect(this, &QTabWidget::currentChanged, this, &TabRelay::OnCurrentChanged);
+	connect(this, &QTabWidget::tabCloseRequested, [this](int index) {
+		auto* w = static_cast<Tab*>(widget(index));
+		if (prev_tab == w)
+		{
+			w->OnLeave();
+			prev_tab = nullptr;
+		}
+		delete w;
+		});
 }
 
 UI::Windows::TabRelay::~TabRelay()
@@ -32,48 +40,12 @@ void TabRelay::OnTabCreated()
 	prev_tab->OnEnter();
 }
 
-void UI::Windows::TabRelay::OnTabClosed(int prev_i)
-{
-	auto key = tabToolTip(prev_i).toStdString();
-	if (auto it = temp_tabs.find(key); it != temp_tabs.end())
-	{
-		if (it->second.get() == prev_tab)
-			prev_tab = nullptr;
-		temp_tabs.erase(it);
-		return;
-	}
-	if (auto it = tabs.find(key); it != tabs.end())
-	{
-		if (it->second.get() == prev_tab)
-			prev_tab = nullptr;
-		tabs.erase(it);
-		return;
-	}
-}
-
 Tab* TabRelay::GetCurrent()
 {
-	int prev_i = currentIndex();
-	if (prev_i == -1)return nullptr;
-	auto key = tabToolTip(prev_i).toStdString();
-	if (auto it = temp_tabs.find(key); it != temp_tabs.end())
-		return it->second.get();
-	if (auto it = tabs.find(key); it != tabs.end())
-		return it->second.get();
-	return nullptr;
+	return static_cast<Tab*>(currentWidget());
 }
 
-std::string TabRelay::UKeyTemp(std::string_view pattern)
+QString TabRelay::UKeyTemp(QStringView pattern)
 {
-	std::string p{ pattern };
-	if (!temp_tabs.contains(p))
-		return p;
-	p += " ";
-	std::string poll;
-	size_t r = 0ull;
-	do
-	{
-		poll = p + std::to_string(r++);
-	} while (temp_tabs.contains(poll));
-	return poll;
+	return pattern.toString() + '_' + QString::number(temp_index++);
 }

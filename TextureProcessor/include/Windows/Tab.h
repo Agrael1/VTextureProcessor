@@ -4,16 +4,21 @@
 
 namespace UI::Windows
 {
-	class Tab
+	class Tab : public QWidget
 	{
+		Q_OBJECT
 	public:
-		Tab() = default;
-		Tab(std::filesystem::path&& p):save_path(std::move(p)){}
-		virtual ~Tab() = default;
+		Tab(std::filesystem::path p):save_path(std::move(p)){}
 	public:
 		void SetPath(const std::filesystem::path& p)
 		{
+			emit PathChanged(save_path, p);
 			save_path = p;
+		}
+		void SetName(QString xname)
+		{
+			name = std::move(xname);
+			emit NameChanged(name);
 		}
 		bool IsTemporary()const noexcept
 		{
@@ -35,8 +40,11 @@ namespace UI::Windows
 		{
 
 		}
-		virtual QWidget* Widget() noexcept = 0;
+	signals:
+		void NameChanged(const QString& nam);
+		void PathChanged(const std::filesystem::path& prev, const std::filesystem::path& new_path);
 	private:
 		std::filesystem::path save_path;
+		QString name;
 	};
 }
