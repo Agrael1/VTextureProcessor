@@ -13,7 +13,7 @@ namespace ver
 	template<ver::string_literal...args>
 	consteval auto _ncat()
 	{
-		constexpr auto l = ((args.length()) + ...);
+		constexpr auto l = 1 + ((args.length()) + ...);
 		ver::string_literal<l> a;
 		(a.append(args.c_str()), ...);
 		return a;

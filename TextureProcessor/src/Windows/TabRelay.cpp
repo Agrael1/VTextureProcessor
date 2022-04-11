@@ -18,6 +18,7 @@ TabRelay::TabRelay(QWidget* parent)
 			w->OnLeave();
 			prev_tab = nullptr;
 		}
+		tabs.erase(w->Path().wstring());
 		delete w;
 		});
 }

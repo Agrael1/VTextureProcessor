@@ -39,12 +39,7 @@ namespace UI::Windows
 		};
 	public:
 		EditorTab(std::filesystem::path&& p, Properties& props);
-		~EditorTab()
-		{
-			docker.removeDockWidget(&scene);
-			docker.removeDockWidget(&edit);
-			docker.removeDockWidget(&con);
-		}
+		~EditorTab();
 		QJsonObject Parse(const std::filesystem::path& p);
 	public:
 		void Save();

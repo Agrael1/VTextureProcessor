@@ -6,6 +6,7 @@
 #include <Editor/NodeParser.h>
 
 #include <QJsonDocument>
+#include <QSaveFile>
 #include <DockWidgetTab.h>
 
 #include <fstream>
@@ -19,6 +20,41 @@ namespace fs = std::filesystem;
 using namespace UI::Windows;
 
 constexpr QSize EditSize{ 128,128 };
+
+
+class DockState
+{
+private:
+	constexpr static auto cfg = ver::config<"edock">();
+public:
+	static DockState& instance()
+	{
+		static DockState ds;
+		return ds;
+	}
+	void SaveState(QByteArray st)
+	{
+		docker_state = std::move(st);
+		QSaveFile file(cfg.c_str());
+		file.open(QIODevice::WriteOnly);
+		file.write(docker_state);
+		file.commit();
+	}
+	auto& State()const
+	{
+		return docker_state;
+	}
+private:
+	DockState()
+	{
+		QFile CurrentFile(cfg.c_str());
+		if (!CurrentFile.open(QIODevice::ReadOnly)) return;
+		docker_state = CurrentFile.readAll();
+	}
+private:
+	QByteArray docker_state;
+};
+
 
 
 EditorTab::SceneDock::SceneDock(Properties& props)
@@ -134,6 +170,15 @@ UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 	tp.SetCatList(scene.scene.GetCategories());
 	tp.SetCategory(tdesc->group);
 	scene.scene.addItem(&*node);
+
+	docker.restoreState(DockState::instance().State());
+}
+UI::Windows::EditorTab::~EditorTab()
+{
+	DockState::instance().SaveState(docker.saveState());
+	docker.removeDockWidget(&scene);
+	docker.removeDockWidget(&edit);
+	docker.removeDockWidget(&con);
 }
 QJsonObject UI::Windows::EditorTab::Parse(const std::filesystem::path& p)
 {
