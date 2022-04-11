@@ -34,6 +34,7 @@ public:
 	}
 signals:
 	void Modified(bool mod_state);
+	void TextChanged();
 protected:
 	void wheelEvent(QWheelEvent* event);
 private:

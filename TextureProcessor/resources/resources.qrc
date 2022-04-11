@@ -15,8 +15,12 @@
 		<file>icons8-opened-folder.png</file>
 		<file>icons8-link.png</file>
 		<file>icons8-save.png</file>
+		<file>icons8-open.png</file>
 		<file>icons8-discard.png</file>
 		<file>icons8-broken-link.png</file>
 		<file>build.png</file>
+		<file>save.png</file>
+		<file>saveas.png</file>
+		<file>open.png</file>
 	</qresource>
 </RCC>

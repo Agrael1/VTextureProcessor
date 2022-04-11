@@ -43,6 +43,7 @@ Editor::Editor()
 	setLayout(&vl);
 
 	connect(&code, &CodeEditor::modificationChanged, this, &Editor::Modified);
+	connect(&code, &CodeEditor::textChanged, this, &Editor::TextChanged);
 }
 
 void Editor::wheelEvent(QWheelEvent* event)

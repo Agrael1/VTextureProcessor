@@ -1,35 +1,24 @@
 {
-  "Add": {
-    "Node": {
-      "Class": "Texture",
-      "Group": "Operations",
-      "Sinks": [
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Operations",
+    "Name": "Add",
+    "Sinks": [
         {
-          "Name": "In1",
-          "Type": "Grayscale"
+            "Name": "in1",
+            "Type": "Grayscale"
         },
         {
-          "Name": "In2",
-          "Type": "Grayscale"
+            "Name": "in2",
+            "Type": "Grayscale"
         }
-      ],
-      "Sources": [
+    ],
+    "Sources": [
         {
-          "Name": "Out",
-          "Type": "Grayscale"
+            "Name": "Out",
+            "Type": "Grayscale"
         }
-      ]
-    },
-    "NodeStyle": {
-      "TitleColor": [ 0, 128, 0 ],
-      "FontColor": "white"
-    },
-    "Value": [
-      "void main() {\n",
-      " vec4 t1 = texture2D(In1, sv_texc);\n",
-      " vec4 t2 = texture2D(In2, sv_texc);\n",
-      " Out = min(t2+t1, vec4(1.0));\n",
-      "}"
-    ]
-  }
+    ],
+    "TitleColor": "#212121",
+    "Value": "void main() {\n\tvec4 t1 = texture2D(in1, sv_texc);\n\tvec4 t2 = texture2D(in2, sv_texc);\n\tOut = min(t2+t1, vec4(1.0));\n}"
 }

@@ -52,7 +52,6 @@ namespace UI::Windows
 	private:
 		void timerEvent(QTimerEvent* event)override;
 		void Init(Properties& props)noexcept;
-		bool event(QEvent* e)override;
 		void SetCBufInfo();
 		void Compile();
 	private:

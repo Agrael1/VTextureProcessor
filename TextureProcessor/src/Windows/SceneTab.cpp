@@ -55,6 +55,8 @@ void SceneTab::SaveAs()
 	scene.Serialize(o);
 	QJsonDocument doc{ o };
 	f << doc.toJson().constData();
+	SetPath(proj_path);
+	SetName(QString::fromStdWString(proj_path.filename().wstring()));
 }
 
 void SceneTab::Clear()
@@ -102,7 +104,7 @@ void UI::Windows::SceneTab::Request(UI::Request rq)
 	switch (rq)
 	{
 	case UI::Request::Save:if (IsTemporary())return SaveAs(); return Save();
-	case UI::Request::SaveAs:return Save();
+	case UI::Request::SaveAs:return SaveAs();
 	case UI::Request::Delete: return scene.DeleteSelected();
 	case UI::Request::Clear: return scene.Clear();
 	case UI::Request::ClearSel: return scene.clearSelection();

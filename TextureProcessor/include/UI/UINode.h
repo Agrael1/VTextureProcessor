@@ -34,6 +34,7 @@ namespace UI
 		}
 		ver::Node& GetModel() noexcept { return *model; };
 		Type GetType()const noexcept { return type; }
+		void UpdateFontColor();
 	public:
 		virtual void Serialize(QJsonObject& doc)override;
 		virtual bool Deserialize(QJsonObject in)override;

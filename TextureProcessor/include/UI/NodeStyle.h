@@ -27,6 +27,10 @@ namespace UI
 		virtual bool Deserialize(QJsonObject doc)override;
 
 		const QString& StyleName()const noexcept { return styleName; }
+		const QColor& HeaderColor()const noexcept { return brTitle.color(); }
+		const QColor& FontColor()const noexcept { return font_color; }
+		void SetFontColor(const QColor& col) { font_color = col; }
+		void SetHeaderColor(const QColor& col) { brTitle = col; }
 		void SetStyleName(QString name)noexcept { styleName = std::move(name); }
 		const QPen& Boundary(bool selected)const noexcept { return selected ? boundary.Selected : boundary.Normal; }
 	private:

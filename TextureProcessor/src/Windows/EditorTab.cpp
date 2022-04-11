@@ -139,22 +139,23 @@ void UI::Windows::EditorTab::Init(Properties& props) noexcept
 	docker.addDockWidget(ads::BottomDockWidgetArea, &con);
 	((QMainWindow*)props.parentWidget())->addDockWidget(Qt::RightDockWidgetArea, &tp, Qt::Vertical);
 
-	connect(&edit.edit, &Editor::Modified, [this](bool mod) {
+	connect(&edit.edit, &Editor::TextChanged, [this]() {
 		text_changed = true;
+		});
+	connect(&tp, &TableProperties::NameChanged, [this](const QString& name) {
+		tdesc->style.SetStyleName(name);
+		node->UpdateHeader();
+		});
+	connect(&tp, &TableProperties::HeadColorChanged, [this](const QColor& c) {
+		tdesc->style.SetHeaderColor(c);
+		node->update();
+		});
+	connect(&tp, &TableProperties::FontColorChanged, [this](const QColor& c) {
+		tdesc->style.SetFontColor(c);
+		node->UpdateFontColor();
 		});
 }
 
-bool UI::Windows::EditorTab::event(QEvent* e)
-{
-	switch (e->type())
-	{
-	case NameChangedEvent::etype:
-		tdesc->style.SetStyleName(((NameChangedEvent*)e)->name);
-		node->UpdateHeader();
-		return true;
-	default:return QWidget::event(e);
-	}
-}
 void UI::Windows::EditorTab::SetCBufInfo()
 {
 	std::unordered_set<std::wstring> consts;
@@ -186,9 +187,12 @@ UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 
 	Init(props);
 	auto x = tdesc->style.StyleName();
+
 	tp.SetName(x.isEmpty() ? QStringLiteral("Node") : x);
 	tp.SetCatList(scene.scene.GetCategories());
 	tp.SetCategory(tdesc->group);
+	tp.SetTitleColor(tdesc->style.HeaderColor());
+	tp.SetFontColor(tdesc->style.FontColor());
 	scene.scene.addItem(&*node);
 
 	docker.restoreState(DockState::instance().State());
@@ -245,7 +249,7 @@ void UI::Windows::EditorTab::Compile()
 	else
 		con.console.appendPlainText("---------------------Compilation Failed---------------------------");
 
-
+	SetCBufInfo();
 	auto pos = node->pos();
 	node.emplace(tdesc->MakeModel());
 	scene.scene.addItem(&*node);

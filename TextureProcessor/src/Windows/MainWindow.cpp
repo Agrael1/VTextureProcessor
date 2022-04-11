@@ -40,10 +40,14 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	mb.addMenu(&nodes);
 	mb.addMenu(&windows);
 
+	auto save = [this]() {tab->RequestActive(UI::Request::Save); };
+	auto saveas = [this]() {tab->RequestActive(UI::Request::SaveAs); };
+	auto load = [this]() { OnLoad(); };
+
 	file.addAction("Clear", [this]() { tab->RequestActive(UI::Request::Clear); });
-	file.addAction("Load", [this]() { OnLoad(); });
-	file.addAction("Save", [this]() {tab->RequestActive(UI::Request::Save); }, { QKeySequence::StandardKey::Save });
-	file.addAction("Save As", [this]() {tab->RequestActive(UI::Request::SaveAs); }, { tr("Ctrl+Shift+S") });
+	file.addAction("Load", load);
+	file.addAction("Save", save, { QKeySequence::StandardKey::Save });
+	file.addAction("Save As", saveas, { tr("Ctrl+Shift+S") });
 	file.addSeparator();
 	file.addAction("Export", [this]() {tab->RequestActive(UI::Request::Export); });
 
@@ -62,6 +66,10 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 
 	auto& toolbar = *addToolBar("");
 	toolbar.setIconSize({ 16,16 });
+	toolbar.addAction(QIcon(":/save.png"), "Save", save);
+	toolbar.addAction(QIcon(":/saveas.png"), "Save As", saveas);
+	toolbar.addAction(QIcon(":/open.png"), "Open Project", load);
+	toolbar.addSeparator();
 	toolbar.addAction(QIcon(":/build.png"), "Compile", [this]() {tab->RequestActive(UI::Request::Compile); });
 
 	tab->LoadTab<SceneTab>(std::move(xprojPath), xprojPath.filename().string().c_str(), property_dock, resolution);

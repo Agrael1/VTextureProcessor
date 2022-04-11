@@ -1,11 +1,12 @@
 #include <Windows/TableProp.h>
 #include <UI/ProjectEvent.h>
+#include <UI/ColorWidget.h>
 #include <QApplication>
 #include <QComboBox>
 
 UI::Windows::TableProperties::TableProperties(QWidget* tab_relay)
 	:QDockWidget("Node Properties"),
-	table(2, 2), tab(tab_relay)
+	table(4, 2), tab(tab_relay)
 {
 	QHeaderView* header = table.verticalHeader();
 	header->setDefaultSectionSize(10);
@@ -14,7 +15,7 @@ UI::Windows::TableProperties::TableProperties(QWidget* tab_relay)
 	table.horizontalHeader()->setStretchLastSection(true);
 
 	setWidget(&table);
-
+	/////////////////////////////NAME///////////////////////////////
 	auto name = new QTableWidgetItem; // header
 	name->setData(Qt::DisplayRole, "Name");
 	name->setFlags(name->flags() & ~Qt::ItemIsEditable);
@@ -23,7 +24,7 @@ UI::Windows::TableProperties::TableProperties(QWidget* tab_relay)
 	name = new QTableWidgetItem; // value
 	name->setData(Qt::DisplayRole, "");
 	table.setItem(0, 1, name);
-
+	/////////////////////////////GROUP///////////////////////////////
 	auto cat = new QTableWidgetItem; // header
 	cat->setData(Qt::DisplayRole, "Category");
 	cat->setFlags(cat->flags() & ~Qt::ItemIsEditable);
@@ -31,8 +32,26 @@ UI::Windows::TableProperties::TableProperties(QWidget* tab_relay)
 
 	table.setCellWidget(1, 1, cats = new QComboBox);
 	cats->setEditable(true);
+	/////////////////////////////HEADER///////////////////////////////
+
+	auto xhead = new QTableWidgetItem; // header
+	xhead->setData(Qt::DisplayRole, QStringLiteral("Header Color"));
+	xhead->setFlags(xhead->flags() & ~Qt::ItemIsEditable);
+	table.setItem(2, 0, xhead);
+
+	table.setCellWidget(2, 1, head = new ColorWidget);
+
+	/////////////////////////////FONT///////////////////////////////
+	auto xfont = new QTableWidgetItem; // header
+	xfont->setData(Qt::DisplayRole, QStringLiteral("Font Color"));
+	xfont->setFlags(xfont->flags() & ~Qt::ItemIsEditable);
+	table.setItem(3, 0, xfont);
+
+	table.setCellWidget(3, 1, font = new ColorWidget);
 
 	connect(&table, &QTableWidget::itemChanged, this, &TableProperties::OnItemChanged);
+	connect(head, &ColorWidget::ColorChanged, this, &TableProperties::HeadColorChanged);
+	connect(font, &ColorWidget::ColorChanged, this, &TableProperties::FontColorChanged);
 }
 
 void UI::Windows::TableProperties::OnItemChanged(QTableWidgetItem* item)
@@ -41,7 +60,7 @@ void UI::Windows::TableProperties::OnItemChanged(QTableWidgetItem* item)
 	switch (item->row())
 	{
 	case 0:
-		QApplication::postEvent(tab, new NameChangedEvent(item->text()));
+		emit NameChanged(item->text());
 		break;
 	default: break;
 	}
@@ -64,4 +83,13 @@ QString UI::Windows::TableProperties::GetCategory() const noexcept
 void UI::Windows::TableProperties::SetCategory(const QString& c) noexcept
 {
 	cats->setCurrentText(c);
+}
+
+void UI::Windows::TableProperties::SetTitleColor(const QColor& c) noexcept
+{
+	head->SetColor(c);
+}
+void UI::Windows::TableProperties::SetFontColor(const QColor& c) noexcept
+{
+	font->SetColor(c);
 }

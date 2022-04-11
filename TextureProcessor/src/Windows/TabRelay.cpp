@@ -48,5 +48,5 @@ Tab* TabRelay::GetCurrent()
 
 QString TabRelay::UKeyTemp(QStringView pattern)
 {
-	return pattern.toString() + '_' + QString::number(temp_index++);
+	return pattern.toString() + ' ' + QString::number(temp_index++);
 }

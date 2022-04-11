@@ -190,6 +190,16 @@ QLabel& UI::NodeUI::Header()
 	return *static_cast<QLabel*>(proxy->widget());
 }
 
+void UI::NodeUI::UpdateFontColor()
+{
+	auto& h = Header();
+	auto& style = GetModel().GetStyle();
+	QPalette p;
+	p.setColor(h.foregroundRole(), style.font_color);
+	h.setPalette(p);
+	h.update();
+}
+
 void UI::NodeUI::Serialize(QJsonObject& doc)
 {
 	QJsonArray xpos;
