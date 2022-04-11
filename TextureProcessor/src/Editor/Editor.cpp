@@ -41,6 +41,8 @@ Editor::Editor()
 	vl.setSpacing(0);
 
 	setLayout(&vl);
+
+	connect(&code, &CodeEditor::modificationChanged, this, &Editor::Modified);
 }
 
 void Editor::wheelEvent(QWheelEvent* event)
@@ -94,8 +96,4 @@ void Editor::SelectFontSize(const QString& text)
 void Editor::LoadText(const QString& in)
 {
 	code.setPlainText(in);
-}
-
-void Editor::SetConstants(std::vector<QString> c)
-{
 }

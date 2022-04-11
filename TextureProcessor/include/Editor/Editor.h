@@ -9,13 +9,14 @@
 
 class Editor : public QWidget
 {
+	Q_OBJECT
+private:
 	static constexpr size_t font_defsz = 12ull;
 	static constexpr size_t font_defc = 146;
 public:
 	Editor();
 public:
 	void LoadText(const QString& in);
-	void SetConstants(std::vector<QString> c);
 	QString GetText()const noexcept
 	{
 		return code.toPlainText();
@@ -31,6 +32,8 @@ public:
 	{
 		hl.SetInfo(std::move(types), std::move(macros), std::move(funcs));
 	}
+signals:
+	void Modified(bool mod_state);
 protected:
 	void wheelEvent(QWheelEvent* event);
 private:

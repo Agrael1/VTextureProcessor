@@ -50,6 +50,7 @@ namespace UI::Windows
 
 		void Request(UI::Request rq)override;
 	private:
+		void timerEvent(QTimerEvent* event)override;
 		void Init(Properties& props)noexcept;
 		bool event(QEvent* e)override;
 		void SetCBufInfo();
@@ -62,5 +63,7 @@ namespace UI::Windows
 		ConsoleDock con;
 		std::optional<ver::DynamicDescriptor> tdesc;
 		std::optional<UI::NodeUI> node;
+		int tid = 0;
+		bool text_changed = false;
 	};
 }

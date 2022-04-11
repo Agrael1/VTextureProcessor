@@ -65,7 +65,6 @@ EditorTab::SceneDock::SceneDock(Properties& props)
 	setWidget(&view);
 	Engine::BindScene(&scene, EditSize);
 }
-
 UI::Windows::EditorTab::SceneDock::~SceneDock()
 {
 	Engine::UnbindScene(&scene);
@@ -87,6 +86,7 @@ void UI::Windows::EditorTab::OnLeave() noexcept
 {
 	tp.hide();
 }
+
 void UI::Windows::EditorTab::Save()
 {
 	std::fstream f;
@@ -117,6 +117,20 @@ void UI::Windows::EditorTab::SaveAs()
 	SetPath(proj_path);
 	SetName(QString::fromStdWString(proj_path.filename().wstring()));
 }
+
+void UI::Windows::EditorTab::timerEvent(QTimerEvent* event)
+{
+	if (!text_changed) return;
+	auto code = edit.edit.GetText().toStdWString();
+	if (code.empty())return;
+
+	NodeParser p(code);
+	p.Parse();
+
+	edit.edit.SetInfo(p.GetTypesInfo(), p.GetMacrosInfo(), p.GetFuncsInfo());
+	text_changed = false;
+}
+
 void UI::Windows::EditorTab::Init(Properties& props) noexcept
 {
 	docker.setStyleSheet("");
@@ -124,7 +138,12 @@ void UI::Windows::EditorTab::Init(Properties& props) noexcept
 	docker.addDockWidget(ads::RightDockWidgetArea, &scene);
 	docker.addDockWidget(ads::BottomDockWidgetArea, &con);
 	((QMainWindow*)props.parentWidget())->addDockWidget(Qt::RightDockWidgetArea, &tp, Qt::Vertical);
+
+	connect(&edit.edit, &Editor::Modified, [this](bool mod) {
+		text_changed = true;
+		});
 }
+
 bool UI::Windows::EditorTab::event(QEvent* e)
 {
 	switch (e->type())
@@ -143,6 +162,7 @@ void UI::Windows::EditorTab::SetCBufInfo()
 		consts.emplace(i.first.begin(), i.first.end());
 	edit.edit.SetCBufInfo(std::move(consts));
 }
+
 UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 	:Tab(std::move(p)), scene(props), tp(this), docker(this)
 {
@@ -172,9 +192,11 @@ UI::Windows::EditorTab::EditorTab(std::filesystem::path&& p, Properties& props)
 	scene.scene.addItem(&*node);
 
 	docker.restoreState(DockState::instance().State());
+	tid = startTimer(2000);
 }
 UI::Windows::EditorTab::~EditorTab()
 {
+	killTimer(tid);
 	DockState::instance().SaveState(docker.saveState());
 	docker.removeDockWidget(&scene);
 	docker.removeDockWidget(&edit);
@@ -229,13 +251,7 @@ void UI::Windows::EditorTab::Compile()
 	scene.scene.addItem(&*node);
 	node->setPos(pos);
 
-	auto code = edit.edit.GetText().toStdWString();
-	if (code.empty())return;
-
-	NodeParser p(code);
-	p.Parse();
-
-	edit.edit.SetInfo(p.GetTypesInfo(), p.GetMacrosInfo(), p.GetFuncsInfo());
+	timerEvent(nullptr);
 }
 void UI::Windows::EditorTab::Request(UI::Request rq)
 {
@@ -251,7 +267,10 @@ void UI::Windows::EditorTab::Request(UI::Request rq)
 	}
 }
 
-UI::Windows::EditorTab::EditorDock::EditorDock() :base_class(QStringLiteral("Editor")) { setFeatures(QFlags{ base_class::DockWidgetFeature::DefaultDockWidgetFeatures } &= ~base_class::DockWidgetFeature::DockWidgetClosable); setWidget(&edit); }
+UI::Windows::EditorTab::EditorDock::EditorDock() :base_class(QStringLiteral("Editor")) 
+{ 
+	setFeatures(QFlags{ base_class::DockWidgetFeature::DefaultDockWidgetFeatures } &= ~base_class::DockWidgetFeature::DockWidgetClosable); setWidget(&edit); 
+}
 UI::Windows::EditorTab::ConsoleDock::ConsoleDock() :base_class("Console")
 {
 	console.setReadOnly(true);
