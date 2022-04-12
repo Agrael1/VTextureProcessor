@@ -128,7 +128,7 @@ namespace ver::dc
 	LEAF_ELEMENT_TYPES
 #undef X
 
-	template<Type t>
+		template<Type t>
 	concept has_min = requires(typename Map<t>::param p) { p.min; };
 	template<Type t>
 	concept has_max = requires(typename Map<t>::param p) { p.max; };
@@ -138,6 +138,10 @@ namespace ver::dc
 	concept integral_core = std::integral<typename Map<t>::SysType> ||
 		requires (typename Map<t>::SysType v) { { v[0] }->std::integral; };
 
+	template<Type t>
+	concept float_array = requires (typename Map<t>::SysType v) { { v[0] }->std::floating_point; };
+
+
 
 	template <Type t>
 	inline consteval uint16_t GetStride()
@@ -145,5 +149,104 @@ namespace ver::dc
 		if constexpr (has_stride<t>)
 			return Map<t>::stride;
 		return Map<t>::floats;
+	}
+
+	template<typename T>
+	struct serializer {
+		using enter_ty = std::conditional_t<(sizeof(T) > 16), const T&, T> ;
+		constexpr static bool specific = false;
+		QJsonValue operator()(enter_ty v) {
+			return v;
+		}
+		void operator()(T& r, QJsonValueRef v) {
+			r = v.toVariant().value<T>();
+		}
+	};
+	template<> struct serializer<QVector2D> {
+		constexpr static bool specific = true;
+		QJsonValue operator()(QVector2D v)
+		{
+			QJsonArray a;
+			a.append(v.x());
+			a.append(v.y());
+			return a;
+		}
+		void operator()(QVector2D& r, QJsonValueRef v)
+		{
+			if (!v.isArray())return;
+			auto a = v.toArray();
+			if (a.size() < 2)return;
+			for (auto i = 0; i < 2; i++)
+				r[i] = a[i].toDouble(0.0);
+		}
+	};
+	template<> struct serializer<QVector3D> {
+		constexpr static bool specific = true;
+		QJsonValue operator()(QVector3D v)
+		{
+			QJsonArray a;
+			a.append(v.x());
+			a.append(v.y());
+			a.append(v.z());
+			return a;
+		}
+		void operator()(QVector3D& r, QJsonValueRef v)
+		{
+			if (!v.isArray())return;
+			auto a = v.toArray();
+			if (a.size() < 3)return;
+			for (auto i = 0; i < 3; i++)
+				r[i] = a[i].toDouble(0.0);
+		}
+	};
+	template<> struct serializer<QVector4D> {
+		constexpr static bool specific = true;
+		QJsonValue operator()(QVector4D v)
+		{
+			QJsonArray a;
+			a.append(v.x());
+			a.append(v.y());
+			a.append(v.z());
+			a.append(v.w());
+			return a;
+		}
+		void operator()(QVector4D& r, QJsonValueRef v)
+		{
+			if (!v.isArray())return;
+			auto a = v.toArray();
+			if (a.size() < 4)return;
+			for (auto i = 0; i < 4; i++)
+				r[i] = a[i].toDouble(0.0);
+		}
+	};
+	template<> struct serializer<QMatrix4x4> {
+		constexpr static bool specific = true;
+		QJsonValue operator()(const QMatrix4x4& v)
+		{
+			QJsonArray a;
+			for (auto i : std::span{ v.constData(), 16 })
+				a.append(i);
+			return a;
+		}
+		void operator()(QMatrix4x4& r, QJsonValueRef v)
+		{
+			if (!v.isArray())return;
+			auto a = v.toArray();
+			if (a.size() < 16)return;
+			auto* m = r.data();
+			for (auto i = 0; i < 16; i++)
+				m[i] = a[i].toDouble(0.0);
+		}
+	};
+
+	template<typename T>
+	QJsonValue Serialize(T&& fwd)
+	{
+		return serializer<std::remove_cvref_t<T>>{}(std::forward<T>(fwd));
+	}
+	template<typename T>
+	void Deserialize(T& fwd, QJsonValueRef v)
+	{
+		serializer<std::remove_cvref_t<T>>{}(fwd, v);
 	}
 }

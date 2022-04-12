@@ -6,6 +6,8 @@ namespace ver::dc
 {
 	struct param_storage
 	{
+		template <Type t>
+		using m_ty = Map<t>::SysType;
 	public:
 		param_storage(Type xt) :t(xt)
 		{
@@ -31,54 +33,55 @@ namespace ver::dc
 		}
 	private:
 		template <Type t> requires has_min<t>
-		void set_min_impl(QVariant v)
+		void set_min_impl(QJsonValueRef v)
 		{
-			get<t>().min = v.value<typename Map<t>::SysType>();
+			Deserialize(get<t>().min, v);
 		}
 		template <Type t>
-		void set_min_impl(QVariant v)
+		void set_min_impl(QJsonValueRef v)
 		{}
 		template <Type t> requires has_max<t>
-		void set_max_impl(QVariant v)
+		void set_max_impl(QJsonValueRef v)
 		{
-			get<t>().max = v.value<typename Map<t>::SysType>();
+			Deserialize(get<t>().max, v);
 		}
 		template <Type t>
-		void set_max_impl(QVariant v)
+		void set_max_impl(QJsonValueRef v)
 		{}
+	private:
 		template <Type t> requires has_min<t>
-		QVariant get_min_impl()const
+		QJsonValue get_min_impl()const
 		{
-			return get<t>().min;
+			return Serialize(get<t>().min);
 		}
 		template <Type t>
-		QVariant get_min_impl()const
+		QJsonValue get_min_impl()const
 		{
 			return {};
 		}
 		template <Type t> requires has_max<t>
-		QVariant get_max_impl()const
+		QJsonValue get_max_impl()const
 		{
-			return get<t>().max;
+			return Serialize(get<t>().max);
 		}
 		template <Type t>
-		QVariant get_max_impl()const
+		QJsonValue get_max_impl()const
 		{
 			return {};
 		}
 	public:
-		void set_default(QVariant v)
+		void set_default(QJsonValueRef v)
 		{
 			switch (t)
 			{
-#define X(el) case Type::el: get<Type::el>().def = v.value<typename Map<Type::el>::SysType>();break;
+#define X(el) case Type::el: Deserialize(get<Type::el>().def, v);break;
 				LEAF_ELEMENT_TYPES
 #undef X
 			default:
 				break;
 			}
 		}
-		void set_min(QVariant v)
+		void set_min(QJsonValueRef v)
 		{
 			switch (t)
 			{
@@ -89,7 +92,7 @@ namespace ver::dc
 				break;
 			}
 		}
-		void set_max(QVariant v)
+		void set_max(QJsonValueRef v)
 		{
 			switch (t)
 			{
@@ -100,11 +103,11 @@ namespace ver::dc
 				break;
 			}
 		}
-		QVariant get_def()const
+		QJsonValue get_def()const
 		{
 			switch (t)
 			{
-#define X(el) case Type::el: return get<Type::el>().def;
+#define X(el) case Type::el: return Serialize(get<Type::el>().def);
 				LEAF_ELEMENT_TYPES
 #undef X
 			default:
@@ -112,7 +115,7 @@ namespace ver::dc
 			}
 			return {};
 		}
-		QVariant get_min()const
+		QJsonValue get_min()const
 		{
 			switch (t)
 			{
@@ -124,7 +127,7 @@ namespace ver::dc
 			}
 			return {};
 		}
-		QVariant get_max()const
+		QJsonValue get_max()const
 		{
 			switch (t)
 			{
@@ -136,7 +139,6 @@ namespace ver::dc
 			}
 			return {};
 		}
-
 	public:
 #define X(el) typename Map<Type::el>::param
 #undef SEP

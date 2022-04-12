@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <Logic/Constants.h>
 #include <Logic/Engine.h>
+#include <QSaveFile>
 
 
 using namespace UI::Windows;
@@ -64,6 +65,22 @@ void SceneTab::Clear()
 	scene.Clear();
 }
 
+void UI::Windows::SceneTab::MakeShader()
+{
+	fs::path proj_path{ QFileDialog::getSaveFileName(
+		nullptr,
+		QStringLiteral("Create new shader")
+	).toStdString() };
+
+	if (proj_path.empty()) return;
+
+
+	std::fstream f;
+	f.open(proj_path, std::ios::out);
+	if (!f.is_open()) return;
+	f << scene.MakeShader().toStdString();
+}
+
 bool SceneTab::Load()
 {
 	using namespace std::string_literals;
@@ -108,7 +125,7 @@ void UI::Windows::SceneTab::Request(UI::Request rq)
 	case UI::Request::Delete: return scene.DeleteSelected();
 	case UI::Request::Clear: return scene.Clear();
 	case UI::Request::ClearSel: return scene.clearSelection();
-	case UI::Request::Compile:
+	case UI::Request::Compile: return MakeShader();
 	case UI::Request::Export: return scene.ExportAll();
 	default:break;
 	}

@@ -36,7 +36,7 @@ namespace ver
 				printf(msg.c_str());
 				return false;
 			}
-			if (source.GetType() != GetType())
+			if (!compatible(GetType(), source.GetType()))
 			{
 				printf("Types do not match\n");
 				return false;

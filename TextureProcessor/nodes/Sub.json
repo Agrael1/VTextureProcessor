@@ -1,36 +1,24 @@
 {
-  "Subtract": {
-    "Node": {
-      "Class": "Texture",
-      "Group": "Operations",
-      "Sinks": [
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Operations",
+    "Name": "Subtract",
+    "Sinks": [
         {
-          "Name": "In1",
-          "Type": "Grayscale"
+            "Name": "In1",
+            "Type": "Grayscale"
         },
         {
-          "Name": "In2",
-          "Type": "Grayscale"
+            "Name": "In2",
+            "Type": "Grayscale"
         }
-      ],
-      "Sources": [
+    ],
+    "Sources": [
         {
-          "Name": "Out",
-          "Type": "Grayscale"
+            "Name": "Out",
+            "Type": "Grayscale"
         }
-      ]
-    },
-    "NodeStyle": {
-      "TitleColor": [ 0, 128, 0 ],
-      "FontColor": "white"
-    },
-    "Value": [
-      "void main() {\n",
-      " vec4 t1 = texture2D(In1, sv_texc);\n",
-      " vec4 t2 = texture2D(In2, sv_texc);\n",
-      " vec3 s = (t1-t2).xyz;\n",
-      " Out = vec4(max(s, vec3(0.0)),1.0);\n",
-      "}"
-    ]
-  }
+    ],
+    "TitleColor": "#005500",
+    "Value": "void main() {\n\tvec4 t1 = texture2D(In1, sv_texc);\n\tvec4 t2 = texture2D(In2, sv_texc);\n\tvec3 s = (t1-t2).xyz;\n\tOut = vec4(max(s, vec3(0.0)),1.0);\n}"
 }

@@ -37,15 +37,13 @@ App::App(int &xargc, char** xargv)
     darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
     darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-
     app.setPalette(darkPalette);
 
     // Event type for opening projects
-    QEvent::registerEventType(QEvent::User+1);
+    QEvent::registerEventType(UI::ProjectEvent::etype);
 
     // Set window size
-    window.emplace<ProjectsWindow>(1280, 720, *this, cfg);
-    std::get<ProjectsWindow>(window).show();
+    window.emplace<ProjectsWindow>(1280, 720, *this, cfg).show();
 }
 
 /**
@@ -67,10 +65,9 @@ int App::Start()
 bool App::event(QEvent* e)
 {
     // Handling of opening projects
-    if (e->type() == QEvent::User+1) {
+    if (e->type() == UI::ProjectEvent::etype) {
         UI::ProjectEvent& proj = static_cast<UI::ProjectEvent&>(*e);
-        window.emplace<MainWindow>(1280, 720, std::move(proj.projPath),proj.size);
-        std::get<MainWindow>(window).showMaximized();
+        window.emplace<MainWindow>(1280, 720, std::move(proj.projPath),proj.size).showMaximized();
         return true;
     }
     return QObject::event(e);

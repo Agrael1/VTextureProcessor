@@ -14,7 +14,7 @@
 #include <Logic/Engine.h>
 #include <utils/utils.h>
 
-#include <UI/PropertyGenerator.h>
+#include <Windows/Properties.h>
 #include <unordered_set>
 
 using namespace ver;
@@ -57,7 +57,7 @@ void ver::ShaderNode::Update()
 
 void ver::ShaderNode::GetProperties(UI::Windows::PropertyElement& props)
 {
-	UI::PropertyBuffer(props, buf, desc.params);
+	props.AppendBuffer(buf, desc.params);
 }
 
 void ver::ShaderNode::Serialize(QJsonObject& doc)
@@ -188,7 +188,7 @@ void ver::TextureDescriptor::SetProperties(const QJsonArray& props)
 			else
 			{
 				opt.enable_def = 1;
-				opt.param.set_default(p[u"Val"].toVariant());
+				opt.param.set_default(p[u"Val"]);
 			}
 		}
 	}
@@ -215,11 +215,11 @@ void ver::TextureDescriptor::SetOptions(QJsonObject obj, dc::Options& opt)
 {
 	auto def = obj.find(u"default");
 	if (opt.enable_def = def != obj.end())
-		opt.param.set_default(def->toVariant());
+		opt.param.set_default(*def);
 	auto min = obj.find(u"min");
 	if (opt.enable_min = min != obj.end())
-		opt.param.set_min(min->toVariant());
+		opt.param.set_min(*min);
 	auto max = obj.find(u"max");
 	if (opt.enable_max = max != obj.end())
-		opt.param.set_max(max->toVariant());
+		opt.param.set_max(*max);
 }

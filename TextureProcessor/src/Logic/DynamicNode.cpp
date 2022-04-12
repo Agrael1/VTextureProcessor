@@ -4,8 +4,6 @@
 #include <UI/UINode.h>
 #include <UI/PortContainer.h>
 #include <Windows/Properties.h>
-#include <UI/PropertyGenerator.h>
-
 #include <UI/PropertyContainer.h>
 
 
@@ -14,22 +12,22 @@ void ver::DynamicNode::GetProperties(UI::Windows::PropertyElement& props)
 	auto& d = Desc();
 	if (!bchange)
 	{
-		struct WB :public QWidget
+		struct WB :public UI::AwareWidget
 		{
 			QHBoxLayout hl;
 			QToolButton tb;
-			WB()
+			WB(bool& change)
 			{
 				tb.setIcon(QIcon{ ":/icons8-edit.png" });
 				hl.setAlignment(Qt::AlignRight);
 				hl.addWidget(&tb);
 				hl.setContentsMargins(0, 0, 0, 0);
 				setLayout(&hl);
+				tb.connect(&tb, &QToolButton::pressed, [this, &change]() {change = true; emit ValueChanged(); });
 			}
 		};
-		auto& tb = props.AppendWidget<WB>();
-		tb.tb.connect(&tb.tb, &QToolButton::pressed, [this, &props]() {bchange = true; Desc().UpdateProperties(props); });
-		UI::PropertyBuffer(props, buf, desc.params);
+		props.AppendUpdaterWidget(std::make_unique<WB>(bchange));
+		props.AppendBuffer(buf, desc.params);
 	}
 	else {
 		d.pcont->SetDiscardCallback([this, &props]()

@@ -67,6 +67,20 @@ namespace ver
 	{
 		return p != PortType::None;
 	}
+	constexpr inline bool compatible(PortType sink, PortType source)
+	{
+		switch (sink)
+		{
+		case ver::PortType::Normal:
+		case ver::PortType::Grayscale:
+			return source == sink;
+		case ver::PortType::Color:
+			return source == sink || source == ver::PortType::Grayscale;
+		default:
+			break;
+		}
+		return false;
+	}
 
 	struct PortDesc
 	{

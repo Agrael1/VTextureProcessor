@@ -29,6 +29,7 @@ namespace UI
 		void ExportAll();
 		void OnSelectionChanged();
 		QSize Dimensions(QJsonObject)const noexcept;
+		QString MakeShader();
 
 		virtual void Serialize(QJsonObject& doc)override;
 		virtual bool Deserialize(QJsonObject doc)override;

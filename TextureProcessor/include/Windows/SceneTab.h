@@ -14,6 +14,7 @@ namespace UI::Windows
 		void Save();
 		void SaveAs();
 		void Clear();
+		void MakeShader();
 		bool Load();
 		void OnEnter()noexcept override;
 

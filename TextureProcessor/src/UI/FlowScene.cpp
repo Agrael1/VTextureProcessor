@@ -6,7 +6,7 @@
 #include <UI/FlowScene.h>
 #include <UI/SceneEvent.h>
 #include <UI/UINode.h>
- //#include <UI/Connection.h>
+#include <Logic/ShaderProbe.h>
 
 #include <Windows/Properties.h>
 #include <QMessageBox>
@@ -231,6 +231,12 @@ QSize UI::FlowScene::Dimensions(QJsonObject in) const noexcept
 		return{ 0,0 };
 	}
 	return dims = QSize(arr[0].toInt(), arr[1].toInt());
+}
+
+QString UI::FlowScene::MakeShader()
+{
+	ver::ShaderProbe probe(nodes);
+	return probe.MakeShader(outputs);
 }
 
 /**

@@ -1,10 +1,20 @@
 #pragma once
-#include <UI/Updater.h>
+#include <UI/AwareWidget.h>
 #include <QDockWidget>
 #include <QGroupBox>
 #include <QScrollArea>
 #include <QBoxLayout>
 #include <vector>
+
+namespace UI
+{
+	struct INode;
+}
+namespace ver::dc
+{
+	class Buffer;
+	struct Options;
+}
 
 namespace UI::Windows
 {
@@ -18,30 +28,9 @@ namespace UI::Windows
 			DetachAll();
 		}
 	public:
-		template <typename W, typename ...Args> requires std::derived_from<W, QWidget>
-		W& AppendWidget(Args&&... args)
-		{
-			auto& r = static_cast<W&>(*widgets.emplace_back(std::make_unique<W>(std::forward<Args>(args)...)));
-			if constexpr (std::derived_from<W, IUpdater>)
-				((IUpdater&)r).SetChangedCallback(&parent);
-			if constexpr (std::derived_from<W, PropertyUpdater>)
-				((PropertyUpdater&)r).SetChangedCallback(&parent, *this);
-
-			lay.addWidget(&r);
-			return r;
-		}
-		template <typename W> requires std::derived_from<W, QWidget>
-		W& AppendWidget(std::unique_ptr<W> r)
-		{
-			auto& r = static_cast<W&>(*widgets.emplace_back(std::move(r)));
-			if constexpr (std::derived_from<W, IUpdater>)
-				((IUpdater&)r).SetChangedCallback(&parent);
-			if constexpr (std::derived_from<W, PropertyUpdater>)
-				((PropertyUpdater&)r).SetChangedCallback(&parent, *this);
-
-			lay.addWidget(&r);
-			return r;
-		}
+		void AppendBuffer(ver::dc::Buffer& buf, std::span<ver::dc::Options> opts);
+		void AppendWidget(std::unique_ptr<AwareWidget> r);
+		void AppendUpdaterWidget(std::unique_ptr<AwareWidget> r);
 		void Clear()noexcept
 		{
 			widgets.clear();
@@ -59,7 +48,7 @@ namespace UI::Windows
 	private:
 		INode& parent;
 		QVBoxLayout lay;
-		std::vector<std::unique_ptr<QWidget>> widgets;
+		std::vector<std::unique_ptr<AwareWidget>> widgets;
 		std::vector<std::shared_ptr<QWidget>> attached;
 	};
 

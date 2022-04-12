@@ -22,7 +22,7 @@ private:
 	QApplication app;
 	ApplicationConfig cfg;
 private:
-	static constexpr std::string_view AppVer = "0.3.0";
+	static constexpr std::string_view AppVer = "0.4.0";
 	static constexpr std::string_view AppTheme = "Fusion";
 	static constexpr std::string_view AppName = "Veritas Texture Editor";
 };

@@ -19,6 +19,6 @@
             "Type": "Grayscale"
         }
     ],
-    "TitleColor": "#212121",
+    "TitleColor": "#005500",
     "Value": "void main() {\n\tvec4 t1 = texture2D(in1, sv_texc);\n\tvec4 t2 = texture2D(in2, sv_texc);\n\tOut = min(t2+t1, vec4(1.0));\n}"
 }
