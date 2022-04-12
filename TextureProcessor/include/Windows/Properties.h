@@ -4,7 +4,7 @@
 #include <QGroupBox>
 #include <QScrollArea>
 #include <QBoxLayout>
-#include <vector>
+#include <list>
 
 namespace UI
 {
@@ -70,6 +70,6 @@ namespace UI::Windows
 	private:
 		QScrollArea s;
 		Dummy dum;
-		std::vector<PropertyElement> props;
+		std::list<PropertyElement> props;
 	};
 }

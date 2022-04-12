@@ -43,8 +43,8 @@ PropertyElement::PropertyElement(INode& parent, std::string_view title)
 PropertyElement::PropertyElement(PropertyElement&& o)noexcept
 	:QGroupBox(o.title()), widgets(std::move(o.widgets)), parent(o.parent)
 {
-
 	lay.setAlignment(Qt::AlignTop);
+	lay.setContentsMargins(0,0,0,0);
 	lay.setSpacing(0);
 
 	int a, b, c, d;
@@ -82,7 +82,6 @@ void UI::Windows::PropertyElement::AppendWidget(std::unique_ptr<AwareWidget> r)
 	connect(r.get(), &AwareWidget::ValueChanged, [this]() {parent.Update(); });
 	lay.addWidget(widgets.emplace_back(std::move(r)).get());
 }
-
 void UI::Windows::PropertyElement::AppendUpdaterWidget(std::unique_ptr<AwareWidget> r)
 {
 	connect(r.get(), &AwareWidget::ValueChanged, [this]() {

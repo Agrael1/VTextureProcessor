@@ -1,44 +1,40 @@
 {
-  "Scale": {
-    "Node": {
-      "Class": "Texture",
-      "Group": "Operations",
-      "Properties": [
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Operations",
+    "Name": "Gray:Scale",
+    "Properties": [
         {
-          "Tag": "Scale",
-          "Type": "vec2",
-          "Val": [ 1.5, 1.0 ]
+            "CName": "Scale",
+            "Type": "vec2",
+            "Val": {
+                "default": [
+                    1,
+                    1
+                ],
+                "max": [
+                    2,
+                    2
+                ],
+                "min": [
+                    -2,
+                    -2
+                ]
+            }
         }
-      ],
-      "Sinks": [
+    ],
+    "Sinks": [
         {
-          "Name": "In",
-          "Type": "Grayscale"
+            "Name": "In",
+            "Type": "Grayscale"
         }
-      ],
-      "Sources": [
+    ],
+    "Sources": [
         {
-          "Name": "Out",
-          "Type": "Grayscale"
+            "Name": "Out",
+            "Type": "Grayscale"
         }
-      ]
-    },
-    "NodeStyle": {
-      "TitleColor": [ 0, 128, 0 ],
-      "FontColor": "white"
-    },
-    "Value": [
-      "mat2 scale(vec2 _scale){         \n",
-      " return mat2(_scale.x,0.0,        \n",
-      "  0.0,_scale.y);          \n",
-      "}               \n",
-      "void main() {            \n",
-      "    vec2 st = sv_texc;    \n",
-      "    st -= vec2(0.5);          \n",
-      "    st = scale(Scale) * st;      \n",
-      "    st += vec2(0.5);          \n",
-      "    Out = texture2D(In, st);\n",
-      "}"
-    ]
-  }
+    ],
+    "TitleColor": "#005500",
+    "Value": "mat2 scale(vec2 _scale){\n\treturn mat2(1/_scale.x,0.0,\n\t0.0,1/_scale.y);\n}\nvoid main() {\n\tvec2 st = sv_texc;\n\tst -= vec2(0.5);\n\tst = scale(Scale) * st;\n\tst += vec2(0.5);\n\tOut = texture2D(In, st);\n}"
 }

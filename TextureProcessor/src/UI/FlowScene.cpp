@@ -199,7 +199,6 @@ void FlowScene::Clear()
 {
 	nodes.clear();
 	codex.ClearCounts();
-	clear();
 }
 
 /**
@@ -271,8 +270,8 @@ void FlowScene::Serialize(QJsonObject& doc)
 		xnodes.append(a);
 	}
 	connections.Serialize(doc);
-	doc.insert("Dimensions", xdims);
-	doc.insert("Nodes", xnodes);
+	doc.insert(u"Dimensions", xdims);
+	doc.insert(u"Nodes", xnodes);
 }
 
 /**

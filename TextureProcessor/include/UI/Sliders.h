@@ -15,7 +15,7 @@ namespace UI
 {
 	class FloatSlider : public AwareWidget
 	{
-		constexpr static auto precision = 200;
+		constexpr static auto precision = 1000;
 		constexpr static auto fprecision = float(precision);
 	public:
 		FloatSlider(float& value, const QString& name, float min = -20, float max = 20);

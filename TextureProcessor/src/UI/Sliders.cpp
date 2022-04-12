@@ -58,8 +58,8 @@ UI::IntSlider::IntSlider(int& value, const QString& name, int xmin, int xmax)
 			emit ValueChanged();
 		});
 
-
 	text.setText(QString::number(value));
+	slider.setValue(value);
 
 	// Set text size policy
 	QSizePolicy spText(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -100,7 +100,7 @@ UI::FloatSlider::FloatSlider(float& value, const QString& name, float xmin, floa
 	connect(&text, &QLineEdit::textEdited,
 		[this](const QString& v) {
 			val = v.toFloat();
-			slider.setValue(int((val - min) / dpi));
+			slider.setValue(int(roundf((val - min) / dpi)));
 		});
 	connect(&slider, &QSlider::valueChanged,
 		[this](int v) {
@@ -110,7 +110,7 @@ UI::FloatSlider::FloatSlider(float& value, const QString& name, float xmin, floa
 		});
 
 	text.setText(QString::number(value));
-	slider.setValue(int((value - min) / dpi));
+	slider.setValue(int(roundf((value - min) / dpi)));
 
 	// Set text size policy
 	QSizePolicy spText(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -131,11 +131,11 @@ void UI::FloatSlider::SetMin(float xmin)
 {
 	valid.setBottom(min = xmin);
 	dpi = fabs(max - min) / fprecision;
-	slider.setValue(int((val - min) / dpi));
+	slider.setValue(int(roundf((val - min) / dpi)));
 }
 void UI::FloatSlider::SetMax(float xmax)
 {
 	valid.setTop(max = xmax);
 	dpi = fabs(max - min) / fprecision;
-	slider.setValue(int((val - min) / dpi));
+	slider.setValue(int(roundf((val - min) / dpi)));
 }
