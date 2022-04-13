@@ -11,7 +11,7 @@ ver::OutputNode::OutputNode(size_t ref)
 	:Node(std::format("{}_{}", "Output", ref))
 	,out(std::make_shared<QImage>())
 {
-	style.SetStyleName(QStringView{ u"Output"}.toString());
+	style.SetStyleName(QStringLiteral(u"Output"));
 	RegisterSink(DirectTextureSink::Make("Out", in, PortType::Grayscale));
 }
 

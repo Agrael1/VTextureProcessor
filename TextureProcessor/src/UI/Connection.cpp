@@ -376,8 +376,12 @@ INode& UI::Connection::SourceNode()
 }
 bool UI::Connection::Connect()
 {
-	auto& xsink = static_cast<Sink&>(*rpSink());
-	if(!xsink.model.Link(static_cast<Source&>(*rpSource()).model))return false;
+	auto& xsink = static_cast<Sink&>(*rpSink()).model;
+	auto& xsource = static_cast<Source&>(*rpSource());
+	
+
+	if(!xsink.Link(xsource.parent.Name(), xsource.model))
+		return false;
 	Update();
 	return true;
 }

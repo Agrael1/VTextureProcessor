@@ -24,7 +24,7 @@ namespace ver
 		{
 			target = nullptr;
 		}
-		bool Link(Source& source) override
+		bool Link(std::string_view nodeName, Source& source) override
 		{
 			auto p = source.YieldTexture();
 			if (!p)
@@ -41,6 +41,7 @@ namespace ver
 				printf("Types do not match\n");
 				return false;
 			}
+			SetTarget(nodeName, source.GetName());
 			target = std::move(p);
 			return true;
 		}

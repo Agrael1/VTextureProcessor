@@ -69,6 +69,7 @@ namespace ver
 		{
 			return desc.style;
 		}
+		void Accept(ver::ShaderProbe& probe)override;
 	protected:
 		std::vector<std::shared_ptr<QImage>> inputs;
 		std::vector<std::shared_ptr<QImage>> outputs;

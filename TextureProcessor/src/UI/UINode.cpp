@@ -271,4 +271,9 @@ void UI::NodeUI::Disconnect()
 	QueryConnectionMap(scene()).Trim(*this);
 }
 
+void UI::NodeUI::Accept(ver::ShaderProbe& probe)
+{
+	GetModel().Accept(probe);
+}
+
 

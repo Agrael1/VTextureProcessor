@@ -21,6 +21,7 @@ namespace UI {
 class QImage;
 namespace ver
 {
+	class ShaderProbe;
 	class Node : public ISerialize
 	{
 	public:
@@ -30,8 +31,6 @@ namespace ver
 	public:
 		std::span<const std::unique_ptr<Source>> GetSources()const noexcept	{return sources;}
 		std::span<const std::unique_ptr<Sink>> GetSinks()const noexcept	{return sinks;}
-
-		void SetUniqueName(std::string xname) { name = std::move(xname); }
 		std::string_view GetName() const noexcept;
 
 		Source& GetSource(std::string_view registeredName);
@@ -58,6 +57,7 @@ namespace ver
 		virtual void Update() = 0;
 		virtual void ExportSilent(std::string_view name) = 0;
 		virtual std::span<std::shared_ptr<QImage>> GetLayout() = 0;
+		virtual void Accept(ver::ShaderProbe& probe);
 
 
 		virtual bool Deserialize(QJsonObject in)override { return true; };

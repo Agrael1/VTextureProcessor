@@ -10,6 +10,7 @@
 #include <Logic/Source.h>
 #include <Logic/Sink.h>
 #include <Logic/Node.h>
+#include <Logic/ShaderProbe.h>
 #include <utils/Exception.h>
 
 using namespace ver;
@@ -80,4 +81,13 @@ void Node::SetSinkLinkage(std::string_view registeredName, std::string_view to_n
 void ver::Node::SetSinkLinkage(size_t index, std::string_view to_node, std::string_view source)
 {
 	GetSink(index).SetTarget(to_node, source);
+}
+
+void ver::Node::Accept(ver::ShaderProbe& probe)
+{
+	for (auto& i : sinks)
+	{
+		if (!i)continue;
+		probe.ReadNode(i->GetOutputNodeName().data());
+	}
 }

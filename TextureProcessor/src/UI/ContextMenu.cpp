@@ -39,10 +39,10 @@ ContextMenu::ContextMenu(QWidget* parent)
  *
  * @param groupName Name of the new group
  */
-void ContextMenu::AppendGroup(std::string_view groupName)
+void ContextMenu::AppendGroup(const QString& groupName)
 {
 	auto& item = *new QTreeWidgetItem(&selection);
-	item.setText(0, groupName.data());
+	item.setText(0, groupName);
 	item.setData(0, Qt::UserRole, skipper.data());
 	current_group = &item;
 }

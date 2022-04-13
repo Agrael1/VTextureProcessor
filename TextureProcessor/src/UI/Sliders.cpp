@@ -101,8 +101,9 @@ UI::FloatSlider::FloatSlider(float& value, const QString& name, float xmin, floa
 		[this](const QString& v) {
 			val = v.toFloat();
 			slider.setValue(int(roundf((val - min) / dpi)));
+			emit ValueChanged();
 		});
-	connect(&slider, &QSlider::valueChanged,
+	connect(&slider, &QSlider::sliderMoved,
 		[this](int v) {
 			val = v * dpi + min;
 			text.setText(QString::number(val));

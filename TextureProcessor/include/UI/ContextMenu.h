@@ -15,7 +15,7 @@ class ContextMenu : public QMenu
 public:
 	ContextMenu(QWidget* parent = nullptr);
 public:
-	void AppendGroup(std::string_view groupName);
+	void AppendGroup(const QString& groupName);
 	void AppendItem(std::string_view item);
 	void Finish();
 	void Execute(const QPoint& where);

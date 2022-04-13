@@ -162,7 +162,7 @@ std::vector<QString> UI::FlowScene::GetCategories() const noexcept
 	std::vector<QString> out;
 	out.reserve(r.size());
 	for (auto&& x : r | std::views::keys)
-		out.push_back(x.c_str());
+		out.push_back(x);
 	return out;
 }
 

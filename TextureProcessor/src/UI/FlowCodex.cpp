@@ -95,6 +95,5 @@ void UI::FlowCodex::ParseJson(const QJsonDocument& json)
 
 	// Adds new group to the context menu
 	auto pair = codex.emplace(p->StyleName().toStdString(), std::move(p));
-	auto rx = x.toStdString();
-	cats[rx].emplace_back((*pair.first).first);
+	cats[x].emplace_back((*pair.first).first);
 }

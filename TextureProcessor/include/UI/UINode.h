@@ -47,7 +47,7 @@ namespace UI
 		virtual void FinishConnection(uint8_t index)override;
 		virtual void UpdateProperties(Windows::PropertyElement& properties) override;
 		virtual void Disconnect()override;
-
+		virtual void Accept(ver::ShaderProbe& probe)override;
 	private:
 		virtual void paint(QPainter* painter,
 			const QStyleOptionGraphicsItem* option,

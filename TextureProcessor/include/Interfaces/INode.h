@@ -8,6 +8,11 @@
 #include <Interfaces/ISerialize.h>
 #include <memory>
 
+namespace ver
+{
+	class ShaderProbe;
+}
+
 namespace UI
 {
 	namespace Windows{class PropertyElement;}
@@ -25,5 +30,6 @@ namespace UI
 		virtual void StartConnection(uint8_t index) = 0;
 		virtual void FinishConnection(uint8_t index) = 0;
 		virtual void Disconnect() = 0;
+		virtual void Accept(ver::ShaderProbe& probe) = 0;
 	};
 }

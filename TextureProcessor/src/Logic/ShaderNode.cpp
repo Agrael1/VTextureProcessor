@@ -3,7 +3,6 @@
  * @author Ilya Doroshenko (xdoros01)
  * @brief ShaderNode model logic
  */
-#include <ranges>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QFileDialog>
@@ -16,6 +15,9 @@
 
 #include <Windows/Properties.h>
 #include <unordered_set>
+#include <ranges>
+#include <Logic/ShaderProbe.h>
+
 
 using namespace ver;
 
@@ -98,6 +100,12 @@ std::string ver::ShaderNode::Export()
 
 	std::ranges::for_each(outputs, [&str](auto& in) {in->mirrored().save(str); });
 	return str.toStdString();
+}
+
+void ver::ShaderNode::Accept(ver::ShaderProbe& probe)
+{
+	Node::Accept(probe);
+	probe.AddDesc(&desc);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////

@@ -20,7 +20,7 @@ namespace ver
 		std::string_view GetOutputNodeName()const noexcept;
 		std::string_view GetSourceName()const noexcept;
 		void SetTarget(std::string_view nodeName, std::string_view sourceName);
-		virtual bool Link(Source& source) { return false; };
+		virtual bool Link(std::string_view nodeName, Source& source) { return false; };
 		virtual void Unlink() {};
 		virtual ~Sink() = default;
 	protected:
