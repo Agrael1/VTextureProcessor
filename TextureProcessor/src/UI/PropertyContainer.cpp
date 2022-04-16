@@ -222,7 +222,7 @@ UI::Editor::Editor(size_t position)
 UI::Editor::Editor(const ver::dc::Layout::Entry& entry, ver::dc::Options* xopt, size_t position)
 	:opt(xopt), position(position)
 {
-	type.addItem("Empty");
+	type.addItem(QStringLiteral("Empty"));
 	std::ranges::for_each(ver::dc::type_strings, [&](auto x) {type.addItem(x); });
 	type.setCurrentIndex(int(entry.second.Get()));
 	code_name.setText(entry.first.c_str());
@@ -235,6 +235,7 @@ ver::dc::Options* UI::Editor::GetOption() const noexcept
 	auto n = name.text();
 	auto cn = code_name.text();
 	ver::dc::Options* o = !editor?opt:&editor->GetOption();
+	if (!o)return nullptr;
 
 	o->enable_alias = n != cn && !n.isEmpty();
 	if (o->enable_alias)
@@ -281,7 +282,7 @@ void UI::Editor::Init()
 	type.connect(&type, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index)
 		{
 			edit.show();
-			editor = nullptr;
+			editor = make_widget(ver::dc::Type(type.currentIndex()), opt);
 			opt = nullptr;
 		});
 	auto xlineA = new QFrame;

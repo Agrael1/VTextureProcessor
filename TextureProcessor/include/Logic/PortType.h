@@ -13,7 +13,8 @@
 	X(None)\
 	X(Grayscale)\
 	X(Color)\
-	X(Normal)
+	X(Normal)\
+	X(Universal)
 
 namespace ver
 {
@@ -69,6 +70,7 @@ namespace ver
 	}
 	constexpr inline bool compatible(PortType sink, PortType source)
 	{
+		if (sink == ver::PortType::Universal || source == ver::PortType::Universal)return true;
 		switch (sink)
 		{
 		case ver::PortType::Normal:
@@ -104,6 +106,7 @@ namespace UI
 			case ver::PortType::Grayscale:return &Grayscale;
 			case ver::PortType::Color:return &Color;
 			case ver::PortType::Normal:return &Normal;
+			case ver::PortType::Universal:return &Universal;
 			default:return nullptr;
 			}
 		}
@@ -116,6 +119,7 @@ namespace UI
 		static const PortStyle Grayscale;
 		static const PortStyle Color;
 		static const PortStyle Normal;
+		static const PortStyle Universal;
 	};
 }
 

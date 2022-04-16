@@ -20,8 +20,16 @@ namespace ver
 		QString MakeShader(std::span<UI::INode*> outputs);
 		void ReadNode(const std::string& connected_node);
 		void AddDesc(TextureDescriptor* td);
+		void AddShader(std::wstring sh);
+		void RegisterNode(std::string_view sh, bool complex = false);
+		bool IsComplex(std::string_view node);
+		void AddOutput(std::wstring connected_node, std::optional<std::wstring> port);
 	private:
 		const container& nodes;
 		std::unordered_set<TextureDescriptor*> descs;
+		std::unordered_map<std::string_view, bool> complexity;
+		std::vector<std::wstring> out_structs;
+		std::vector<std::wstring> shaders;
+		std::vector<std::wstring> outputs;
 	};
 }

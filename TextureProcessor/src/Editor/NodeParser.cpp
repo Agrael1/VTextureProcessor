@@ -2,17 +2,6 @@
 #include <Editor/Lexer.h>
 #include <Editor/Highlight.h>
 
-//[(property, name = "god sake")]
-//uniform float x;
-//
-//[(property, name = "god sake2")]
-//uniform float x2;
-//
-//void main()
-//{
-//}
-
-
 
 bool NodeParser::Parse()
 {
@@ -82,20 +71,5 @@ void NodeParser::TryParseFunction()
 	}
 
 	funcs.emplace(x->value, x->line);
-}
-
-
-token::type GetType(const token& tk)
-{
-	using enum token::type;
-	if (tk.xtype == keyword && tk.value == L"property")
-		return tt_property;
-	if (tk.xtype == identifier)
-	{
-		if (tk.value == L"min")return tt_min;
-		if (tk.value == L"max")return tt_max;
-		if (tk.value == L"name")return tt_name;
-	}
-	return tk.xtype;
 }
 

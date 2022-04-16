@@ -31,6 +31,7 @@ namespace ver
 		std::string Export()override;
 		virtual void ExportSilent(std::string_view name);
 		virtual void Serialize(QJsonObject& doc)override;
+		virtual void Accept(ver::ShaderProbe& probe)override;
 	private:
 		std::shared_ptr<QImage> in;
 		std::shared_ptr<QImage> out;

@@ -5,25 +5,11 @@
 
 constexpr std::wstring_view m_define{ L"#define" };
 
-///**/void "sdasdwd" //
-///*
-//
-//asdasdwd
-//
-//*/
-//sdawdsdawds
-//;; "s"
-//asdawdasdwdad
-//void a()
-//{
-//}
-
-
 class LexContext
 {
 public:
 	LexContext(std::wstring_view code, size_t offset)
-		:code(code) , offset(offset) {}
+		:code(code), offset(offset) {}
 public:
 	wchar_t fetch_one()noexcept
 	{
@@ -215,7 +201,7 @@ public:
 			wchar_t c = prefetch_one();
 			if (c == '.')
 				if (dot)return {};
-				else { dot = true;}
+				else { dot = true; }
 			if (!iswalnum(c))
 				break;
 			if (!iswdigit(c))return{};
@@ -396,9 +382,9 @@ static std::optional<token> GetTokenLoop(LexContext& lex)
 		case ')':
 			return token{ token::type::close_br, lex.Offset() - 1 };
 		case '{':
-			return token{ token::type::open_cbr, lex.Offset() - 1 };
+			return token{ token::type::open_cbr, lex.Offset() - 1 ,0,L"{" };
 		case '}':
-			return token{ token::type::close_cbr, lex.Offset() - 1 };
+			return token{ token::type::close_cbr, lex.Offset() - 1,0,L"}" };
 		case ';':
 			return token{ token::type::semicolon, lex.Offset() - 1 };
 		case ',':
@@ -413,6 +399,8 @@ static std::optional<token> GetTokenLoop(LexContext& lex)
 			return lex.try_get_strlit();
 		case '#':
 			return lex.try_get_define();
+		case '.':
+			return token{ token::type::tt_point, lex.Offset() - 1 };
 		default:
 			break;
 		}
@@ -430,7 +418,7 @@ static std::optional<token> GetTokenLoop(LexContext& lex)
 }
 ver::generator<token> GetToken(std::wstring_view code, size_t offset)
 {
-	LexContext lex{ code , offset}; std::optional<token> st;
+	LexContext lex{ code , offset }; std::optional<token> st;
 	while (st = GetTokenLoop(lex))
 		co_yield *st;
 }

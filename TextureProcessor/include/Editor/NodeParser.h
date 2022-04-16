@@ -6,15 +6,7 @@
 
 
 class NodeParser
-{
-	struct PropertyDesc
-	{
-		std::wstring_view name;
-		std::wstring_view code_name;
-		ver::dc::Type ty;//min max
-		std::optional<ver::dc::param_storage> params;
-	};
-	
+{	
 public:
 	NodeParser(std::wstring_view code);
 public:
@@ -31,5 +23,4 @@ private:
 	std::unordered_set<std::wstring> macros;
 	std::unordered_map<std::wstring, size_t> funcs;
 	std::vector<token> tokens;
-	std::vector<PropertyDesc> properties;
 };

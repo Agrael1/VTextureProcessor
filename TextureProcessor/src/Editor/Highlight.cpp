@@ -3,17 +3,6 @@
 #include <Editor/Lexer.h>
 #include <utils/const_utils.h>
 
-//struct c { int a; };
-//
-//void a()
-//{
-//}
-//
-//int a_main()
-//{
-//	c a;
-//}
-
 
 const QRegularExpression startExpression("/\\*");
 const QRegularExpression endExpression("\\*/");

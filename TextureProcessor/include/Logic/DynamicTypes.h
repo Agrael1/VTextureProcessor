@@ -4,6 +4,9 @@
 #include <QVector4D>
 #include <QMatrix4x4>
 
+#include <format>
+#include <utils/string_literal.h>
+
 #define LEAF_ELEMENT_TYPES \
 	X(Float)SEP()\
 	X(Float2)SEP()\
@@ -153,7 +156,7 @@ namespace ver::dc
 
 	template<typename T>
 	struct serializer {
-		using enter_ty = std::conditional_t<(sizeof(T) > 16), const T&, T> ;
+		using enter_ty = std::conditional_t<(sizeof(T) > 16), const T&, T>;
 		constexpr static bool specific = false;
 		QJsonValue operator()(enter_ty v) {
 			return v;
@@ -250,3 +253,47 @@ namespace ver::dc
 		serializer<std::remove_cvref_t<T>>{}(fwd, v);
 	}
 }
+
+
+template<typename CharT>
+struct std::formatter<QVector2D, CharT>
+{
+	template<typename Ctx>
+	auto parse(Ctx& fc) { return fc.begin(); }
+	template<typename Ctx>
+	auto format(const QVector2D& t, Ctx& fc) const {
+		return std::format_to(fc.out(), "vec2({},{})", t.x(), t.y());
+	}
+};
+template<typename CharT>
+struct std::formatter<QVector3D, CharT>
+{
+	template<typename Ctx>
+	auto parse(Ctx& fc) { return fc.begin(); }
+	template<typename Ctx>
+	auto format(const QVector3D& t, Ctx& fc) const {
+		return std::format_to(fc.out(), "vec3({},{},{})", t.x(), t.y(), t.z());
+	}
+};
+template<typename CharT>
+struct std::formatter<QVector4D, CharT>
+{
+	template<typename Ctx>
+	auto parse(Ctx& fc) { return fc.begin(); }
+	template<typename Ctx>
+	auto format(const QVector4D& t, Ctx& fc) const {
+		return std::format_to(fc.out(), "vec4({},{},{},{})", t.x(), t.y(), t.z(), t.w());
+	}
+};
+template<typename CharT>
+struct std::formatter<QMatrix4x4, CharT>
+{
+	template<typename Ctx>
+	auto parse(Ctx& fc) { return fc.begin(); }
+	template<typename Ctx>
+	auto format(const QMatrix4x4& t, Ctx& fc) const {
+		auto* x = t.constData();
+		return std::format_to(fc.out(), "mat4({},{},{},{}, {},{},{},{}, {},{},{},{}, {},{},{},{})",
+			x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13], x[14], x[15]);
+	}
+};

@@ -31,14 +31,7 @@ public:
 		comma,
 		_operator,
 		eq,
-
-
-		tt_min,
-		tt_max,
-		tt_name,
-		tt_property,
-		tt_type,
-		tt_uniform,
+		tt_point,
 		other,
 	}xtype;
 	size_t offset;

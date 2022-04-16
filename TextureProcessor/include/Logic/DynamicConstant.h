@@ -317,6 +317,21 @@ namespace ver::dc
 			assert(false && "Attemt to get non existent element");
 			return{};
 		}
+
+		std::wstring to_wstring()const
+		{
+			switch (type.Get())
+			{
+#define X(el) case Type::el: return std::format(L"{}", this->operator Map<Type::el>::SysType&());
+				LEAF_ELEMENT_TYPES
+#undef X
+			default:
+				break;
+			}
+			assert(false && "Attemt to get non existent element");
+			return{};
+		}
+
 		Type GetType()const noexcept
 		{
 			return type.Get();

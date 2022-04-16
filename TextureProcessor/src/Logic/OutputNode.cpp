@@ -2,6 +2,7 @@
 #include <Logic/SinksT.h>
 
 #include <QFileDialog>
+#include <Logic/ShaderProbe.h>
 
 constexpr uint32_t nullcolor = 0;
 
@@ -45,6 +46,19 @@ void ver::OutputNode::Serialize(QJsonObject& doc)
 {
 	doc.insert(u"Type", QStringLiteral("Output"));
 	doc.insert(u"Name", GetName().data());
+}
+
+void ver::OutputNode::Accept(ver::ShaderProbe& probe)
+{
+	for (auto& i : sinks)
+	{
+		if (!i)continue;
+		auto x = i->GetOutputNodeName();
+		auto y = i->GetSourceName();
+		probe.ReadNode(x.data());
+		probe.AddOutput(std::format(L"{}_main", x), 
+			probe.IsComplex(x) ? std::optional{ std::wstring{y.begin(), y.end()} } : std::nullopt);
+	}
 }
 
 std::unique_ptr<ver::Node> ver::OutputDescriptor::MakeModel()

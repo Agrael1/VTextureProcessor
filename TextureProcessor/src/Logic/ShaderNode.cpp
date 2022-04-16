@@ -11,12 +11,12 @@
 #include <Logic/SourcesT.h>
 #include <Logic/SinksT.h>
 #include <Logic/Engine.h>
+#include <Logic/ShaderProbe.h>
 #include <utils/utils.h>
 
 #include <Windows/Properties.h>
 #include <unordered_set>
 #include <ranges>
-#include <Logic/ShaderProbe.h>
 
 
 using namespace ver;
@@ -102,10 +102,61 @@ std::string ver::ShaderNode::Export()
 	return str.toStdString();
 }
 
+
+#include <Editor/NodeParser.h>
+#include <Logic/CodeTransformer.h>
+
 void ver::ShaderNode::Accept(ver::ShaderProbe& probe)
 {
-	Node::Accept(probe);
-	probe.AddDesc(&desc);
+	std::unordered_map<std::wstring, input_info> inputs;
+	for (auto& i : sinks)
+	{
+		if (!i)continue;
+		probe.ReadNode(i->GetOutputNodeName().data());
+
+		auto on = i->GetOutputNodeName();
+		auto ou = i->GetSourceName();
+
+		input_info ii;
+		ii.node = std::wstring{ on.begin(), on.end() };
+		ii.complex = probe.IsComplex(on);
+		ii.output = std::wstring{ ou.begin(), ou.end() };
+
+		auto r = i->GetRegisteredName();
+		inputs.emplace(std::wstring{ r.begin(), r.end() },std::move(ii));
+	}
+
+	std::unordered_set<std::wstring> outs;
+	for (auto&& i : sources)
+	{
+		auto r = i->GetName();
+		outs.emplace(std::wstring{ r.begin(), r.end() });
+	}
+
+	if (sources.size() > 1)
+		probe.AddDesc(&desc);
+
+	std::unordered_map<std::wstring, std::wstring> cbuffer;
+	for (auto&& i : buf)
+	{
+		auto r = i.GetName();
+		cbuffer.emplace(std::wstring{ r.begin(), r.end() }, i.to_wstring());
+	}
+
+	auto n = GetName();
+	std::wstring node_name{ n.begin(), n.end() };
+
+	auto code = desc.shader_body.toStdWString();
+	NodeParser np(code);
+	np.Parse();
+	auto rcode = CodeTransformer(np.GetTypesInfo(), np.GetMacrosInfo(), np.GetFuncsInfo())
+		.SetCBuf(cbuffer)
+		.SetOutputs(outs)
+		.SetInputs(inputs)
+		.Transform(node_name, code);
+
+	probe.RegisterNode(n, sources.size() > 1);
+	probe.AddShader(std::move(rcode));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,20 +252,23 @@ void ver::TextureDescriptor::SetProperties(const QJsonArray& props)
 		}
 	}
 }
+
+
+
 bool ver::TextureDescriptor::valid() const noexcept {
 	std::unordered_set<QStringView> distinct;
 	std::ranges::for_each(sinks, [&distinct](const ver::PortDesc& a) {distinct.emplace(a.name); });
-	if (distinct.size() != sinks.size()) 
-	{ 
+	if (distinct.size() != sinks.size())
+	{
 		last_error = QStringLiteral("Sink names are not unique");
-		return false; 
+		return false;
 	}
 	distinct.clear();
 	std::ranges::for_each(sources, [&distinct](const ver::PortDesc& a) {distinct.emplace(a.name); });
 	if (distinct.size() != sources.size()) {
 		last_error = QStringLiteral("Sources names are not unique"); return false;
 	}
-	if(!buffer.is_distinct()) {
+	if (!buffer.is_distinct()) {
 		last_error = QStringLiteral("Buffer Layout is not distinct"); return false;
 	}
 	return shader.isCompiled();
@@ -231,3 +285,4 @@ void ver::TextureDescriptor::SetOptions(QJsonObject obj, dc::Options& opt)
 	if (opt.enable_max = max != obj.end())
 		opt.param.set_max(*max);
 }
+
