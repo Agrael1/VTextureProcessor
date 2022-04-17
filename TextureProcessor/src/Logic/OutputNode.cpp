@@ -56,8 +56,8 @@ void ver::OutputNode::Accept(ver::ShaderProbe& probe)
 		auto x = i->GetOutputNodeName();
 		auto y = i->GetSourceName();
 		probe.ReadNode(x.data());
-		probe.AddOutput(std::format(L"{}_main", x), 
-			probe.IsComplex(x) ? std::optional{ std::wstring{y.begin(), y.end()} } : std::nullopt);
+		auto r = i->GetOutputNodeName();
+		probe.AddOutput(GetName(), r, probe.IsComplex(r)? i->GetSourceName() :"");
 	}
 }
 

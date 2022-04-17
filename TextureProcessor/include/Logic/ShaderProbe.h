@@ -23,13 +23,13 @@ namespace ver
 		void AddShader(std::wstring sh);
 		void RegisterNode(std::string_view sh, bool complex = false);
 		bool IsComplex(std::string_view node);
-		void AddOutput(std::wstring connected_node, std::optional<std::wstring> port);
+		void AddOutput(std::string_view output_node, std::string_view connected_node, std::string_view port="");
 	private:
 		const container& nodes;
 		std::unordered_set<TextureDescriptor*> descs;
 		std::unordered_map<std::string_view, bool> complexity;
 		std::vector<std::wstring> out_structs;
 		std::vector<std::wstring> shaders;
-		std::vector<std::wstring> outputs;
+		std::unordered_map<std::string_view, std::pair<std::string_view, std::string_view>> outputs;
 	};
 }

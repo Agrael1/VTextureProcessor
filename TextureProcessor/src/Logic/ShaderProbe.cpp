@@ -4,21 +4,41 @@
 #include <Editor/NodeParser.h>
 #include <ranges>
 
-QString ver::ShaderProbe::MakeShader(std::span<UI::INode*> outputs)
+QString ver::ShaderProbe::MakeShader(std::span<UI::INode*> xoutputs)
 {
 	QString shader;
-	for (size_t i = 0; i < outputs.size(); i++)
-		shader += std::format("layout(location = {})out vec4 {};\n\n", i, outputs[i]->Name()).c_str();
+	for (size_t i = 0; i < xoutputs.size(); i++)
+		shader += std::format("layout(location = {})out vec4 {};\n\n", i, xoutputs[i]->Name()).c_str();
 
-	for (auto* i : outputs)
+	for (auto* i : xoutputs)
 		i->Accept(*this);
 
 	for (auto& i : out_structs)
 		shader += QString::fromStdWString(i);
-	
+
 	for (auto& i : shaders)
 		shader += QString::fromStdWString(i);
-	
+
+	size_t tmpcnt = 0;
+	std::unordered_set<std::string_view> complex_vars;
+	for (auto& i : outputs) {
+		complex_vars.emplace(i.second.first);
+	}
+
+	shader += u"void main(){\n";
+	for (auto i : complex_vars)
+		shader += std::format("\t{} tmpvar_{} = {}_main(gl_FragCoord);\n",
+			IsComplex(i) ? i : "vec4", i, i).c_str();
+
+	for (auto* i : xoutputs)
+	{
+		auto n = i->Name();
+		auto r = outputs.at(n);
+		shader += std::format("\t{} = tmpvar_{};\n", n, 
+			r.second.empty()?r.first:std::format("{}.{}", r.first, r.second)).c_str();
+	}
+
+	shader += u"}\n";
 	return shader;
 }
 
@@ -58,8 +78,8 @@ bool ver::ShaderProbe::IsComplex(std::string_view node)
 	return false;
 }
 
-void ver::ShaderProbe::AddOutput(std::wstring connected_node, std::optional<std::wstring> port)
+void ver::ShaderProbe::AddOutput(std::string_view output_node, std::string_view connected_node, std::string_view port)
 {
-	outputs.emplace(std::move(connected_node), std::move(port));
+	outputs.emplace(output_node, std::pair{ connected_node , port });
 }
 
