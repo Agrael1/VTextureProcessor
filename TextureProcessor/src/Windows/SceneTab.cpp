@@ -6,6 +6,7 @@
 #include <Logic/Engine.h>
 #include <QSaveFile>
 
+#include <optimizer/optimizer.h>
 
 using namespace UI::Windows;
 namespace fs = std::filesystem;
@@ -78,7 +79,11 @@ void UI::Windows::SceneTab::MakeShader()
 	std::fstream f;
 	f.open(proj_path, std::ios::out);
 	if (!f.is_open()) return;
-	f << scene.MakeShader().toStdString();
+
+	Optimizer o;
+	auto resource = o.Optimize("#version 330\n" + scene.MakeShader().toStdString(), xShaderStage::MESA_SHADER_FRAGMENT, 330);
+	if (!o.Failed()) { f << resource; return; }
+	qDebug() << o.GetLog().c_str();
 }
 
 bool SceneTab::Load()

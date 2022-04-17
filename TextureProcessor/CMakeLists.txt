@@ -28,7 +28,11 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System.git
 )
 FetchContent_MakeAvailable(ads)
-
+FetchContent_Declare(
+  optimizer
+  GIT_REPOSITORY https://github.com/Agrael1/tiny-glsl-optimizer.git
+)
+FetchContent_MakeAvailable(optimizer)
 
 
 
@@ -40,9 +44,11 @@ add_executable (TextureProcessor "${vsrc}" "${vhead}" "resources/resources.qrc" 
 target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt5Widgets_INCLUDE_DIRS}")
 target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories("${PROJECT_NAME}" PUBLIC "${ads_SOURCE_DIR}/src")
+target_include_directories("${PROJECT_NAME}" PUBLIC "${optimizer_SOURCE_DIR}/include")
 target_precompile_headers("${PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/pch.h")
 target_link_libraries("${PROJECT_NAME}" Qt5::Widgets)
 target_link_libraries("${PROJECT_NAME}" qtadvanceddocking)
+target_link_libraries("${PROJECT_NAME}" GlslOptimizerV2)
 
 
 add_custom_command(TARGET "${PROJECT_NAME}" POST_BUILD
