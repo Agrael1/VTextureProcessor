@@ -6,9 +6,43 @@
 
 #include <Logic/Engine.h>
 #include <QOpenGLTexture>
+#include <QOpenGLExtraFunctions>
 
 std::optional<Engine> Engine::e;
 
+constexpr GLenum bufs[] = {
+GL_COLOR_ATTACHMENT0
+, GL_COLOR_ATTACHMENT1 
+, GL_COLOR_ATTACHMENT2 
+, GL_COLOR_ATTACHMENT3 
+, GL_COLOR_ATTACHMENT4 
+, GL_COLOR_ATTACHMENT5 
+, GL_COLOR_ATTACHMENT6 
+, GL_COLOR_ATTACHMENT7 
+, GL_COLOR_ATTACHMENT8 
+, GL_COLOR_ATTACHMENT9 
+, GL_COLOR_ATTACHMENT10
+, GL_COLOR_ATTACHMENT11
+, GL_COLOR_ATTACHMENT12
+, GL_COLOR_ATTACHMENT13
+, GL_COLOR_ATTACHMENT14
+, GL_COLOR_ATTACHMENT15
+, GL_COLOR_ATTACHMENT16
+, GL_COLOR_ATTACHMENT17
+, GL_COLOR_ATTACHMENT18
+, GL_COLOR_ATTACHMENT19
+, GL_COLOR_ATTACHMENT20
+, GL_COLOR_ATTACHMENT21
+, GL_COLOR_ATTACHMENT22
+, GL_COLOR_ATTACHMENT23
+, GL_COLOR_ATTACHMENT24
+, GL_COLOR_ATTACHMENT25
+, GL_COLOR_ATTACHMENT26
+, GL_COLOR_ATTACHMENT27
+, GL_COLOR_ATTACHMENT28
+, GL_COLOR_ATTACHMENT29
+, GL_COLOR_ATTACHMENT30
+, GL_COLOR_ATTACHMENT31};
 
  /**
   * @brief Creates GL context
@@ -133,6 +167,10 @@ void Engine::Render(QOpenGLShader& ps, std::span<std::shared_ptr<QImage>> inputs
 
 	con.funcs.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	con.funcs.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	QOpenGLExtraFunctions* f = QOpenGLContext::currentContext()->extraFunctions();
+	f->glDrawBuffers(current->sizes().size(), bufs);
+
 	con.funcs.glDrawArrays(GL_TRIANGLES, 0, 3);
 	shaders.removeShader(&ps);
 

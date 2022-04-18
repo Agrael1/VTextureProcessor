@@ -97,7 +97,7 @@ QVariant UI::NodeUI::itemChange(GraphicsItemChange change, const QVariant& value
 	{
 		auto delta = value.toPointF() - pos();
 		for (auto& x : sinks)x.MoveConnections(delta);
-		for (auto& x : sources)x.MoveConnections(delta);
+		for (auto& x : sources) { x.MoveConnections(delta); break; };
 	}
 	return INode::itemChange(change, value);
 }
