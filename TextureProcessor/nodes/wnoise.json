@@ -1,0 +1,26 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Noises",
+    "Name": "White Noise",
+    "Properties": [
+        {
+            "CName": "_seed",
+            "Tag": "Seed",
+            "Type": "float",
+            "Val": {
+                "default": 12.753999710083008,
+                "max": 500,
+                "min": -500
+            }
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "_out",
+            "Type": "Grayscale"
+        }
+    ],
+    "TitleColor": "#0055ff",
+    "Value": "float random (vec2 st) {\n    return fract(sin(dot(st.xy,\n                         vec2(12.9898,78.233)))*\n        _seed*437.5453123);\n}\n\nvoid main() {\n    vec2 st = sv_texc;\n    float rnd = random( st );\n    _out = vec4(vec3(rnd),1.0);\n}\n"
+}

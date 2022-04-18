@@ -22,6 +22,7 @@ namespace ver
 		}
 		void Unlink()override
 		{
+			ResetTarget();
 			target = nullptr;
 		}
 		bool Link(std::string_view nodeName, Source& source) override

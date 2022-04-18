@@ -15,3 +15,11 @@ std::filesystem::path ver::generate(const std::filesystem::path& p, std::string_
 
 	return rp;
 }
+
+std::string ver::normalize_name(std::string in)
+{
+	std::ranges::replace(in, ' ', '_'); 
+	auto [first, last] = std::ranges::remove_if(in, [](char c) {return !std::isalnum(c) && c != '_'; });
+	in.erase(first, last);
+	return in;
+}

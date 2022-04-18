@@ -48,6 +48,7 @@ std::wstring CodeTransformer::ReformTexture2D(ver::generator<token>& gen, std::w
 	using enum token::type;
 	std::wstring o;
 	input_info* ii = nullptr;
+	bool ignore = false;
 
 	for (auto& i : gen)
 	{
@@ -55,8 +56,10 @@ std::wstring CodeTransformer::ReformTexture2D(ver::generator<token>& gen, std::w
 		switch (i.xtype)
 		{
 		case close_br:
-			if(ii)o += std::format(L").{}", ii->output);
 			out = i.offset + 1;
+			if (ignore)
+				return o;
+			if(ii)o += std::format(L").{}", ii->output);
 			return o;
 		case comma:
 			if (ii && !ii->complex)
@@ -66,13 +69,20 @@ std::wstring CodeTransformer::ReformTexture2D(ver::generator<token>& gen, std::w
 			}
 			break;
 		case identifier:
+			if (ignore)break;
 			if (auto it = inputs.find(c); it!= inputs.end())
 			{
 				ii = std::addressof(it->second);
 				o += std::format(L"{}_main(", ii->node);
 				break;
 			}
-			o+= i.value;
+			if (c == L"sv_texc")
+				o += i.value;
+			else
+			{
+				ignore = true;
+				o += L"vec4(0.0)";
+			}
 			break;
 		default:
 			break;

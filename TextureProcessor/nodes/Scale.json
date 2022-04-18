@@ -2,7 +2,7 @@
     "Class": "Texture",
     "FontColor": "#ffffff",
     "Group": "Operations",
-    "Name": "Gray:Scale",
+    "Name": "Scale",
     "Properties": [
         {
             "CName": "Scale",
@@ -26,13 +26,13 @@
     "Sinks": [
         {
             "Name": "In",
-            "Type": "Grayscale"
+            "Type": "Universal"
         }
     ],
     "Sources": [
         {
             "Name": "Out",
-            "Type": "Grayscale"
+            "Type": "Universal"
         }
     ],
     "TitleColor": "#005500",

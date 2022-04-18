@@ -52,8 +52,8 @@ void ver::OutputNode::Accept(ver::ShaderProbe& probe)
 {
 	for (auto& i : sinks)
 	{
-		if (!i)continue;
 		auto x = i->GetOutputNodeName();
+		if (x.empty())continue;
 		auto y = i->GetSourceName();
 		probe.ReadNode(x.data());
 		auto r = i->GetOutputNodeName();

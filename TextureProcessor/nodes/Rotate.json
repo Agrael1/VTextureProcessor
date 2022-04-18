@@ -18,13 +18,13 @@
     "Sinks": [
         {
             "Name": "_in",
-            "Type": "Grayscale"
+            "Type": "Universal"
         }
     ],
     "Sources": [
         {
             "Name": "_out",
-            "Type": "Grayscale"
+            "Type": "Universal"
         }
     ],
     "TitleColor": "#005500",

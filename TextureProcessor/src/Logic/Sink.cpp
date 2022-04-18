@@ -56,6 +56,11 @@ void Sink::SetTarget(std::string_view nodeName, std::string_view sourceName)
 	}
 }
 
+void ver::Sink::ResetTarget() noexcept
+{
+	nodeName = sourceName = "";
+}
+
 Sink::Sink(std::string_view registeredName, PortType type):registeredName(registeredName), type(type)
 {
 	if (registeredName.empty())

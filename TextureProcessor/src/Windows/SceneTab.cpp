@@ -81,7 +81,7 @@ void UI::Windows::SceneTab::MakeShader()
 	if (!f.is_open()) return;
 
 	Optimizer o;
-	auto resource = o.Optimize("#version 330\n" + scene.MakeShader().toStdString(), xShaderStage::MESA_SHADER_FRAGMENT, 330);
+	auto resource = o.Optimize("#version 420\n" + scene.MakeShader().toStdString(), xShaderStage::MESA_SHADER_FRAGMENT, 420);
 	if (!o.Failed()) { f << resource; return; }
 	qDebug() << o.GetLog().c_str();
 }

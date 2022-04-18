@@ -23,7 +23,7 @@ using namespace ver;
 
 
 ver::ShaderNode::ShaderNode(TextureDescriptor& td)
-	:desc(td), Node(std::format("{}_{}", td.style.StyleName().toStdString(), td.use_count())), buf(td.buffer, td.params)
+	:desc(td), Node(std::format("{}_{}", normalize_name(td.style.StyleName().toStdString()), td.use_count())), buf(td.buffer, td.params)
 {
 	sinks.reserve(desc.sinks.size());
 	sources.reserve(desc.sources.size());
@@ -111,8 +111,9 @@ void ver::ShaderNode::Accept(ver::ShaderProbe& probe)
 	std::unordered_map<std::wstring, input_info> inputs;
 	for (auto& i : sinks)
 	{
-		if (!i)continue;
-		probe.ReadNode(i->GetOutputNodeName().data());
+		auto x = i->GetOutputNodeName();
+		if (x.empty())continue;
+		probe.ReadNode(x.data());
 
 		auto on = i->GetOutputNodeName();
 		auto ou = i->GetSourceName();

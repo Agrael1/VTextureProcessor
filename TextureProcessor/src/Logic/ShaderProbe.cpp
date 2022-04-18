@@ -32,6 +32,7 @@ QString ver::ShaderProbe::MakeShader(std::span<UI::INode*> xoutputs)
 	for (auto* i : xoutputs)
 	{
 		auto n = i->Name();
+		if (!outputs.contains(n))continue;
 		auto r = outputs.at(n);
 		shader += std::format("\t{} = tmpvar_{};\n", n, 
 			r.second.empty()?r.first:std::format("{}.{}", r.first, r.second)).c_str();
