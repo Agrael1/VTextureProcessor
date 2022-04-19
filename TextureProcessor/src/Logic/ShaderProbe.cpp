@@ -3,6 +3,7 @@
 #include <Interfaces/INode.h>
 #include <Editor/NodeParser.h>
 #include <ranges>
+#include <utils/utils.h>
 
 QString ver::ShaderProbe::MakeShader(std::span<UI::INode*> xoutputs)
 {
@@ -54,10 +55,10 @@ void ver::ShaderProbe::AddDesc(TextureDescriptor* td)
 	if (descs.contains(td))return;
 	descs.emplace(td);
 
-	std::wstring str = std::format(L"struct {}{{\n", td->style.StyleName().toStdWString());
+	std::wstring str = std::format(L"struct {}{{\n", normalize_name(td->style.StyleName().toStdWString()));
 	for (auto&& i : td->sources)
 		str += std::format(L"\tvec4 {};\n", i.name.toStdWString());
-	str += L"}\n\n";
+	str += L"};\n\n";
 	out_structs.emplace_back(std::move(str));
 }
 

@@ -204,7 +204,7 @@ public:
 				else { dot = true; }
 			if (!iswalnum(c))
 				break;
-			if (!iswdigit(c))return{};
+			if (!iswdigit(c) && c != 'e' && c != 'E' && c != '+' && c!='-')return{};
 			advance();
 		}
 		return token{ token::type::tt_num_literal, roffset, line, {av, offset - roffset} };

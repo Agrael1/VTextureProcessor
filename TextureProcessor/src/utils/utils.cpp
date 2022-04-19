@@ -23,3 +23,10 @@ std::string ver::normalize_name(std::string in)
 	in.erase(first, last);
 	return in;
 }
+std::wstring ver::normalize_name(std::wstring in)
+{
+	std::ranges::replace(in, ' ', '_'); 
+	auto [first, last] = std::ranges::remove_if(in, [](char c) {return !std::isalnum(c) && c != '_'; });
+	in.erase(first, last);
+	return in;
+}
