@@ -4,7 +4,7 @@
  * @brief Class for frameless window style
  */
 
-#include <UI/Frameless.h>
+#include <Projects/Frameless.h>
 #include <QEvent>
 #include <QMouseEvent>
 

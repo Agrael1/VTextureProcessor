@@ -216,7 +216,7 @@ void FlowScene::ExportAll()
 			continue;
 		}
 		// Exports output silently if name already valid
-		x->ExportSilent(ver::generate(name).string());
+		x->ExportSilent(ver::generate(name,"").string());
 	}
 }
 

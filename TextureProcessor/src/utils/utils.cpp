@@ -30,3 +30,9 @@ std::wstring ver::normalize_name(std::wstring in)
 	in.erase(first, last);
 	return in;
 }
+
+const QString ver::MakeConstString(const char16_t* line, size_t length)
+{
+	auto str = const_cast<char16_t*>(line);
+	return QString(QStringPrivate{ nullptr, str, qsizetype(length) });
+}

@@ -5,7 +5,11 @@
 #include <QMatrix4x4>
 
 #include <format>
+#include <span>
 #include <utils/string_literal.h>
+
+#include <QJsonArray>
+#include <QJsonObject>
 
 #define LEAF_ELEMENT_TYPES \
 	X(Float)SEP()\

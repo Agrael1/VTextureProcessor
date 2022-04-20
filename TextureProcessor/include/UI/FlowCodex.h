@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <memory>
-#include <string>
+#include <QString>
 
 namespace ver {
 	struct Descriptor;

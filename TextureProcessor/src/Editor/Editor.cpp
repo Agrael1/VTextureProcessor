@@ -2,6 +2,7 @@
 #include <format>
 #include <QLineEdit>
 #include <QApplication>
+#include <QWheelEvent>
 #include <QPainter>
 
 const QRegularExpression sz_re{ "^\\d{0,3} ?%?$" };
@@ -29,7 +30,7 @@ Editor::Editor()
 	font_szbox.setStyleSheet(szbox_ss.data());
 	font_szbox.addItems({ "20 %", "50 %","70 %", "100 %", "150 %", "200 %", "400 %" });
 	connect(font_szbox.lineEdit(), &QLineEdit::editingFinished, this, &Editor::ParseFontSize);
-	connect(&font_szbox, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &Editor::SelectFontSize);
+	connect(&font_szbox, &QComboBox::currentTextChanged, this, &Editor::SelectFontSize);
 	font_szbox.setEditText(QString{ std::format("{} %", font_defc).data() });
 
 	sbar.addWidget(&font_szbox);
@@ -55,7 +56,7 @@ void Editor::wheelEvent(QWheelEvent* event)
 	const QRegularExpression sz{ "^\\d{0,3}" };
 	auto x = sz.match(text);
 	int i = x.captured().toInt();
-	int n = event->delta() > 0 ? int(i * 1.1f) : int(i / 1.1f);
+	int n = event->angleDelta().y() > 0 ? int(i * 1.1f) : int(i / 1.1f);
 	n = n > 400 ? 400 : n;
 	n = n < 20 ? 20 : n;
 

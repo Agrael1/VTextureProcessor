@@ -1,5 +1,6 @@
 #pragma once
 #include <QComboBox>
+#include <QLineEdit>
 #include <QToolButton>
 #include <Logic/DynamicConstant.h>
 #include <functional>

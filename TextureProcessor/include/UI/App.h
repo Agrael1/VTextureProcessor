@@ -10,6 +10,8 @@
 #include <Logic/ApplicationConfig.h>
 #include <variant>
 
+using namespace QtLiterals;
+
 class App : public QObject
 {
 public:
@@ -20,9 +22,8 @@ private:
 	bool event(QEvent* e);
 	std::variant<MainWindow, ProjectsWindow, bool> window;
 	QApplication app;
-	ApplicationConfig cfg;
 private:
-	static constexpr std::string_view AppVer = "0.4.0";
-	static constexpr std::string_view AppTheme = "Fusion";
-	static constexpr std::string_view AppName = "Veritas Texture Editor";
+	static constexpr ver::u16string_literal AppVer = u"0.6.0";
+	static constexpr ver::u16string_literal AppTheme = u"Fusion";
+	static constexpr ver::u16string_literal AppName = u"Veritas Texture Editor";
 };

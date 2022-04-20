@@ -30,9 +30,7 @@ PropertyElement::PropertyElement(INode& parent, std::string_view title)
 	lay.setAlignment(Qt::AlignTop);
 	lay.setSpacing(0);
 
-	int a, b, c, d;
-	getContentsMargins(&a, &b, &c, &d);
-	setContentsMargins(0, b, 0, 0);
+	lay.setContentsMargins(0, 0, 0, 0);
 	setLayout(&lay);
 }
 
@@ -47,9 +45,6 @@ PropertyElement::PropertyElement(PropertyElement&& o)noexcept
 	lay.setContentsMargins(0,0,0,0);
 	lay.setSpacing(0);
 
-	int a, b, c, d;
-	getContentsMargins(&a, &b, &c, &d);
-	setContentsMargins(0, b, 0, 0);
 	setLayout(&lay);
 	for (auto& w : widgets)
 		lay.addWidget(w.get());

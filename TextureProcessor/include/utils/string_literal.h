@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <stdexcept>
+#include <QString>
 
 namespace ver
 {
@@ -92,6 +93,10 @@ namespace ver
 	{
 		constexpr u16string_literal(const char16_t(&str)[N]) :basic_string_literal<char16_t, N>(str) {};
 		using basic_string_literal<char16_t, N>::basic_string_literal;
+		operator QString()const
+		{
+			return QString(QtPrivate::qMakeStringPrivate(this->value));
+		}
 	};
 	template<size_t N>struct u32string_literal :basic_string_literal<char32_t, N>
 	{

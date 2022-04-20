@@ -6,6 +6,7 @@
 #include <Logic/PortType.h>
 
 #include <unordered_map>
+#include <span>
 
 
 namespace ver

@@ -1,5 +1,6 @@
 #include <UI/ColorWidget.h>
 #include <QColorDialog>
+#include <QPainter>
 
 using namespace UI;
 

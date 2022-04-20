@@ -5,6 +5,7 @@
 #include <QScrollArea>
 #include <QBoxLayout>
 #include <list>
+#include <span>
 
 namespace UI
 {

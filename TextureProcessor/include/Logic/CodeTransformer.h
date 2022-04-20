@@ -1,6 +1,7 @@
 #pragma once
 #include <Editor/Lexer.h>
 #include <unordered_set>
+#include <unordered_map>
 
 struct input_info
 {

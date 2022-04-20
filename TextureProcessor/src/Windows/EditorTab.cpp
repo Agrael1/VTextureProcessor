@@ -25,7 +25,7 @@ constexpr QSize EditSize{ 128,128 };
 class DockState
 {
 private:
-	constexpr static auto cfg = ver::config<"edock">();
+	constexpr static auto cfg = ver::config<u"edock">();
 public:
 	static DockState& instance()
 	{
@@ -35,7 +35,7 @@ public:
 	void SaveState(QByteArray st)
 	{
 		docker_state = std::move(st);
-		QSaveFile file(cfg.c_str());
+		QSaveFile file(cfg);
 		file.open(QIODevice::WriteOnly);
 		file.write(docker_state);
 		file.commit();
@@ -47,7 +47,7 @@ public:
 private:
 	DockState()
 	{
-		QFile CurrentFile(cfg.c_str());
+		QFile CurrentFile(cfg);
 		if (!CurrentFile.open(QIODevice::ReadOnly)) return;
 		docker_state = CurrentFile.readAll();
 	}

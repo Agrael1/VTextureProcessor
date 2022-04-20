@@ -18,7 +18,14 @@ namespace ver
 		(a.append(args.c_str()), ...);
 		return a;
 	}
-
+	template<ver::u16string_literal...args>
+	consteval auto _u16ncat()
+	{
+		constexpr auto l = 1 + ((args.length()) + ...);
+		ver::u16string_literal<l> a;
+		(a.append(args.c_str()), ...);
+		return a;
+	}
 
 	template<std::integral T>
 	consteval size_t IntLength(T f)
@@ -52,11 +59,30 @@ namespace ver
 			str[0] = '-';
 			xvalue = -xvalue;
 		}
-		for (auto end = int(l-1); end >= 0; end--, xvalue /= 10)
+		for (auto end = int(l - 1); end >= 0; end--, xvalue /= 10)
 			str[end] = "0123456789"[xvalue % 10];
 		return str;
 	}
+	template<std::integral auto value, size_t l = IntLength(value)>
+	constexpr auto u16int2str()
+	{
+		auto xvalue = value;
+		ver::u16string_literal<l+1> str;
 
+		if constexpr (value == 0)
+		{
+			str[0] = '0';
+			return str;
+		}
+		if (value < 0)
+		{
+			str[0] = '-';
+			xvalue = -xvalue;
+		}
+		for (auto end = int(l - 1); end >= 0; end--, xvalue /= 10)
+			str[end] = u"0123456789"[xvalue % 10];
+		return str;
+	}
 
 	consteval auto rgb_to_hex(uint8_t r, uint8_t g, uint8_t b)
 	{

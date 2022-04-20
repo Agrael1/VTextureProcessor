@@ -1,6 +1,6 @@
 /**
  * @file App.cpp
- * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @author Ilya Doroshenko (xdoros01)
  * @brief Class for loading project view initialization
  */
 #include <UI/App.h>
@@ -17,10 +17,10 @@ App::App(int &xargc, char** xargv)
 	:app(xargc, xargv), window{false}
 {
     // Basic setup of the application
-	QCoreApplication::setApplicationName(AppName.data());
-	QCoreApplication::setApplicationVersion(AppVer.data());
-	app.setStyle(QStyleFactory::create(AppTheme.data()));
-    app.setWindowIcon(QIcon{ ":/tlr.ico" });
+	QCoreApplication::setApplicationName(AppName);
+	QCoreApplication::setApplicationVersion(AppVer);
+	app.setStyle(QStyleFactory::create(AppTheme));
+    app.setWindowIcon(QIcon{ u":/tlr.ico"_qs });
 
     // Style definition (darkmode)
     QPalette darkPalette;
@@ -43,7 +43,7 @@ App::App(int &xargc, char** xargv)
     QEvent::registerEventType(UI::ProjectEvent::etype);
 
     // Set window size
-    window.emplace<ProjectsWindow>(1280, 720, *this, cfg).show();
+    window.emplace<ProjectsWindow>(1280, 720, *this).show();
 }
 
 /**

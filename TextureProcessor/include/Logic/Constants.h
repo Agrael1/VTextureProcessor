@@ -3,7 +3,7 @@
 
 namespace ver
 {
-	constexpr auto config_ext = _tl(".vtxc");
+	constexpr u16string_literal config_ext = u".vtxc";
 	constexpr auto proj_ext = _tl(".vtxproj");
 	constexpr auto node_ext = _tl(".json");
 	
@@ -12,10 +12,15 @@ namespace ver
 	{
 		return _ncat<_tl("(*"), ext, _tl(");;")>();
 	}
-	template<ver::string_literal f>
+	//template<ver::string_literal f>
+	//consteval auto config()
+	//{
+	//	return _ncat<f, config_ext>();
+	//}
+	template<ver::u16string_literal f>
 	consteval auto config()
 	{
-		return _ncat<f, config_ext>();
+		return _u16ncat<f, config_ext>();
 	}
 	template<ver::string_literal f>
 	consteval auto project()
