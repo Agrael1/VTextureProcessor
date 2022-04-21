@@ -13,9 +13,38 @@
 #include <Logic/Constants.h>
 #include <Logic/Engine.h>
 
+#include <Projects/CreatePage.h>
+#include <Projects/Frameless.h>
 
 namespace fs = std::filesystem;
 using namespace UI::Windows;
+
+
+class CreationDialog : public QDialog
+{
+public:
+	CreationDialog()
+		:fw(this)
+	{
+		vl.addWidget(&cp);
+		setLayout(&vl);
+	}
+public:
+	void mouseMoveEvent(QMouseEvent* e)override
+	{
+		//if (isMaximized())
+		//{
+		//	window.Restore();
+		//	move(e->globalPos() / 2);
+		//	return;
+		//}
+		fw.MouseMove(e);
+	}
+private:
+	QVBoxLayout vl;
+	UI::CreatePage cp;
+	UI::FrameLess fw;
+};
 
 /**
  * @brief Creates a main application window
@@ -24,10 +53,10 @@ using namespace UI::Windows;
  * @param xprojPath file project that is being worked upon
 */
 MainWindow::MainWindow(int32_t width, int32_t height, ProjectDescriptor desc)
-	:file("File")
-	, windows("Windows")
-	, nodes("Nodes")
-	, view("View")
+	:file(u"File"_qs)
+	, windows(u"Windows"_qs)
+	, nodes(u"Nodes"_qs)
+	, view(u"View"_qs)
 {
 	Engine::Instance();
 	resize(width, height);
@@ -42,12 +71,14 @@ MainWindow::MainWindow(int32_t width, int32_t height, ProjectDescriptor desc)
 	auto save = [this]() {tab->RequestActive(UI::Request::Save); };
 	auto saveas = [this]() {tab->RequestActive(UI::Request::SaveAs); };
 	auto load = [this]() { OnLoad(); };
+	auto xnew = [this]() { OnNew(); };
 
-	file.addAction("Clear", [this]() { tab->RequestActive(UI::Request::Clear); });
-	file.addAction("Load", load);
+	file.addAction("New", xnew, { QKeySequence::StandardKey::New });
+	file.addAction("Load", load, { QKeySequence::StandardKey::Open });
 	file.addAction("Save", save, { QKeySequence::StandardKey::Save });
 	file.addAction("Save As", saveas, { tr("Ctrl+Shift+S") });
 	file.addSeparator();
+	file.addAction("Clear", [this]() { tab->RequestActive(UI::Request::Clear); });
 	file.addAction("Export", [this]() {tab->RequestActive(UI::Request::Export); });
 
 	windows.addAction("Properties", [this]() { OnProps(); });
@@ -92,6 +123,12 @@ void MainWindow::OnLoad()
 	if (proj_path.empty()) return;
 	proj_path = proj_path.make_preferred();
 	tab->LoadTab<SceneTab>(std::move(proj_path), proj_path.filename().string().c_str(), property_dock, QSize(256, 256));
+}
+
+void MainWindow::OnNew()
+{
+	CreationDialog* a = new CreationDialog;
+	a->exec();
 }
 
 void MainWindow::OnCreateNode()

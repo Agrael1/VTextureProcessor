@@ -23,6 +23,7 @@ public:
 		property_dock.show();
 	}
 	void OnLoad();
+	void OnNew();
 	void OnCreateNode();
 	void OnLoadNode();
 private:

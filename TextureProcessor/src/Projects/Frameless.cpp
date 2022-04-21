@@ -101,6 +101,9 @@ void FrameLess::MouseRealese(QMouseEvent* e)
 */
 void FrameLess::MouseMove(QMouseEvent* e)
 {
+	if (!(e->buttons() & Qt::MouseButton::LeftButton))
+		return;
+
 	if (cursor_edge == Edge::None)
 	{
 		target.move(target.pos() + e->globalPos() - last_pos);
