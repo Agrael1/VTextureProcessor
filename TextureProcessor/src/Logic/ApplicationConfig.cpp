@@ -31,6 +31,7 @@ void ApplicationConfig::Write()
 	fs::path cache{ filename.c_str() };
 	std::basic_fstream<char16_t> f;
 	f.open(cache, std::ios::out);
+	if (!f.is_open())return;
 	f << last_proj_folder << '\n';
 	f.close();
 }

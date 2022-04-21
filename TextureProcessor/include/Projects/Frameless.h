@@ -43,8 +43,7 @@ namespace UI
 		bool bLBPress = false;
 		Edge cursor_edge = Edge::None;
 
-		static constexpr int border_width = 5;
+		static constexpr int border_width = 7;
 	};
-
 }
 

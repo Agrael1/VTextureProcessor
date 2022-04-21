@@ -1,19 +1,18 @@
 #include <Projects/CreatePage.h>
 #include <QFileDialog>
 #include <QApplication>
-#include <filesystem>
 #include <utils/utils.h>
 
 #include <UI/ProjectEvent.h>
 
 namespace fs = std::filesystem;
 
-UI::CreatePage::CreatePage(QWidget* app)
+UI::CreatePage::CreatePage()
 	: name(u"New Project"_qs)
 	, project_name(u"Project Name"_qs)
 	, project_folder(u"Project Folder"_qs)
 	, search(u"..."_qs)
-	, cancel(u"Cancel"_qs), create(u"Create"_qs), parent(app)
+	, cancel(u"Cancel"_qs), create(u"Create"_qs)
 	, tex_size(u"Texture Dimensions"_qs)
 	, lock(locked, "")
 {
@@ -97,12 +96,15 @@ void UI::CreatePage::OnCreateClicked(bool checked)
 {
 	fs::path p{ pfolder.text().toStdU16String() };
 	p = (p / pname.text().toStdU16String()).replace_extension(ver::proj_ext.c_str());
-	QApplication::postEvent(parent, new ProjectEvent(std::move(p), { xwidth.text().toInt(), xheight.text().toInt() }));
+	emit CreateClicked({
+		std::move(p),
+		{ xwidth.text().toInt(), xheight.text().toInt() }
+		});
 }
 
 void UI::CreatePage::OnCancelClicked(bool checked)
 {
-	QApplication::postEvent(parent, new NewProjEvent(NewProjEvent::Type::Back));
+	emit CancelClicked();
 }
 
 void UI::CreatePage::OnLink(bool checked)

@@ -41,7 +41,7 @@ void SceneTab::SaveAs()
 		nullptr,
 		"Create new project",
 		"",
-		ver::proj_filter.c_str()
+		ver::proj_filter
 	).toStdString() };
 
 	if (proj_path.empty()) return;

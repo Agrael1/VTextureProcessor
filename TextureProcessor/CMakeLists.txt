@@ -38,7 +38,7 @@ FetchContent_MakeAvailable(optimizer)
 file(GLOB_RECURSE vsrc "src/*.cpp")
 file(GLOB_RECURSE vhead "include/*.h" "include/*.hpp")
 
-add_executable (TextureProcessor "${vsrc}" "${vhead}" "resources/resources.qrc" "include/Logic/ParameterStorage.h" "include/Projects/CreatePage.h")
+add_executable (TextureProcessor "${vsrc}" "${vhead}" "resources/resources.qrc")
 
 target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt6Widgets_INCLUDE_DIRS}")
 target_include_directories("${PROJECT_NAME}" PUBLIC "${Qt6Widgets_INCLUDE_DIRS}")

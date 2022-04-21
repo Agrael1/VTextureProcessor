@@ -101,7 +101,7 @@ void UI::Windows::EditorTab::SaveAs()
 	nullptr,
 	QStringLiteral("Save Node As"),
 	"",
-	ver::node_filter.c_str()).toStdString() };
+	ver::node_filter).toStdString() };
 
 	if (proj_path.empty()) return;
 

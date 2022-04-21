@@ -4,8 +4,9 @@
  * @brief Custom event for application
  */
 #pragma once
-#include <filesystem>
+#include <Projects/ProjectDescriptor.h>
 #include <QEvent>
+
 
 namespace UI
 {
@@ -16,15 +17,8 @@ namespace UI
 	};
 
 	struct ProjectEvent : public VEvent<1> {
-		std::filesystem::path projPath;
-		QSize size;
-
-		ProjectEvent(std::filesystem::path&& projPath, QSize size)
-			:projPath(std::move(projPath)), size(size) {}
-	};
-	struct NewProjEvent : public VEvent<2> {
-		enum class Type { Forward, Back }ty;
-		NewProjEvent(Type ty = Type::Forward) :ty(ty) {}
+		ProjectDescriptor pd;
+		ProjectEvent(ProjectDescriptor pd):pd(pd) {}
 	};
 	struct NameChangedEvent : public VEvent<3> {
 		QString name;

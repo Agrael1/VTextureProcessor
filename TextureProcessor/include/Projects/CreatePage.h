@@ -6,23 +6,21 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QValidator>
+#include <Projects/ProjectDescriptor.h>
 
-
-
-
-class ApplicationConfig;
 
 namespace UI
 {
 	class CreatePage : public QWidget
 	{
+		Q_OBJECT
 	private:
-		static constexpr auto proj_def_name = ver::project<"TextureProject">();
+		static constexpr auto proj_def_name = ver::project<u"TextureProject">();
 		static constexpr auto size_min = 16u;
 		static constexpr auto size_min_s = ver::u16int2str<size_min>();
 		static constexpr auto size_std_s = ver::u16int2str<256>();
 	public:
-		CreatePage(QWidget* app);
+		CreatePage();
 	protected:
 		void OnCreateClicked(bool checked);
 		void OnCancelClicked(bool checked);
@@ -32,8 +30,10 @@ namespace UI
 		void OnHeightEChanged();
 		void OnWidthChanged(const QString& text);
 		void OnHeightChanged(const QString& text);
+	signals:
+		void CreateClicked(ProjectDescriptor desc);
+		void CancelClicked();
 	private:
-		QWidget* parent;
 		ApplicationConfig cfg;
 		QVBoxLayout lay;
 

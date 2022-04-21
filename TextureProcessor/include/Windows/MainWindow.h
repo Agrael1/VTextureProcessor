@@ -9,12 +9,12 @@
 
 #include <Windows/Properties.h>
 #include <Windows/TabRelay.h>
-
+#include <Projects/ProjectDescriptor.h>
 
 class MainWindow : public QMainWindow
 {
 public:
-	MainWindow(int32_t width, int32_t height, std::filesystem::path&& projPath, QSize resolution);
+	MainWindow(int32_t width, int32_t height, ProjectDescriptor desc);
 public:
 	void closeEvent(QCloseEvent* event)override;
 

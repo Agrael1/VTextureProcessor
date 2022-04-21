@@ -17,7 +17,7 @@ App::App(int &xargc, char** xargv)
 	:app(xargc, xargv), window{false}
 {
     // Basic setup of the application
-	QCoreApplication::setApplicationName(AppName);
+	QCoreApplication::setApplicationName(ver::app_name);
 	QCoreApplication::setApplicationVersion(AppVer);
 	app.setStyle(QStyleFactory::create(AppTheme));
     app.setWindowIcon(QIcon{ u":/tlr.ico"_qs });
@@ -43,7 +43,7 @@ App::App(int &xargc, char** xargv)
     QEvent::registerEventType(UI::ProjectEvent::etype);
 
     // Set window size
-    window.emplace<ProjectsWindow>(1280, 720, *this).show();
+    window.emplace<ProjectsWindow>(1280, 720, this).show();
 }
 
 /**
@@ -67,7 +67,7 @@ bool App::event(QEvent* e)
     // Handling of opening projects
     if (e->type() == UI::ProjectEvent::etype) {
         UI::ProjectEvent& proj = static_cast<UI::ProjectEvent&>(*e);
-        window.emplace<MainWindow>(1280, 720, std::move(proj.projPath),proj.size).showMaximized();
+        window.emplace<MainWindow>(1280, 720, std::move(proj.pd)).showMaximized();
         return true;
     }
     return QObject::event(e);

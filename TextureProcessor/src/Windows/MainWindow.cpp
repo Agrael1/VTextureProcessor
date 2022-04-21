@@ -1,6 +1,6 @@
 /**
  * @file Window.cpp
- * @author Ilya Doroshenko (xdoros01), David Černý (xcerny74)
+ * @author Ilya Doroshenko (xdoros01)
  * @brief Handles menubar actions
  */
 
@@ -12,7 +12,6 @@
 
 #include <Logic/Constants.h>
 #include <Logic/Engine.h>
-#include <UI/ProjectEvent.h>
 
 
 namespace fs = std::filesystem;
@@ -24,7 +23,7 @@ using namespace UI::Windows;
  * @param height of a window
  * @param xprojPath file project that is being worked upon
 */
-MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xprojPath, QSize resolution)
+MainWindow::MainWindow(int32_t width, int32_t height, ProjectDescriptor desc)
 	:file("File")
 	, windows("Windows")
 	, nodes("Nodes")
@@ -72,7 +71,7 @@ MainWindow::MainWindow(int32_t width, int32_t height, std::filesystem::path&& xp
 	toolbar.addSeparator();
 	toolbar.addAction(QIcon(":/build.png"), "Compile", [this]() {tab->RequestActive(UI::Request::Compile); });
 
-	tab->LoadTab<SceneTab>(std::move(xprojPath), xprojPath.filename().string().c_str(), property_dock, resolution);
+	tab->LoadTab<SceneTab>(std::move(desc.project_path), desc.project_path.filename().string().c_str(), property_dock, desc.pixel_size);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -87,7 +86,7 @@ void MainWindow::OnLoad()
 		nullptr,
 		"Open existing project",
 		"",
-		ver::proj_filter.c_str()
+		ver::proj_filter
 	).toStdString() };
 
 	if (proj_path.empty()) return;
@@ -105,7 +104,7 @@ void MainWindow::OnLoadNode()
 		nullptr,
 		"Open existing node",
 		"nodes",
-		ver::node_filter.c_str()
+		ver::node_filter
 	).toStdString() };
 
 	if (node_path.empty()) return;

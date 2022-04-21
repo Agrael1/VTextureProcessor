@@ -6,7 +6,7 @@
 #pragma once
 #include <QApplication>
 #include <Windows/MainWindow.h>
-#include <Windows/ProjectsWindow.h>
+#include <Projects/ProjectsWindow.h>
 #include <Logic/ApplicationConfig.h>
 #include <variant>
 
@@ -25,5 +25,4 @@ private:
 private:
 	static constexpr ver::u16string_literal AppVer = u"0.6.0";
 	static constexpr ver::u16string_literal AppTheme = u"Fusion";
-	static constexpr ver::u16string_literal AppName = u"Veritas Texture Editor";
 };

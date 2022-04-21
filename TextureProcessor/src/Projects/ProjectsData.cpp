@@ -3,7 +3,7 @@
  * @author Ilya Doroshenko (xdoros01)
  * @brief Logic for projects window
  */
-#include <Logic/ProjectsData.h>
+#include <Projects/ProjectsData.h>
 #include <fstream>
 
 namespace fs = std::filesystem;
