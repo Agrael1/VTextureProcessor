@@ -32,6 +32,7 @@ private:
 
 	QMenu file;
 	QMenu windows;
+	QMenu project;
 	QMenu nodes;
 	QMenu view;
 };

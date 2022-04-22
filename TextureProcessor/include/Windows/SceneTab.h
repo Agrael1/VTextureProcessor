@@ -2,6 +2,7 @@
 #include <Windows/Tab.h>
 #include <UI/FlowView.h>
 #include <UI/FlowScene.h>
+#include <Projects/ProjectDescriptor.h>
 
 namespace UI::Windows
 {
