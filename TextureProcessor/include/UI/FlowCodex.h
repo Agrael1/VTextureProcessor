@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <map>
 #include <memory>
 #include <QString>
 
@@ -29,6 +30,6 @@ namespace UI
 		void ParseJson(const QJsonDocument& json);
 	private:
 		std::unordered_map<std::string, std::unique_ptr<ver::Descriptor>> codex;
-		std::unordered_map<QString, std::vector<std::string_view>> cats;
+		std::map<QString, std::vector<std::string_view>> cats;
 	};
 }

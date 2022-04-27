@@ -1,0 +1,50 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Filters",
+    "Name": "Gaussian Blur",
+    "Properties": [
+        {
+            "CName": "_radius",
+            "Tag": "Radius",
+            "Type": "float",
+            "Val": {
+                "default": 0.10000000149011612,
+                "max": 1,
+                "min": 0
+            }
+        },
+        {
+            "CName": "Directions",
+            "Type": "int",
+            "Val": {
+                "default": 12,
+                "max": 25,
+                "min": 1
+            }
+        },
+        {
+            "CName": "Quality",
+            "Type": "int",
+            "Val": {
+                "default": 12,
+                "max": 16,
+                "min": 1
+            }
+        }
+    ],
+    "Sinks": [
+        {
+            "Name": "input",
+            "Type": "Universal"
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "Out",
+            "Type": "Universal"
+        }
+    ],
+    "TitleColor": "#aa55ff",
+    "Value": "const float Pi = 6.28318530718;//pi * 2\n\nvoid main()\n{\n\tvec2 radius = vec2(_radius);\n    \tvec4 Color = texture2D( input, sv_texc);\n    \tfor( float d=0.0;d<Pi;d+=Pi/float(Directions) )\n    \t{\n        \tfor( float i=1.0/float(Quality);i<=1.0;i+=1.0/float(Quality) )\n        \t{\n                Color += texture2D( input, sv_texc+vec2(cos(d),sin(d))*radius*i);\n        \t}\n    \t}\n    \tColor /= float(Quality)*float(Directions)+1.0;\n    \tOut =  Color;\n}"
+}

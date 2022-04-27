@@ -4,7 +4,7 @@
 #include <QFileDialog>
 #include <Logic/Constants.h>
 #include <Logic/Engine.h>
-#include <QSaveFile>
+#include <QMessageBox>
 
 #include <optimizer/optimizer.h>
 
@@ -80,8 +80,21 @@ void UI::Windows::SceneTab::MakeShader()
 	f.open(proj_path, std::ios::out);
 	if (!f.is_open()) return;
 
+	auto shader = u"#version 420\n"_qs + scene.MakeShader();
+	QOpenGLShader sh{ QOpenGLShader::Fragment };
+	if (!sh.compileSourceCode(shader))
+		QMessageBox::critical(nullptr, u"Shader Compiler Error"_qs,
+			u"Shader failed to compile, check custom nodes implementations for errors."_qs);
+
+	auto i = QMessageBox::information(nullptr, u"Optimize?"_qs, u"Should shader be optimized?"_qs, QMessageBox::StandardButton::Yes, QMessageBox::StandardButton::No);
+	if (i == QMessageBox::StandardButton::No)
+	{
+		f << shader.toStdString();
+		return;
+	}
+
 	Optimizer o;
-	auto resource = o.Optimize("#version 420\n" + scene.MakeShader().toStdString(), xShaderStage::MESA_SHADER_FRAGMENT, 420);
+	auto resource = o.Optimize(shader.toStdString(), xShaderStage::MESA_SHADER_FRAGMENT, 420);
 	if (!o.Failed()) { f << resource; return; }
 	qDebug() << o.GetLog().c_str();
 }

@@ -29,8 +29,10 @@ Editor::Editor()
 	font_szbox.setValidator(&value_range);
 	font_szbox.setStyleSheet(szbox_ss.data());
 	font_szbox.addItems({ "20 %", "50 %","70 %", "100 %", "150 %", "200 %", "400 %" });
+
 	connect(font_szbox.lineEdit(), &QLineEdit::editingFinished, this, &Editor::ParseFontSize);
 	connect(&font_szbox, &QComboBox::currentTextChanged, this, &Editor::SelectFontSize);
+
 	font_szbox.setEditText(QString{ std::format("{} %", font_defc).data() });
 
 	sbar.addWidget(&font_szbox);

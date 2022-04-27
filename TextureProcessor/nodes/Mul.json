@@ -1,0 +1,36 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Operations",
+    "Name": "Multiply",
+    "Properties": [
+        {
+            "CName": "_mul",
+            "Tag": "Multiplier",
+            "Type": "float",
+            "Val": {
+                "default": 1,
+                "max": 1,
+                "min": 0
+            }
+        }
+    ],
+    "Sinks": [
+        {
+            "Name": "In1",
+            "Type": "Universal"
+        },
+        {
+            "Name": "In2",
+            "Type": "Universal"
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "Out",
+            "Type": "Universal"
+        }
+    ],
+    "TitleColor": "#005500",
+    "Value": "void main()\n{\n\tvec3 t1 = texture2D(In1, sv_texc).rgb;\n\tvec3 t2 = texture2D(In2, sv_texc).rgb;\n\tOut = vec4((t2*t1*_mul), 1.0);\n}"
+}

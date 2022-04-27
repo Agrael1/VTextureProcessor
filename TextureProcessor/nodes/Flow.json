@@ -1,0 +1,46 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Noises",
+    "Name": "Perlin Noise",
+    "Properties": [
+        {
+            "CName": "scale",
+            "Tag": "Scale",
+            "Type": "float",
+            "Val": {
+                "default": 5,
+                "max": 256,
+                "min": 1
+            }
+        },
+        {
+            "CName": "_seed",
+            "Tag": "Seed",
+            "Type": "float",
+            "Val": {
+                "default": 1,
+                "max": 500,
+                "min": -500
+            }
+        },
+        {
+            "CName": "angle",
+            "Tag": "Angle",
+            "Type": "float",
+            "Val": {
+                "default": 0,
+                "max": 10,
+                "min": 0
+            }
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "Out",
+            "Type": "Grayscale"
+        }
+    ],
+    "TitleColor": "#0055ff",
+    "Value": "//https://www.shadertoy.com/view/MtcGRl\nvec2 GetGradient(vec2 intPos, float t) {\n    // Uncomment for calculated rand\n    float rand = fract(sin(dot(intPos, vec2(12.9898, 78.233))) * _seed * 437.585453);\n    \n    // Rotate gradient: random starting rotation, random rotation rate\n    float angle = 6.283185 * rand + 4.0 * t * rand;\n    return vec2(cos(angle), sin(angle));\n}\n\n\nfloat Pseudo3dNoise(vec3 pos) {\n    vec2 i = floor(pos.xy);\n    vec2 f = pos.xy - i;\n    vec2 blend = f * f * (3.0 - 2.0 * f);\n    float noiseVal = \n        mix(\n            mix(\n                dot(GetGradient(i + vec2(0, 0), pos.z), f - vec2(0, 0)),\n                dot(GetGradient(i + vec2(1, 0), pos.z), f - vec2(1, 0)),\n                blend.x),\n            mix(\n                dot(GetGradient(i + vec2(0, 1), pos.z), f - vec2(0, 1)),\n                dot(GetGradient(i + vec2(1, 1), pos.z), f - vec2(1, 1)),\n                blend.x),\n        blend.y\n    );\n    return noiseVal / 0.7; // normalize to about [-1..1]\n}\n\n\nvoid main() {\n\tvec2 uv = sv_texc*scale;\n\tfloat noiseVal = 0.5 + 0.5 * Pseudo3dNoise(vec3(uv, angle));\n\tOut = vec4(vec3(noiseVal), 1.0);\n}"
+}

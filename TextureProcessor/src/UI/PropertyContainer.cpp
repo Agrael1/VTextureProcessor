@@ -282,7 +282,7 @@ void UI::Editor::Init()
 	type.connect(&type, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index)
 		{
 			edit.show();
-			editor = make_widget(ver::dc::Type(type.currentIndex()), opt);
+			editor = make_widget(ver::dc::Type(type.currentIndex()), nullptr);
 			opt = nullptr;
 		});
 	auto xlineA = new QFrame;

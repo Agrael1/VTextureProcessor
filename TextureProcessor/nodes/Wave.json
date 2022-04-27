@@ -1,0 +1,66 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Shapes",
+    "Name": "Wave",
+    "Properties": [
+        {
+            "CName": "_a",
+            "Tag": "Angle",
+            "Type": "float",
+            "Val": {
+                "default": 0,
+                "max": 1,
+                "min": 0
+            }
+        },
+        {
+            "CName": "_p",
+            "Tag": "Periods",
+            "Type": "float",
+            "Val": {
+                "default": 1,
+                "max": 10,
+                "min": 0
+            }
+        },
+        {
+            "CName": "_hd",
+            "Tag": "Horizontal Displacement",
+            "Type": "float",
+            "Val": {
+                "default": 0,
+                "max": 1,
+                "min": 0
+            }
+        },
+        {
+            "CName": "_vd",
+            "Tag": "Vertical Displacement",
+            "Type": "float",
+            "Val": {
+                "default": 0,
+                "max": 2,
+                "min": -2
+            }
+        },
+        {
+            "CName": "_m",
+            "Tag": "Multiplier",
+            "Type": "float",
+            "Val": {
+                "default": 1,
+                "max": 10,
+                "min": 0
+            }
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "_out",
+            "Type": "Grayscale"
+        }
+    ],
+    "TitleColor": "#005500",
+    "Value": "#define PI 3.14159265359\nmat2 rotate(float r){\n\tfloat a = sin(r);\n\tfloat b = cos(r);\n    \treturn mat2(b,-a,\n\t\t\ta,b);\n}\n\nvoid main(){\n\tvec2 st = sv_texc;\n\tst -= vec2(0.5);\n\tst = rotate(_a*PI) * st;\n\tst += vec2(0.5);\n\n\tvec2 c = st;\n\tfloat f = (sin((c.x+_hd)*2*PI*_p)+_vd)*_m;\n\t_out = vec4(vec3(f),1.0);\n}"
+}
