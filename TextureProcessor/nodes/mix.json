@@ -1,0 +1,36 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Operations",
+    "Name": "Mix",
+    "Properties": [
+        {
+            "CName": "_v",
+            "Tag": "Value",
+            "Type": "float",
+            "Val": {
+                "default": 0.5,
+                "max": 1,
+                "min": 0
+            }
+        }
+    ],
+    "Sinks": [
+        {
+            "Name": "_in1",
+            "Type": "Universal"
+        },
+        {
+            "Name": "_in2",
+            "Type": "Universal"
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "_out",
+            "Type": "Universal"
+        }
+    ],
+    "TitleColor": "#005500",
+    "Value": "void main()\n{\n    _out = mix(texture2D(_in1, sv_texc), texture2D(_in2, sv_texc), _v);\n}\n"
+}

@@ -65,6 +65,11 @@ void FlowView::contextMenuEvent(QContextMenuEvent* event)
 	QApplication::postEvent(scene(), new SceneEvent(*event, mapToScene(event->pos())));
 }
 
+void UI::FlowView::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	QApplication::postEvent(scene(), new SceneMouseEvent(*event, mapToScene(event->pos())));
+}
+
 /**
  * @brief Scales up view and checks for limit
  *

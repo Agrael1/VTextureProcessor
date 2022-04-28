@@ -18,6 +18,7 @@ namespace UI
 	private:
 		void wheelEvent(QWheelEvent* event) override;
 		void contextMenuEvent(QContextMenuEvent* event)override;
+		void mouseDoubleClickEvent(QMouseEvent* event)override;
 		void scaleUp();
 		void scaleDown();
 	};

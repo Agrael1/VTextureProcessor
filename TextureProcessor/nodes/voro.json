@@ -1,0 +1,43 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Noises",
+    "Name": "Voronoise",
+    "Properties": [
+        {
+            "CName": "sc",
+            "Tag": "Scale",
+            "Type": "float",
+            "Val": {
+                "default": 6,
+                "min": 0
+            }
+        },
+        {
+            "CName": "_v",
+            "Tag": "Variation",
+            "Type": "float",
+            "Val": {
+                "default": 0.5,
+                "max": 2,
+                "min": 0
+            }
+        },
+        {
+            "CName": "seed",
+            "Tag": "Seed",
+            "Type": "float",
+            "Val": {
+                "default": 100
+            }
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "_out",
+            "Type": "Grayscale"
+        }
+    ],
+    "TitleColor": "#0055ff",
+    "Value": "#define PI 3.14159265359\nvec3 hash3( vec2 p )\n{\n    vec3 q = vec3( dot(p,vec2(127.1,311.7)), \n\t\t\t\t   dot(p,vec2(269.5,183.3)), \n\t\t\t\t   dot(p,vec2(419.2,371.9)) );\n\treturn fract(sin(q)* seed * 437.585453);\n}\n\nfloat voronoise( in vec2 p, float u, float v )\n{\n\tfloat k = 1.0+63.0*pow(1.0-v,6.0);\n\n    vec2 i = floor(p);\n    vec2 f = fract(p);\n    \n\tvec2 a = vec2(0.0,0.0);\n    for( int y=-2; y<=2; y++ )\n    for( int x=-2; x<=2; x++ )\n    {\n        vec2  g = vec2( x, y );\n\t\tvec3  o = hash3( i + g )*vec3(u,u,1.0);\n\t\tvec2  d = g - f + o.xy;\n\t\tfloat w = pow( 1.0-smoothstep(0.0,1.414,length(d)), k );\n\t\ta += vec2(o.z*w,w);\n    }\n\t\n    return a.x/a.y;\n}\n\nvoid main()\n{\n\tvec2 uv = sv_texc;\n\n    vec2 p = 0.5 - 0.5*cos(PI*_v*vec2(1.0,0.5) );\n\t\n\tp = p*p*(3.0-2.0*p);\n\tp = p*p*(3.0-2.0*p);\n\tp = p*p*(3.0-2.0*p);\n\t\n\tfloat f = voronoise( sc*uv, p.x, p.y );\n\t\n\t_out = vec4( f, f, f, 1.0 );\n}"
+}

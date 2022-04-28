@@ -1,0 +1,46 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Noises",
+    "Name": "Solid Color",
+    "Properties": [
+        {
+            "CName": "_r",
+            "Tag": "Red",
+            "Type": "int",
+            "Val": {
+                "default": 0,
+                "max": 255,
+                "min": 0
+            }
+        },
+        {
+            "CName": "_g",
+            "Tag": "Green",
+            "Type": "int",
+            "Val": {
+                "default": 0,
+                "max": 255,
+                "min": 0
+            }
+        },
+        {
+            "CName": "_b",
+            "Tag": "Blue",
+            "Type": "int",
+            "Val": {
+                "default": 0,
+                "max": 255,
+                "min": 0
+            }
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "_o",
+            "Type": "Color"
+        }
+    ],
+    "TitleColor": "#0055ff",
+    "Value": "void main()\n{\n\t_o = vec4(float(_r)/255.,\n\tfloat(_g)/255.,\n\tfloat(_b)/255.,1.0);\n}"
+}
