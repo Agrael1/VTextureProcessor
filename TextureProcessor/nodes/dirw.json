@@ -1,0 +1,55 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Filters",
+    "Name": "Directional warp",
+    "Properties": [
+        {
+            "CName": "_d",
+            "Tag": "Direction",
+            "Type": "vec2",
+            "Val": {
+                "default": [
+                    1,
+                    0
+                ],
+                "max": [
+                    1,
+                    1
+                ],
+                "min": [
+                    -1,
+                    -1
+                ]
+            }
+        },
+        {
+            "CName": "_p",
+            "Tag": "Power",
+            "Type": "float",
+            "Val": {
+                "default": 0.009999999776482582,
+                "max": 0.20000000298023224,
+                "min": 0
+            }
+        }
+    ],
+    "Sinks": [
+        {
+            "Name": "_in",
+            "Type": "Universal"
+        },
+        {
+            "Name": "_v",
+            "Type": "Grayscale"
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "_out",
+            "Type": "Universal"
+        }
+    ],
+    "TitleColor": "#aa55ff",
+    "Value": "void main()\n{\n\tvec2 a = texture2D(_v, sv_texc).xy;\n\tvec2 dir = normalize(_d);\n\t_out = texture2D(_in, sv_texc + a*(_p*dir));\n}"
+}

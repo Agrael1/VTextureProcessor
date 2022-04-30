@@ -1,0 +1,34 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Filters",
+    "Name": "Compare",
+    "Properties": [
+        {
+            "CName": "_b",
+            "Tag": "Below",
+            "Type": "bool",
+            "Val": {
+                "default": false
+            }
+        }
+    ],
+    "Sinks": [
+        {
+            "Name": "_in",
+            "Type": "Grayscale"
+        },
+        {
+            "Name": "_val",
+            "Type": "Grayscale"
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "_out",
+            "Type": "Grayscale"
+        }
+    ],
+    "TitleColor": "#aa55ff",
+    "Value": "void main()\n{\n\tvec4 i = texture2D(_in, sv_texc);\n\tvec4 v = texture2D(_val, sv_texc);\n\tif(_b)\n\t\t_out = max(v, i);\n\telse\n\t\t_out = min(v, i);\n}"
+}
