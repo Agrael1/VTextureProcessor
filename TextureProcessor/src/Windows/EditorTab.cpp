@@ -257,6 +257,10 @@ void UI::Windows::EditorTab::Compile()
 
 	timerEvent(nullptr);
 }
+void UI::Windows::EditorTab::resizeEvent(QResizeEvent* event)
+{
+	docker.resize(event->size());
+}
 void UI::Windows::EditorTab::Request(UI::Request rq)
 {
 	switch (rq)

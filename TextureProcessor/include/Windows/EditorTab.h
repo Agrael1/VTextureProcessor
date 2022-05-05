@@ -54,6 +54,7 @@ namespace UI::Windows
 		void Init(Properties& props)noexcept;
 		void SetCBufInfo();
 		void Compile();
+		void resizeEvent(QResizeEvent* event)override;
 	private:
 		ads::CDockManager docker;
 		TableProperties tp;
