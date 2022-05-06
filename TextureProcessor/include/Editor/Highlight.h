@@ -25,4 +25,5 @@ private:
 	std::unordered_set<std::wstring> macros;
 	std::unordered_set<std::wstring> cbuf;
 	std::unordered_map<std::wstring, size_t> funcs;
+	static std::unordered_set<std::wstring_view> builtin_functions;
 };

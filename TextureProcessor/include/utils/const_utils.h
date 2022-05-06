@@ -86,7 +86,7 @@ namespace ver
 
 	consteval auto rgb_to_hex(uint8_t r, uint8_t g, uint8_t b)
 	{
-		ver::string_literal<7> str;
+		ver::u16string_literal<8> str;
 		str[0] = '#';
 		for (auto end = 2; end > 0; end--, r >>= 4)
 			str[end] = "0123456789abcdef"[r & 0x0f];

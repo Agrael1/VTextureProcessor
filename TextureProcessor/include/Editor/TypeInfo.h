@@ -12,8 +12,10 @@ namespace ver::detail
 		function,
 		str_lit,
 		macro_lit,
+		num_lit,
 		define,
 		cbuf,
+		builtin,
 		size
 	};
 }
