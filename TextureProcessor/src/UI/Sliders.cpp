@@ -37,8 +37,8 @@ UI::Matrix::Matrix(QMatrix4x4& value, const QString& name)
 		}
 }
 
-UI::IntSlider::IntSlider(int& value, const QString& name, int xmin, int xmax)
-	:valid(min, max), slider(Qt::Horizontal), min(xmin), max(xmax)
+UI::IntSlider::IntSlider(int& xvalue, const QString& name, int xmin, int xmax)
+	:valid(min, max), slider(Qt::Horizontal), min(xmin), max(xmax), value(xvalue)
 {
 	vl.setContentsMargins(0, 0, 0, 0);
 	lay.setContentsMargins(0, 0, 0, 0);
@@ -46,20 +46,23 @@ UI::IntSlider::IntSlider(int& value, const QString& name, int xmin, int xmax)
 
 	slider.setRange(min, max);
 	text.setValidator(&valid);
+
+	text.setText(QString::number(value));
+	slider.setValue(value);
+
 	connect(&text, &QLineEdit::textEdited,
-		[this, &value](const QString& v) {
+		[this](const QString& v) {
 			value = v.toInt();
 			slider.setValue(value);
 		});
 	connect(&slider, &QSlider::valueChanged,
-		[this, &value](int v) {
+		[this](int v) {
 			value = v;
 			text.setText(QString::number(value));
 			emit ValueChanged();
 		});
 
-	text.setText(QString::number(value));
-	slider.setValue(value);
+
 
 	// Set text size policy
 	QSizePolicy spText(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -85,6 +88,11 @@ void UI::IntSlider::SetMax(int xmax)
 {
 	slider.setRange(min, max = xmax);
 	valid.setTop(xmax);
+}
+
+void UI::IntSlider::Revalidate()
+{
+	slider.setValue(value);
 }
 
 UI::FloatSlider::FloatSlider(float& value, const QString& name, float xmin, float xmax)

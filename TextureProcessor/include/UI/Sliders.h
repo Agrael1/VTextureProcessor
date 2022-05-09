@@ -41,6 +41,7 @@ namespace UI
 	public:
 		void SetMin(int min);
 		void SetMax(int max);
+		void Revalidate();
 	private:
 		QVBoxLayout vl;
 		QHBoxLayout lay;
@@ -49,6 +50,7 @@ namespace UI
 		QIntValidator valid;
 		int min;
 		int max;
+		int& value;
 	};
 
 	class CheckBox : public AwareWidget

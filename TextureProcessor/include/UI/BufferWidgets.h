@@ -64,6 +64,7 @@ namespace UI
 			auto& x = opt.param.get<ver::dc::Type::Integer>();
 			if (opt.enable_min)SetMin(x.min);
 			if (opt.enable_max)SetMax(x.max);
+			Revalidate();
 		}
 	};
 	template<>

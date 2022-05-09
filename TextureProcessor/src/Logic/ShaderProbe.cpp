@@ -28,7 +28,7 @@ QString ver::ShaderProbe::MakeShader(std::span<UI::INode*> xoutputs)
 	shader += u"void main(){\n";
 	for (auto i : complex_vars)
 		shader += std::format("\t{} tmpvar_{} = {}_main(gl_FragCoord.xy);\n",
-			IsComplex(i) ? i : "vec4", i, i).c_str();
+			IsComplex(i) ? i.substr(0, i.find_last_of('_')) : "vec4", i, i).c_str();
 
 	for (auto* i : xoutputs)
 	{
