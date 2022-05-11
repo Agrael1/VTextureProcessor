@@ -1,0 +1,25 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Shapes",
+    "Name": "Tiles",
+    "Properties": [
+        {
+            "CName": "_sc",
+            "Tag": "Scale",
+            "Type": "float",
+            "Val": {
+                "default": 4,
+                "min": 0
+            }
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "_out",
+            "Type": "Grayscale"
+        }
+    ],
+    "TitleColor": "#aa0000",
+    "Value": "void main()\n{\n\tvec2 I = floor(sv_texc*_sc); \n\tbool vert = mod(I.x+I.y,2.)==0.;\n\tif (vert) \n\t\t_out = 1.-_out; \n\t_out *= vec4(.9,.85,.85,1);\n}"
+}

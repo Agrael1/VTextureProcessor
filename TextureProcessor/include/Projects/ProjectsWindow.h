@@ -18,7 +18,6 @@ protected:
 	void mouseMoveEvent(QMouseEvent* e)override;
 private:
 	QObject* app;
-	ProjectsData pdata;
 	
 	UI::Internal::FrameControl window;
 	UI::FrameLess f;
