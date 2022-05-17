@@ -1,0 +1,41 @@
+{
+    "Class": "Texture",
+    "FontColor": "#ffffff",
+    "Group": "Operations",
+    "Name": "Shift",
+    "Properties": [
+        {
+            "CName": "_d",
+            "Tag": "Direction",
+            "Type": "vec2",
+            "Val": {
+                "default": [
+                    0,
+                    0
+                ],
+                "max": [
+                    1,
+                    1
+                ],
+                "min": [
+                    -1,
+                    -1
+                ]
+            }
+        }
+    ],
+    "Sinks": [
+        {
+            "Name": "_in",
+            "Type": "Universal"
+        }
+    ],
+    "Sources": [
+        {
+            "Name": "_out",
+            "Type": "Universal"
+        }
+    ],
+    "TitleColor": "#005500",
+    "Value": "void main()\n{\n\t_out = texture2D(_in, mod(sv_texc + _d, 1.0));\n}"
+}

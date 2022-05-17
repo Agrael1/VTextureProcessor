@@ -1,0 +1,213 @@
+{
+    "Connections": [
+        {
+            "Sink": [
+                "Mix_1",
+                1
+            ],
+            "Source": [
+                "Multiply_1",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Output_0",
+                0
+            ],
+            "Source": [
+                "Voronoi_1",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Output_1",
+                0
+            ],
+            "Source": [
+                "Voronoi_1",
+                1
+            ]
+        },
+        {
+            "Sink": [
+                "Multiply_2",
+                0
+            ],
+            "Source": [
+                "Fractional_Brownian_Motion_1",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Multiply_1",
+                0
+            ],
+            "Source": [
+                "Fractional_Brownian_Motion_2",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Voronoi_1",
+                0
+            ],
+            "Source": [
+                "Mix_1",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Multiply_2",
+                1
+            ],
+            "Source": [
+                "Solid_Color_1",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Multiply_1",
+                1
+            ],
+            "Source": [
+                "Solid_Color_2",
+                0
+            ]
+        },
+        {
+            "Sink": [
+                "Mix_1",
+                0
+            ],
+            "Source": [
+                "Multiply_2",
+                0
+            ]
+        }
+    ],
+    "Dimensions": [
+        256,
+        256
+    ],
+    "Nodes": [
+        {
+            "Buffer": {
+                "_d": true,
+                "_w": 2.440000057220459,
+                "sc": 6,
+                "seed": 14.880001068115234
+            },
+            "Name": "Voronoi_1",
+            "Position": [
+                -562,
+                -44
+            ],
+            "Type": "Voronoi"
+        },
+        {
+            "Buffer": {
+                "_v": 0.5
+            },
+            "Name": "Mix_1",
+            "Position": [
+                -785,
+                42
+            ],
+            "Type": "Mix"
+        },
+        {
+            "Buffer": {
+                "_b": 0,
+                "_g": 0,
+                "_r": 255
+            },
+            "Name": "Solid_Color_2",
+            "Position": [
+                -1238,
+                244
+            ],
+            "Type": "Solid Color"
+        },
+        {
+            "Buffer": {
+                "_s": 7.940000057220459,
+                "seed": 7.439998626708984
+            },
+            "Name": "Fractional_Brownian_Motion_1",
+            "Position": [
+                -1220,
+                -245
+            ],
+            "Type": "Fractional Brownian Motion"
+        },
+        {
+            "Buffer": {
+                "_s": 7.299999713897705,
+                "seed": 100
+            },
+            "Name": "Fractional_Brownian_Motion_2",
+            "Position": [
+                -1234,
+                109
+            ],
+            "Type": "Fractional Brownian Motion"
+        },
+        {
+            "Buffer": {
+                "_b": 0,
+                "_g": 255,
+                "_r": 0
+            },
+            "Name": "Solid_Color_1",
+            "Position": [
+                -1196,
+                -61
+            ],
+            "Type": "Solid Color"
+        },
+        {
+            "Buffer": {
+                "_mul": 1
+            },
+            "Name": "Multiply_1",
+            "Position": [
+                -1011,
+                142
+            ],
+            "Type": "Multiply"
+        },
+        {
+            "Buffer": {
+                "_mul": 1
+            },
+            "Name": "Multiply_2",
+            "Position": [
+                -1003,
+                -143
+            ],
+            "Type": "Multiply"
+        },
+        {
+            "Name": "Output_0",
+            "Position": [
+                -308,
+                -81
+            ],
+            "Type": "Output"
+        },
+        {
+            "Name": "Output_1",
+            "Position": [
+                -305,
+                164
+            ],
+            "Type": "Output"
+        }
+    ]
+}
