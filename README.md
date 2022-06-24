@@ -1,7 +1,6 @@
 # Documentation of ICP project 2020/2021
 - Authors:
   - Ilya Doroshenko (xdoros01)
-  - David Černý (xcerny74)
 
 ## About
 The project implements a **heavily modified** version of the 2. project variant
@@ -9,8 +8,8 @@ The project implements a **heavily modified** version of the 2. project variant
 editors in 3D modeling software.
 
 ## Requirements
-- *Qt* version **5.12**+
-- *cmake* version **3.16**+
+- *Qt* version **6.3.0+**
+- *cmake* version **3.18**+
 - *OpenGL* version **4.2**+
 
 ## Features
